@@ -1,0 +1,20 @@
+[
+  {
+    "check": "type",
+    "size": 44,
+    "line": 36,
+    "reason": "Headline L is 44px type on a 36px line in tokens.json (0.82x), so a wrapped headline is cramped. A Figma token: report to design (scorecard 02, #10). Needs a taller line height there."
+  },
+  {
+    "check": "type",
+    "size": 24,
+    "line": 24,
+    "reason": "Headline S is 24px on a 24px line (1.0x). Mic skipped keeps Headline S for its paragraph by the designer's decision (2026-10-12), and the mic primer uses it too. A Figma token."
+  },
+  {
+    "check": "type",
+    "size": 18,
+    "line": 20,
+    "reason": "The Headline XS Regular caption under the centered message titles is 18px on a 20px line (1.11x). A Figma token (TextBlock XL and L captions)."
+  }
+]

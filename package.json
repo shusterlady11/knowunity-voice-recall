@@ -16,7 +16,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "chromatic": "dotenv -e .env.local -- chromatic",
-    "test:unit": "vitest run --project unit"
+    "test:unit": "vitest run --project unit",
+    "check:render": "node scripts/check-render.mjs"
   },
   "dependencies": {
     "next": "16.3.5",

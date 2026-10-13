@@ -14,6 +14,7 @@ Next.js web prototype of Knowunity's voice active-recall feature (student speaks
 - Every screen is built from `scaffold`'s slots. `docs/design-system.md` §2.
 - All color/spacing/radius/type/motion values: `tokens/` (`tokens.json` is synced from Figma; `motion.json` is code-only). Usage rules: `docs/design-system.md`.
 - `npm run check` runs four checks and prints the file and line for each problem — run it after building or changing any component, and report findings before fixing what it finds: `check:tokens` (raw hex color in `src/components` or `src/app`), `check:fallbacks` (`var(--token, fallback)`), `check:generated` (`build/css/tokens.css` matches `npm run tokens`), `check:claude` (this file starts with `@AGENTS.md`).
+- `npm run check:render` walks every screen and state at 320, 390 and 430px in a real browser and checks overflow, contrast, tap targets, wrapped-text line height, that the mic and question card stay put, and that state changes reach the screen-reader live region. It starts the app itself if none is running and takes a couple of minutes, so it is not part of `npm run check`: run it after building or changing a screen, and report what it finds before fixing. Known, decided failures live in `scripts/check-render.known.json` with their reason; add to it only with the designer's say-so.
 - Naming: lowerCamelCase for components/props/tokens. `docs/design-system.md` §3 (legacy exceptions).
 - Contrast, touch-target, reduced-motion requirements. `docs/platform-constraints.md`.
 - Decisions already made: `docs/sprint-context.md` — check before re-deciding.
@@ -56,6 +57,7 @@ When working on UI, use the storybook tools to read the component library before
 - `docs/design-system.md` — component index, `scaffold` composition, naming conventions, Module 6 specs. Read before building or styling any screen.
 - `tokens/tokens.json` — color/spacing/radius/type values. Source of truth for every literal value in code. Synced from Figma; edit here, then run `npm run tokens`.
 - `tokens/motion.json` — duration, easing and opacity values (spinner, toggle, pulse). Code-only: Figma can't hold them, so keep them out of `tokens.json`, which a Figma sync can overwrite. Run `npm run tokens` after editing.
+- `scripts/check-render.mjs` — the phone-size render check (`npm run check:render`); `scripts/check-render.known.json` — its known, decided failures, each with a reason.
 - `style-dictionary.config.mjs` — Style Dictionary config; turns `tokens/*.json` into CSS variables.
 - `build/css/tokens.css` — generated CSS variables (`--color-interactive-primary` etc.). Tracked in git so a fresh clone builds.
 - `docs/platform-constraints.md` — canvas, touch, spacing, typography, contrast, a11y, performance, i18n rules. Read before writing any UI code.

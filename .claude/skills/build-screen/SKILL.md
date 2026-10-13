@@ -121,6 +121,7 @@ This is Next.js 16. Read the relevant guide in `node_modules/next/dist/docs/` be
 ## Check it
 
 - `npm run lint` and `npm run build` pass.
+- `npm run check:render` passes at 320, 390 and 430px (overflow, contrast, tap targets, wrapped-text line height, the mic and question card staying put, state changes reaching the live region). Report anything it finds before fixing it; only the designer adds an entry to `scripts/check-render.known.json`.
 - `npm run dev`, then open the screen at 390×844 by tapping through from the screen before it. Every state shows, every tap goes where SPEC.md says, and text renders in Inter.
 - The Storybook `test-run` MCP tool still passes, and so do any new component stories.
 - Screenshot the result next to the Figma frame, if there is one.

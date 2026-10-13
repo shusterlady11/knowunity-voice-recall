@@ -24,7 +24,7 @@ export function RecordingScreen({ n }: { n: number }) {
   const router = useRouter();
   // The same question as the screen before, so it stays put; it rises in only when opened fresh.
   const { animateIn, markShown } = useQuestionEnter(n);
-  const [hint, setHint] = useState('Listening… tap the mic when you’re done');
+  const [hint, setHint] = useState('Listening… tap the mic to finish');
   const [hintFading, setHintFading] = useState(false);
   const session = useSession();
   const xp = session?.xp ?? 0;
