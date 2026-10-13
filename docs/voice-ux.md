@@ -116,6 +116,17 @@ not a dead spinner,  see platform constraints) so the student knows their answer
 landed and an answer is coming. This matters doubly on the budget Android phones
 a lot of students use.
 
+### Blocked states, in general
+
+Principles 3 and 6 are two cases of one rule: any state that blocks the main path
+(mic denied or skipped, a slow judge, a take nobody could hear, anything
+unavailable) says four things. What happened. Why, in one clause. What the student
+can do now. How to undo it later. The fallback is presented as an equal way to do
+the same thing, never as the lesser option, and leaving is never presented as the
+alternative to the fallback (so "No thanks" next to "Continue" on a mic-off screen
+needs a label that says it ends the session). The same rule applies to a state
+added later.
+
 ---
 
 ## States to design: and what to actually build in 2.5 weeks

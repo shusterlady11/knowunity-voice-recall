@@ -57,7 +57,9 @@ Storybook is the only place to look for something to reuse. Most of the Figma li
 
 Don't stop to ask. Build it inside the screen, from tokens, and add a line to `docs/component-gaps.md`: what it was, and which screen it was for. Create the file if it doesn't exist.
 
-If the same thing is already on that list from another screen, build it properly as a component instead:
+Log it as you write it, not in the report at the end. This covers anything built by hand in a screen: a layout wrapper, an offset or negative margin, or a component used for a job other than its own (for example `TapToAnswer` showing a status). Before you write a rule, search the other screens' CSS for the same one; if it is already there, this is the second copy.
+
+If the same thing is already on that list from another screen, or already written in another screen's CSS, build it properly as a component or a Scaffold slot instead:
 - a folder in `src/components/<lowerCamelName>/` with its CSS and a story
 - props named as in Figma
 - the Figma description in the story docs
@@ -86,6 +88,29 @@ Build every state SPEC.md lists for the screen, including the failure ones ("did
 
 Wire every button, toggle and close to the destination in the screen's actions table. A button that leads nowhere means the screen isn't finished. If the destination is a screen that isn't built yet, say so in the report as unfinished, rather than calling the screen done. Every required action has a way out or a non-voice fallback: never trap the student.
 
+### 10. Every state is said and named
+
+When you add a state, add two things in the same change, not later:
+- **Its sentence:** every change a sighted student sees is also said, as a full sentence, through the one live region (`announce()`), including opening and closing a sheet, a new screen, and a switch between voice and typing.
+- **Its name:** every control's accessible name says what it does in its current state. A button that starts a take and then ends it is "Record answer", then "Stop and send answer". A graphic that shows a number carries the number in its label.
+
+Check it in the running app: after each tap, read the live region's text.
+
+### 11. Say each thing once
+
+Each fact appears once on a screen, in the one element best suited to carry it. Before you add a number, label, icon or sentence, look at what the screen already says. If something says it, remove one of the two; do not style them differently to make both look needed. Common repeats: a count in a ring and in the headline, an icon that repeats its card's color, a card that says "tap the mic" above a caption that says it too, a confirm sheet and the screen after it both saying "saved".
+
+### 12. Put it next to its neighbors
+
+Before you call a screen done, look at it beside the screen that leads to it and the one that follows:
+- It is not louder than the screen before it (saturated fills, big areas, type weight), unless it is the one peak the flow builds toward, and then through one element.
+- The mic, the primary action and the toggle sit at the same coordinates as on the neighbors. If states differ in height, the content moves, not the control.
+- Read the copy aloud across the screens as one script. Wording that wouldn't fit on the previous screen gets rewritten. If it comes from Figma, report it instead.
+
+### 13. Blocked states tell the way through
+
+Any state that blocks the main path (mic denied or skipped, slow, can't hear, unavailable) says what happened, why in one clause, what the student can do now, and how to undo it later. It never presents the fallback as the lesser choice, and never presents leaving as the alternative to the fallback. See "Blocked states, in general" in `docs/voice-ux.md`.
+
 ## Next.js in this repo
 
 This is Next.js 16. Read the relevant guide in `node_modules/next/dist/docs/` before writing a page.
@@ -105,6 +130,7 @@ This is Next.js 16. Read the relevant guide in `node_modules/next/dist/docs/` be
 - **With a Figma frame:** list every difference between what you built and the frame: size, spacing, text, component or variant, and missing or extra elements. Give the reason for each difference, or say there is none.
 - **Without a frame:** list everything you had to decide that wasn't written down anywhere (SPEC.md, `docs/design-brief.md`, `docs/voice-ux.md`, `docs/sprint-context.md`).
 - **Always:**
+  - what you removed, moved or reworded because of steps 11 and 12, and any state whose sentence or name you added in step 10
   - what you added to `docs/component-gaps.md`
   - any button that goes to a screen not built yet
   - any state you couldn't make reachable
