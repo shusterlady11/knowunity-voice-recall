@@ -12,7 +12,7 @@ There is currently no icon instance-swap property — each variant's icon is har
 
 recordingGlow (the 4-ellipse halo, separate component) is not part of this button — it's a separate instance meant to sit behind micButton during Listening, composed independently so the two can animate on their own.
 
-**In code:** \`listeningState\` and \`interactionState\` use Figma's names and options, and the types don't allow the omitted listening + disabled combination. The button is a push-to-talk toggle named "Record answer": it reports whether it's listening to screen readers (pressed = listening), and a tap starts or stops recording. While disabled it is marked busy and unavailable but keeps keyboard focus, and taps are ignored. When pressed the bevel goes and the face sits 2px lower, as in Figma (\`Space/100\` top padding on the fixed frame centers the face), and a real press shows the same look. The icon takes \`accent/brand/bold\` at rest, \`accent/brand/subtle\` on the idle pressed fill (\`interactive/primaryActive\`), \`interactive/onListening\` on the coral listening fill (\`interactive/listening\`), \`interactive/onListeningActive\` on its pressed fill (\`interactive/listeningActive\`) and \`icon/disabled\` when disabled. The thinking dots use \`interactive/thinking\` (violet, because Knowie is the one thinking) and the fill is \`background/surface\` with the same 1px ring as disabled.
+**In code:** \`listeningState\` and \`interactionState\` use Figma's names and options, and the types don't allow the omitted listening + disabled combination. The button is a push-to-talk control: it is named "Record answer" and, while listening, "Stop and send answer" (the name carries the state, so there is no pressed flag), and a tap starts or stops recording. While disabled it is marked busy and unavailable but keeps keyboard focus, and taps are ignored. When pressed the bevel goes and the face sits 2px lower, as in Figma (\`Space/100\` top padding on the fixed frame centers the face), and a real press shows the same look. The icon takes \`accent/brand/bold\` at rest, \`accent/brand/subtle\` on the idle pressed fill (\`interactive/primaryActive\`), \`interactive/onListening\` on the coral listening fill (\`interactive/listening\`), \`interactive/onListeningActive\` on its pressed fill (\`interactive/listeningActive\`) and \`icon/disabled\` when disabled. The thinking dots use \`interactive/thinking\` (violet, because Knowie is the one thinking) and the fill is \`background/surface\` with the same 1px ring as disabled.
 
 **Size:** \`Control/Mic\` (96px) for both the outer frame and the visible circle. The circle is well above the touch-target minimum, so there's no separate tap area.
 
@@ -99,8 +99,8 @@ const meta = {
     if (interaction !== 'thinking') await expect(getComputedStyle(button).color).toBe(color(iconColor));
     else await expect(getComputedStyle(button.querySelector('.loadingDots__dot') as HTMLElement).backgroundColor).toBe(color('--color-interactive-thinking'));
 
-    await expect(button).toHaveAttribute('aria-pressed', listening === 'listening' ? 'true' : 'false');
-    await expect(button).toHaveAccessibleName('Record answer');
+    await expect(button).not.toHaveAttribute('aria-pressed');
+    await expect(button).toHaveAccessibleName(listening === 'listening' ? 'Stop and send answer' : 'Record answer');
 
     if (interaction === 'disabled' || interaction === 'thinking') {
       await expect(button).toHaveAttribute('aria-disabled', 'true');

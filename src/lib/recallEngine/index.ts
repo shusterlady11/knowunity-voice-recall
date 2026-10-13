@@ -86,6 +86,8 @@ export function feedbackFor(verdict: Verdict, covered: number[], hintsUsed: numb
 
 /** Fills a hint's {covered} and {total} with the covered count. */
 export function fillHint(hint: string, covered: number[], keyPointCount: number): string {
+  // With nothing covered, "You've got 0 of 3 key ideas." is the bluntest line there is, so the hint stands alone.
+  if (covered.length === 0) return hint.replace(/^[^.]*\{covered\}[^.]*\.\s*/, '');
   return hint.replace('{covered}', String(covered.length)).replace('{total}', String(keyPointCount));
 }
 

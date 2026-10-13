@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Scaffold } from '../../../../components/scaffold/Scaffold';
+import { AppBar } from '../../../../components/appBar/AppBar';
 import { MiddleSection } from '../../../../components/middleSection/MiddleSection';
 import { TapToAnswer } from '../../../../components/tapToAnswer/TapToAnswer';
 import { MicButton } from '../../../../components/micButton/MicButton';
@@ -14,7 +15,7 @@ import { defaultCode, scripts } from '../../../../content/scripts';
 import { combine, feedbackFor, judgeTake, verdictFor, xpFor, type Verdict } from '../../../../lib/recallEngine';
 import { announce } from '../../../../lib/announcer';
 import { durationMs } from '../../../../lib/motion';
-import { getSession, questionRecord, questionRoute, updateSession } from '../../../../lib/session';
+import { getSession, questionRecord, questionRoute, updateSession, useSession } from '../../../../lib/session';
 import { useQuestionEnter } from '../../../../lib/questionEnter';
 import { sendBackOnLoad } from '../../sendBackOnLoad';
 import './thinking.css';
@@ -29,6 +30,7 @@ export function ThinkingScreen({ n }: { n: number }) {
   const router = useRouter();
   // The same question as the screen before, so it stays put; it rises in only when opened fresh.
   const { animateIn, markShown } = useQuestionEnter(n);
+  const xp = useSession()?.xp ?? 0;
   const [message, setMessage] = useState<string | undefined>(undefined);
   const isLast = n === questions.length;
 
@@ -134,8 +136,13 @@ export function ThinkingScreen({ n }: { n: number }) {
 
   return (
     <Scaffold
-      // No app bar while Knowie thinks (Figma, 2026-10-12): it fades back in with the result.
-      showTopNavSlot={false}
+      // Hidden while Knowie thinks, but it keeps its height (decided 2026-10-12) so the question card doesn't
+      // move; it fades back in with the result.
+      topNavigation={
+        <div className="thinking__appBar" aria-hidden="true">
+          <AppBar progress={((n - 1) / questions.length) * 100} xp={xp} />
+        </div>
+      }
       middleContent={
         <div className="thinking__content">
           {/* No intro card once the student has answered, so Knowie's reply fits (decided 2026-10-04). */}

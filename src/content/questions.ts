@@ -34,7 +34,7 @@ export type Question = {
 export const idkTranscript = 'I don’t know.';
 
 /** What the result card says when a slow take gave up waiting (2026-10-12): the delay was ours, not the student's audio. */
-export const timedOut = 'That took longer than it should. Tap the mic to try again.';
+export const timedOut = 'That took longer than it should. Let’s try again.';
 
 export const topic = 'Cellular energetics';
 

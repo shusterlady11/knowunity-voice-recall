@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Scaffold } from '../../../../components/scaffold/Scaffold';
+import { AppBar } from '../../../../components/appBar/AppBar';
 import { MiddleSection } from '../../../../components/middleSection/MiddleSection';
 import { TapToAnswer } from '../../../../components/tapToAnswer/TapToAnswer';
 import { RecordingGlow } from '../../../../components/recordingGlow/RecordingGlow';
@@ -23,9 +24,10 @@ export function RecordingScreen({ n }: { n: number }) {
   const router = useRouter();
   // The same question as the screen before, so it stays put; it rises in only when opened fresh.
   const { animateIn, markShown } = useQuestionEnter(n);
-  const [hint, setHint] = useState('Listening…');
+  const [hint, setHint] = useState('Listening… tap the mic when you’re done');
   const [hintFading, setHintFading] = useState(false);
   const session = useSession();
+  const xp = session?.xp ?? 0;
   // The welcome card, if the student hasn't started answering before: it opens here still showing, then fades
   // while the question card slides up, once Knowie is listening (decided 2026-10-05).
   const showIntro = n === 1 && session !== null && session.introSeen !== true;
@@ -53,7 +55,7 @@ export function RecordingScreen({ n }: { n: number }) {
     markShown();
     // Saved as the question itself: reopening the app mid-take returns there.
     rememberRoute(`/q/${n}`);
-    announce('Listening for your answer.');
+    announce('Listening for your answer. Tap the mic when you’re done.');
     // Let the card draw once, then retire it, so it animates out rather than vanishing.
     let frame = requestAnimationFrame(() => {
       frame = requestAnimationFrame(() =>
@@ -81,9 +83,14 @@ export function RecordingScreen({ n }: { n: number }) {
 
   return (
     <Scaffold
-      // No app bar while listening (Figma, 2026-10-12): the progress, XP and the close X come back with the
-      // result, and the cancel X under the mic is the way out, so the student is never stuck here.
-      showTopNavSlot={false}
+      // The app bar is hidden while listening but keeps its height (decided 2026-10-12), so the question card
+      // doesn't jump when the student taps the mic. It fades back in with the result; the cancel X under the mic
+      // is the way out, so the student is never stuck here.
+      topNavigation={
+        <div className="recording__appBar" aria-hidden="true">
+          <AppBar progress={((n - 1) / questions.length) * 100} xp={xp} />
+        </div>
+      }
       middleContent={
         <div className="recording__content">
           <MiddleSection topic={topic} intro={intro} question={bold(questions[n - 1].prompt)} showIntro={showIntro} animateIn={animateIn} />

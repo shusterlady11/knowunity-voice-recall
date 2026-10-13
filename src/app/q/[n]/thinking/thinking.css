@@ -47,3 +47,9 @@
 .thinking__answer > .buttonIcon {
   margin-top: var(--space-600);
 }
+
+/* The app bar is invisible while Knowie thinks but still takes its room, so the question card doesn't move
+   (decided 2026-10-12). */
+.thinking__appBar {
+  visibility: hidden;
+}

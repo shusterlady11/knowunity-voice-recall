@@ -113,6 +113,10 @@ describe('hints', () => {
     expect(feedbackFor('notCaught', [], [], 3)).toEqual({ kind: 'notCaught' });
   });
 
+  it('leaves out the count sentence when nothing is covered', () => {
+    expect(fillHint('You’ve got {covered} of {total} key ideas. Think about the energy.', [], 3)).toBe('Think about the energy.');
+  });
+
   it('fills in the covered count', () => {
     expect(fillHint('You’ve got {covered} of {total} key ideas.', [1, 2], 3)).toBe('You’ve got 2 of 3 key ideas.');
   });

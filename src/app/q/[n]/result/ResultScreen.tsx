@@ -81,10 +81,10 @@ export function ResultScreen({ n }: { n: number }) {
     const card = saved.feedback ? feedbackText(saved.feedback, saved.covered ?? []) : undefined;
     announce(
       saved.feedback?.kind === 'timedOut'
-        ? timedOut
+        ? `${timedOut} Tap the mic to try again.`
         : saved.verdict === 'notCaught'
           ? verdictWord.notCaught
-          : `${verdictWord[saved.verdict]} You covered ${covered} of ${total} key ideas. ${card ?? ''}`.trim(),
+          : `${verdictWord[saved.verdict]} ${covered > 0 ? `You covered ${covered} of ${total} key ideas.` : ''} ${card ?? ''}`.replace(/\s+/g, ' ').trim(),
     );
   }, [n, total, router, markShown, feedbackText]);
 

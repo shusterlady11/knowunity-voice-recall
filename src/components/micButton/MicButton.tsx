@@ -26,13 +26,13 @@ export function MicButton({
 
   return (
     <button
-      aria-label="Record answer"
+      // While listening the same button ends the take, so its name says that instead of "Record answer".
+      aria-label={listeningState === 'listening' ? 'Stop and send answer' : 'Record answer'}
       {...rest}
       type={type}
       className="micButton"
       data-listening-state={listeningState}
       data-interaction-state={interactionState}
-      aria-pressed={listeningState === 'listening'}
       aria-disabled={isDisabled || undefined}
       aria-busy={isDisabled || undefined}
       onClick={isDisabled ? undefined : onClick}

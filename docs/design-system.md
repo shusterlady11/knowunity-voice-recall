@@ -175,7 +175,8 @@ legacy one.
   heading — capitals are for proper nouns and acronyms only (XP, DNA),
   never for emphasis or because a mock somewhere used Title Case. That
   includes uppercase text-case styling: a label typed in sentence case
-  but displayed in all caps still breaks this rule.
+  but displayed in all caps still breaks this rule. One exception, decided 2026-10-12: "Add to Home Screen" on the entry
+  link's install steps keeps its capitals, because it is the name of the iOS menu item the student has to find.
 - **Never put a hue or lightness word in a semantic name.** Words for
   what a color *is* ("violet," "light," "dark," "LightVersion") belong in
   the primitive layer only (`color/violet/500`, not

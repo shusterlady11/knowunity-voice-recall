@@ -61,3 +61,9 @@
 .recording__answer > .buttonIcon {
   margin-top: var(--space-600);
 }
+
+/* The app bar is invisible while listening but still takes its room, so the question card stays where it was
+   on the question screen (decided 2026-10-12). visibility also keeps it out of the tab order. */
+.recording__appBar {
+  visibility: hidden;
+}

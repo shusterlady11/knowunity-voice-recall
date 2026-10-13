@@ -112,11 +112,11 @@ It follows the same pattern as the Storybook story "BottomSheet › Mic permissi
 
 - **States:** one: listening. The student sees no transcript while speaking.
 - **Components:**
-  - `TopicPill`, `MascotSlot` 2XL, `AnswerCard` `question`. No `AppBar` while listening (changed 2026-10-12, Figma frame 15917:17350): the progress, XP and close X are hidden and the middle section moves up by the bar's height; they fade back in with the result.
+  - `AppBar`, hidden while listening but keeping its height (decided 2026-10-12, replacing the Figma frame's "middle moves up"), so the question card doesn't jump; the progress, XP and close X fade back in with the result. `TopicPill`, `MascotSlot` 2XL, `AnswerCard` `question`.
   - `RecordingGlow`, breathing, with no ripples and without the two outline rings (see Mocked recall › recordingGlow in this build)
   - `MicButton` `listening` / `ready`
   - `ButtonIcon` Secondary S with `src/icons/XIcon.tsx`, labelled "Cancel recording" for screen readers
-  - `TapToAnswer` reading "Listening…", then "Tap to submit…" after 3 seconds (`motion.duration.listeningHint`). The old words fade out (`hintFadeOut`, 250ms) and the new ones fade in (`hintFadeIn`, 400ms); with reduced motion they just swap. The mic is mocked, so it's a timer, not speech detection; it never stops the recording. Figma shows "Tap to submit" throughout (decided 2026-10-02).
+  - `TapToAnswer` reading "Listening… tap the mic when you're done" (so the stop is named from the first second, 2026-10-12), then "Tap to submit…" after 3 seconds (`motion.duration.listeningHint`). The old words fade out (`hintFadeOut`, 250ms) and the new ones fade in (`hintFadeIn`, 400ms); with reduced motion they just swap. The mic is mocked, so it's a timer, not speech detection; it never stops the recording. Figma shows "Tap to submit" throughout (decided 2026-10-02).
   - No toggle and no Skip, as in Figma.
 - **Actions:**
 
@@ -149,9 +149,9 @@ A different code starts a new session for it. An unknown code shows "This link d
 - **States** (changed 2026-10-12, Figma frame 15917:17457):
   - Thinking, for at least 1.2s: the mic is replaced by three violet dots on a dark disc. There is no "Thinking..." card and no skeleton; the wait is the button itself.
   - "Taking a moment…", from ~4s, only for a `slow` take, in the `TapToAnswer` line above the mic (where "Tap to submit…" sits on the dictating screen), fading in over `motion.duration.hintFadeIn`.
-  - Fallback at ~10s: goes to the result as "didn't catch that", with the card saying "That took longer than it should. Tap the mic to try again." instead of "I couldn't understand that take", because the wait was ours, not the student's audio.
+  - Fallback at ~10s: goes to the result as "didn't catch that", with the card saying "That took longer than it should. Let's try again." (the caption below already says what to tap) instead of "I couldn't understand that take", because the wait was ours, not the student's audio.
 - **Components:**
-  - `TopicPill`, `MascotSlot` 2XL, `AnswerCard` `question`. No `AppBar`, as on the dictating screen: it fades back in with the result.
+  - `AppBar`, hidden but keeping its height, as on the dictating screen: it fades back in with the result. `TopicPill`, `MascotSlot` 2XL, `AnswerCard` `question`.
   - `MicButton` `idle` / `thinking` (it holds the loading dots; `LoadingDots` is used inside it)
   - `TapToAnswer`, empty until "Taking a moment…"
   - `ButtonIcon` Secondary S with `src/icons/XIcon.tsx`, labelled "Cancel answer" for screen readers

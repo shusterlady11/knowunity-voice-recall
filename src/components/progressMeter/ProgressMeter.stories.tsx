@@ -11,7 +11,7 @@ Ring and label colors are all bound to variables (background/surface for the tra
 KNOWN LIMITATION (deferred, not fixed)
 The denominator is hardcoded to /5 for the fixed 5-question session length. Supporting a different session length (e.g. 4 questions) would need a second total variant axis crossed with score - explicitly deferred by the designer, not started.
 
-**In code:** \`score\` is 1 to 5 with no 0, so leave the meter out when nothing was correct. The size is \`Indicator/Meter\` (80px). The ring's thickness is 15% of its radius (Figma's inner radius is 85%), worked out from the size, so it's 6px at 80px and follows the size with no token of its own. The ring starts at the top and runs clockwise, and each point of score fills a fifth of it. The label uses the Body M Bold text style and shows the percentage. It's exposed to screen readers as an image labelled with that percentage (for example "40%"), since the ring and label are decoration for the same fact.`;
+**In code:** \`score\` is 1 to 5 with no 0, so leave the meter out when nothing was correct. The size is \`Indicator/Meter\` (80px). The ring's thickness is 15% of its radius (Figma's inner radius is 85%), worked out from the size, so it's 6px at 80px and follows the size with no token of its own. The ring starts at the top and runs clockwise, and each point of score fills a fifth of it. The label uses the Body M Bold text style and shows the percentage. It's exposed to screen readers as an image labelled with the percentage and the count (for example "40%, 2 of 5 answered on their own"), since the ring and label are decoration for the same fact.`;
 
 const meta = {
   title: 'Components/progressMeter',
@@ -72,7 +72,7 @@ const meta = {
     await expect(Math.abs(text.top + text.height / 2 - (box.top + box.height / 2))).toBeLessThan(1);
 
     await expect(meter).toHaveAttribute('role', 'img');
-    await expect(meter).toHaveAccessibleName(`${score * 20}%`);
+    await expect(meter).toHaveAccessibleName(`${score * 20}%, ${score} of 5 answered on their own`);
   },
 } satisfies Meta<typeof ProgressMeter>;
 

@@ -24,7 +24,7 @@ export function ProgressMeter({ score = 1 }: ProgressMeterProps) {
     <div
       className="progressMeter"
       role="img"
-      aria-label={`${percent}%`}
+      aria-label={`${percent}%, ${score} of ${TOTAL} answered on their own`}
       data-score={score}
     >
       <svg className="progressMeter__ring" viewBox="0 0 100 100" aria-hidden="true">
