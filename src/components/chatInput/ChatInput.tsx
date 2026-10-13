@@ -121,7 +121,13 @@ export function ChatInput({
       {showLeadingButton && (
         <ButtonIcon variant="Secondary" size="L" icon={<PlusIcon />} aria-label="Add" />
       )}
-      <div className="chatInput__field">
+      {/* The whole pill is the tap target (56px), not only the one-line text area inside it. */}
+      <div
+        className="chatInput__field"
+        onClick={(event) => {
+          if (event.target === event.currentTarget) fieldRef.current?.focus();
+        }}
+      >
         <textarea
           ref={fieldRef}
           className="chatInput__text"

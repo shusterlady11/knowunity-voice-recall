@@ -20,8 +20,10 @@
   margin-top: var(--space-600);
 }
 
-/* The mic, centered, with the voice/keyboard toggle at the left edge, its bottom Space/200 below the mic's
-   (as in Figma). The toggle takes no room, so the mic stays centered. */
+/* The mic, centered, with the voice/keyboard toggle at the left edge, level with the mic's bottom. The toggle
+   takes no room, so the mic stays centered. The mic and its caption sit exactly where they do on the question
+   screen (Space/200 above the drawer, not Figma's Space/400), so the thumb target never moves; the toggle
+   keeps the spot it had (decided 2026-10-12, a small step away from Figma's offset). */
 .result__mic {
   position: relative;
   display: flex;
@@ -31,7 +33,7 @@
 
 .result__toggle {
   position: absolute;
-  bottom: var(--space-negative-200);
+  bottom: var(--space-0);
   left: var(--space-0);
 }
 
@@ -42,7 +44,10 @@
   margin: var(--space-0) var(--space-negative-400) calc(var(--space-negative-400) - env(safe-area-inset-bottom));
 }
 
-.result__mic + .result__bar,
+.result__mic + .result__bar {
+  margin-top: var(--space-200);
+}
+
 .result__typing + .result__bar {
   margin-top: var(--space-400);
 }

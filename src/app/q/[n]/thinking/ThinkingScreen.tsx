@@ -81,7 +81,8 @@ export function ThinkingScreen({ n }: { n: number }) {
         record.verdict = verdict;
         const hintsUsed = record.hintsUsed ?? [];
         record.feedback = timedOut ? { kind: 'timedOut' } : feedbackFor(verdict, covered, hintsUsed, keyPointCount);
-        if (record.feedback.kind === 'hint') record.hintsUsed = [...hintsUsed, record.feedback.keyPoint];
+        // Only a hint the student hasn't seen is counted; the last one repeated, once they're all used, is not.
+        if (record.feedback.kind === 'hint' && record.feedback.fresh) record.hintsUsed = [...hintsUsed, record.feedback.keyPoint];
         if (verdict === 'correct' && !record.outcome) {
           const revealed = record.revealed === true;
           record.outcome = revealed ? 'needsPractice' : 'correct';

@@ -8,7 +8,7 @@ export function generateStaticParams() {
   return questions.map((_, i) => ({ n: String(i + 1) }));
 }
 
-/** Result (SPEC.md › 7): Knowie's verdict on the latest take, with a hint, the nudge or the answer. */
+/** Result (SPEC.md › 7): Knowie's verdict on the latest take, with a hint or the answer. */
 export default async function ResultPage({ params }: PageProps<'/q/[n]/result'>) {
   const { n } = await params;
   return <ResultScreen n={Number(n)} />;

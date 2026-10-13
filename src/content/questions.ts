@@ -11,10 +11,11 @@ export type Question = {
   /** The 2–4 ideas a good answer covers. Scripts refer to them by number, from 1. */
   keyPoints: string[];
   /**
-   * One hint per key point, in the same order. {covered} and {total} are filled in with the covered count,
-   * e.g. "You've got 2 of 3 key ideas".
+   * A ladder of hints per key point, in the same order, each one more specific than the last (2026-10-12: the
+   * fixed "You're close" nudge is gone; every retry gets a new hint). {covered} and {total} are filled in with
+   * the covered count, e.g. "You've got 2 of 3 key ideas".
    */
-  hints: string[];
+  hints: string[][];
   /** Knowie's line on a correct answer. */
   correct: string;
   /**
@@ -31,9 +32,6 @@ export type Question = {
 
 /** The transcript for an "I don't know" take. */
 export const idkTranscript = 'I don’t know.';
-
-/** The card's text after both hints are used, the same for every question (SPEC.md › 7). */
-export const nudge = 'You’re close. Want to see the full answer?';
 
 /** What the result card says when a slow take gave up waiting (2026-10-12): the delay was ours, not the student's audio. */
 export const timedOut = 'That took longer than it should. Tap the mic to try again.';
@@ -52,9 +50,21 @@ export const questions: Question[] = [
       'The enzyme isn’t used up, so it can be used again and again',
     ],
     hints: [
-      'You’ve got {covered} of {total} key ideas. Think about the energy a reaction needs to get started.',
-      'You’ve got {covered} of {total} key ideas. Think about where the substrate attaches to the enzyme.',
-      'You’ve got {covered} of {total} key ideas. Think about what happens to the enzyme after the reaction.',
+      [
+        'You’ve got {covered} of {total} key ideas. Think about the energy a reaction needs to get started.',
+        'You’ve got {covered} of {total} key ideas. Picture a hill the reaction has to climb. What do enzymes do to the height of that hill?',
+        'You’ve got {covered} of {total} key ideas. Enzymes lower something called the activation energy. Say what that means for the reaction.',
+      ],
+      [
+        'You’ve got {covered} of {total} key ideas. Think about where the substrate attaches to the enzyme.',
+        'You’ve got {covered} of {total} key ideas. The enzyme has a special spot with a shape made for its substrate. What is that spot called?',
+        'You’ve got {covered} of {total} key ideas. It’s the active site. Say how the substrate fits into it.',
+      ],
+      [
+        'You’ve got {covered} of {total} key ideas. Think about what happens to the enzyme after the reaction.',
+        'You’ve got {covered} of {total} key ideas. After the reaction, is the enzyme used up like a battery, or does it come out the same?',
+        'You’ve got {covered} of {total} key ideas. It comes out unchanged. Say what that lets it do next.',
+      ],
     ],
     correct: 'Exactly: enzymes lower the activation energy, and they’re ready to work again right after.',
     answer: {
@@ -76,9 +86,21 @@ export const questions: Question[] = [
       'The active site no longer fits the substrate, so the reaction slows or stops',
     ],
     hints: [
-      'You’ve got {covered} of {total} key ideas. Think about the conditions where an enzyme works best.',
-      'You’ve got {covered} of {total} key ideas. Think about what heat or acid does to a protein’s shape.',
-      'You’ve got {covered} of {total} key ideas. Think about whether the substrate can still bind.',
+      [
+        'You’ve got {covered} of {total} key ideas. Think about the conditions where an enzyme works best.',
+        'You’ve got {covered} of {total} key ideas. Each enzyme has a sweet spot for temperature and pH. What do we call that sweet spot?',
+        'You’ve got {covered} of {total} key ideas. It’s the optimal range. Say what happens when conditions leave it.',
+      ],
+      [
+        'You’ve got {covered} of {total} key ideas. Think about what heat or acid does to a protein’s shape.',
+        'You’ve got {covered} of {total} key ideas. Too much heat or acid can unfold a protein. What is that unfolding called?',
+        'You’ve got {covered} of {total} key ideas. It’s called denaturing: the enzyme’s shape changes. Say what that does to the enzyme.',
+      ],
+      [
+        'You’ve got {covered} of {total} key ideas. Think about whether the substrate can still bind.',
+        'You’ve got {covered} of {total} key ideas. If the enzyme’s shape changes, what happens to its active site?',
+        'You’ve got {covered} of {total} key ideas. The active site no longer fits the substrate. Say what that means for the reaction.',
+      ],
     ],
     correct: 'You got it: change the shape, and the substrate can’t fit anymore.',
     answer: {
@@ -100,9 +122,21 @@ export const questions: Question[] = [
       'The Calvin cycle uses that ATP and NADPH to turn carbon dioxide into sugar',
     ],
     hints: [
-      'You’ve got {covered} of {total} key ideas. Think about what the light reactions make from sunlight.',
-      'You’ve got {covered} of {total} key ideas. Think about where the oxygen comes from.',
-      'You’ve got {covered} of {total} key ideas. Think about what the Calvin cycle builds, and from what.',
+      [
+        'You’ve got {covered} of {total} key ideas. Think about what the light reactions make from sunlight.',
+        'You’ve got {covered} of {total} key ideas. The light reactions turn light energy into two energy-carrying molecules. What are they?',
+        'You’ve got {covered} of {total} key ideas. They’re ATP and NADPH. Say what the light reactions do to store light energy in them.',
+      ],
+      [
+        'You’ve got {covered} of {total} key ideas. Think about where the oxygen comes from.',
+        'You’ve got {covered} of {total} key ideas. The oxygen a plant gives off comes from a molecule the light reactions break apart. Which one?',
+        'You’ve got {covered} of {total} key ideas. It’s water: the light reactions split it. Say what that releases.',
+      ],
+      [
+        'You’ve got {covered} of {total} key ideas. Think about what the Calvin cycle builds, and from what.',
+        'You’ve got {covered} of {total} key ideas. The Calvin cycle builds sugar. What gas does it take in, and what powers it?',
+        'You’ve got {covered} of {total} key ideas. It takes in carbon dioxide, powered by the ATP and NADPH from the light reactions. Say how it turns them into sugar.',
+      ],
     ],
     correct: 'Spot on: light energy goes in, and the Calvin cycle turns it into sugar.',
     answer: {
@@ -124,9 +158,21 @@ export const questions: Question[] = [
       'Oxygen is the final electron acceptor, forming water',
     ],
     hints: [
-      'You’ve got {covered} of {total} key ideas. Think about which stage makes the most ATP.',
-      'You’ve got {covered} of {total} key ideas. Think about how ATP synthase is powered.',
-      'You’ve got {covered} of {total} key ideas. Think about why the cell needs oxygen.',
+      [
+        'You’ve got {covered} of {total} key ideas. Think about which stage makes the most ATP.',
+        'You’ve got {covered} of {total} key ideas. It’s the last stage, a chain of proteins in the mitochondria. What is it called?',
+        'You’ve got {covered} of {total} key ideas. It’s the electron transport chain. Say where in the cell it sits.',
+      ],
+      [
+        'You’ve got {covered} of {total} key ideas. Think about how ATP synthase is powered.',
+        'You’ve got {covered} of {total} key ideas. The chain pumps something across a membrane, and its flow back makes ATP. What is it?',
+        'You’ve got {covered} of {total} key ideas. Protons flow back through ATP synthase. Say what that flow does.',
+      ],
+      [
+        'You’ve got {covered} of {total} key ideas. Think about why the cell needs oxygen.',
+        'You’ve got {covered} of {total} key ideas. Electrons reach the end of the chain, and something has to take them. What does?',
+        'You’ve got {covered} of {total} key ideas. Oxygen takes them, and forms a product. Say what it forms.',
+      ],
     ],
     correct: 'Exactly right: the proton gradient powers ATP synthase, and oxygen keeps the chain moving.',
     answer: {
@@ -148,9 +194,21 @@ export const questions: Question[] = [
       'It makes far less ATP: 2 per glucose, instead of about 30',
     ],
     hints: [
-      'You’ve got {covered} of {total} key ideas. Think about what fermentation does without.',
-      'You’ve got {covered} of {total} key ideas. Think about what keeps glycolysis going.',
-      'You’ve got {covered} of {total} key ideas. Think about how much ATP each one makes.',
+      [
+        'You’ve got {covered} of {total} key ideas. Think about what fermentation does without.',
+        'You’ve got {covered} of {total} key ideas. Aerobic respiration needs a gas to finish the job, and fermentation works when it’s missing. Which gas?',
+        'You’ve got {covered} of {total} key ideas. It’s oxygen. Say when a cell has to rely on fermentation.',
+      ],
+      [
+        'You’ve got {covered} of {total} key ideas. Think about what keeps glycolysis going.',
+        'You’ve got {covered} of {total} key ideas. Glycolysis needs a molecule recycled so it can keep running. Which one?',
+        'You’ve got {covered} of {total} key ideas. It’s NAD+. Say what recycling it lets glycolysis keep doing.',
+      ],
+      [
+        'You’ve got {covered} of {total} key ideas. Think about how much ATP each one makes.',
+        'You’ve got {covered} of {total} key ideas. Compare the ATP counts: fermentation makes just a handful per glucose. How many, against about 30?',
+        'You’ve got {covered} of {total} key ideas. Fermentation makes 2 ATP per glucose. Say how that compares with aerobic respiration.',
+      ],
     ],
     correct: 'You nailed it: no oxygen, NAD+ recycled, and a lot less ATP.',
     answer: {

@@ -8,10 +8,23 @@ import { useEffect, useState } from 'react';
 
 let setMessage: ((message: string) => void) | null = null;
 
-/** Says a sentence to screen-reader users. The same sentence twice in a row is said twice. */
+// A sentence said within this long after another is read after it, so a screen that opens right after another
+// ("Recording cancelled." then the question) doesn't cut the first one off. Only the one before is carried, so
+// the region never piles up.
+const QUEUE_WINDOW_MS = 800;
+// The same sentence again this soon is one event reported twice (React runs effects twice in development), not
+// a second announcement.
+const DUPLICATE_WINDOW_MS = 100;
+let last = { message: '', time: 0 };
+
+/** Says a sentence to screen-reader users. The same sentence twice in a row, a moment apart, is said twice. */
 export function announce(message: string) {
+  const now = Date.now();
+  if (message === last.message && now - last.time < DUPLICATE_WINDOW_MS) return;
+  const text = now - last.time < QUEUE_WINDOW_MS ? `${last.message} ${message}` : message;
+  last = { message, time: now };
   setMessage?.('');
-  requestAnimationFrame(() => setMessage?.(message));
+  requestAnimationFrame(() => setMessage?.(text));
 }
 
 export function Announcer() {

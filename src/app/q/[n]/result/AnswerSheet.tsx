@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { BottomSheet } from '../../../../components/bottomSheet/BottomSheet';
 import type { Question } from '../../../../content/questions';
+import { announce } from '../../../../lib/announcer';
 import { focusQuietly } from '../../../../lib/focusQuietly';
 
 /**
@@ -13,22 +14,29 @@ import { focusQuietly } from '../../../../lib/focusQuietly';
 export function AnswerSheet({ answer, onClose }: { answer: Question['answer']; onClose: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
 
+  // Said when the student closes the sheet, by the X or Escape; leaving the screen some other way doesn't say it.
+  const close = useCallback(() => {
+    announce('Answer closed.');
+    onClose();
+  }, [onClose]);
+
   // Focus moves into the sheet and Escape closes it; closing hands focus back to what opened it.
   useEffect(() => {
     const opener = document.activeElement as HTMLElement | null;
     focusQuietly(ref.current?.querySelector('button'));
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    announce(`The answer for ${answer.title}: ${answer.heading}.`);
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && close();
     document.addEventListener('keydown', onKey);
     return () => {
       document.removeEventListener('keydown', onKey);
       focusQuietly(opener);
     };
-  }, [onClose]);
+  }, [close, answer.title, answer.heading]);
 
   return (
     <div ref={ref} className="answerSheet">
       <BottomSheet
-        appBar={{ type: 'dismissOnly', title: answer.title, dismissLabel: 'Close answer', onDismiss: onClose }}
+        appBar={{ type: 'dismissOnly', title: answer.title, dismissLabel: 'Close answer', onDismiss: close }}
         middleSection={
           <div className="answerSheet__content">
             {/* Built here: Figma's bulleted, underlined heading is loose layers (docs/component-gaps.md). */}

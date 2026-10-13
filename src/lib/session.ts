@@ -6,6 +6,7 @@
 // still works, just without resuming.
 
 import { useMemo, useSyncExternalStore } from 'react';
+import { defaultCode } from '../content/scripts';
 import { xpFor, type Feedback, type Verdict } from './recallEngine';
 
 export type InputMode = 'voice' | 'keyboard';
@@ -19,7 +20,7 @@ export type QuestionRecord = {
   verdict?: Verdict;
   /** What the result card says for the latest take, chosen when it was judged. */
   feedback?: Feedback;
-  /** Key points whose hints the student has seen, in order. */
+  /** The key point of every hint the student has seen, in order; a key point repeats once for each further hint. */
   hintsUsed?: number[];
   /** What the student said, one entry per take, in order (for the Results rows). */
   transcripts?: string[];
@@ -165,6 +166,9 @@ export function markSplashSeen() {
  * ("Progress saved. Come back any time.").
  */
 export function endSession(endedBy: EndedBy) {
+  // A student who got here without an entry link has no saved session yet; start one so the end screen can
+  // remember how they left.
+  if (!getSession()) startSession(defaultCode, '/');
   updateSession((session) => {
     session.endedBy = endedBy;
     if (endedBy !== 'left') session.route = '/done';

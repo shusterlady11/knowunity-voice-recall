@@ -7,6 +7,7 @@ import { TextBlock } from '../../components/textBlock/TextBlock';
 import { ButtonGroup } from '../../components/buttonGroup/ButtonGroup';
 import { Button } from '../../components/button/Button';
 import { endSession } from '../../lib/session';
+import { announce } from '../../lib/announcer';
 import { focusQuietly } from '../../lib/focusQuietly';
 
 /**
@@ -20,7 +21,12 @@ export function ExitConfirm({ onKeepGoing }: { onKeepGoing: () => void }) {
   // Focus moves into the sheet and Escape closes it; closing hands focus back to the X.
   useEffect(() => {
     focusQuietly(ref.current?.querySelector('button'));
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onKeepGoing();
+    announce('Leave? Your progress is saved. Keep going or leave.');
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      announce('Back to your question.');
+      onKeepGoing();
+    };
     document.addEventListener('keydown', onKey);
     return () => {
       document.removeEventListener('keydown', onKey);
@@ -36,7 +42,15 @@ export function ExitConfirm({ onKeepGoing }: { onKeepGoing: () => void }) {
         middleSection={<TextBlock variant="L" title="Leave?" caption="Your progress is saved." />}
         bottomSection={
           <ButtonGroup variant="Vertical" size="L">
-            <Button variant="Primary" size="L" CTA="Keep going" onClick={onKeepGoing} />
+            <Button
+              variant="Primary"
+              size="L"
+              CTA="Keep going"
+              onClick={() => {
+                announce('Back to your question.');
+                onKeepGoing();
+              }}
+            />
             <Button
               variant="Secondary"
               size="L"

@@ -11,9 +11,9 @@ import { MicButton } from '../../../../components/micButton/MicButton';
 import { InputModeToggle } from '../../../../components/inputModeToggle/InputModeToggle';
 import { BottomCTA } from '../../../../components/bottomCTA/BottomCTA';
 import { ChatInput } from '../../../../components/chatInput/ChatInput';
-import { nudge, questions, timedOut, topic } from '../../../../content/questions';
+import { questions, timedOut, topic } from '../../../../content/questions';
 import { bold } from '../../../../content/bold';
-import { fillHint, type Verdict } from '../../../../lib/recallEngine';
+import { fillHint, type Feedback, type Verdict } from '../../../../lib/recallEngine';
 import { announce } from '../../../../lib/announcer';
 import { endQuestion, getSession, questionRecord, questionRoute, rememberRoute, updateSession, useSession } from '../../../../lib/session';
 import { useQuestionEnter } from '../../../../lib/questionEnter';
@@ -56,6 +56,20 @@ export function ResultScreen({ n }: { n: number }) {
   const [sheet, setSheet] = useState<'none' | 'exit' | 'answer'>('none');
   const closeSheet = useCallback(() => setSheet('none'), []);
 
+  // What the result card says for a feedback: the hint, the correct line or the slow-take line. Nothing for
+  // "didn't catch that", which keeps the card's own default line.
+  const feedbackText = useCallback(
+    (feedback: Feedback, covered: number[]): string | undefined =>
+      feedback.kind === 'correct'
+        ? question.correct
+        : feedback.kind === 'hint'
+          ? fillHint(question.hints[feedback.keyPoint - 1][feedback.level - 1], covered, total)
+          : feedback.kind === 'timedOut'
+            ? timedOut
+            : undefined,
+    [question, total],
+  );
+
   // Remember this result; with no judged take (opened some other way), go back to the question.
   useEffect(() => {
     const saved = getSession()?.questions[n];
@@ -63,29 +77,22 @@ export function ResultScreen({ n }: { n: number }) {
     rememberRoute(`/q/${n}/result`);
     markShown();
     const covered = saved.covered?.length ?? 0;
+    // The card's own words are the part the student acts on, so they are said too (not only the verdict).
+    const card = saved.feedback ? feedbackText(saved.feedback, saved.covered ?? []) : undefined;
     announce(
       saved.feedback?.kind === 'timedOut'
         ? timedOut
         : saved.verdict === 'notCaught'
           ? verdictWord.notCaught
-          : `${verdictWord[saved.verdict]} You covered ${covered} of ${total} key ideas.`,
+          : `${verdictWord[saved.verdict]} You covered ${covered} of ${total} key ideas. ${card ?? ''}`.trim(),
     );
-  }, [n, total, router, markShown]);
+  }, [n, total, router, markShown, feedbackText]);
 
   if (!record?.verdict || !record.feedback) return null;
   const { verdict, feedback } = record;
   const covered = record.covered ?? [];
 
-  const message =
-    feedback.kind === 'correct'
-      ? question.correct
-      : feedback.kind === 'hint'
-        ? fillHint(question.hints[feedback.keyPoint - 1], covered, total)
-        : feedback.kind === 'nudge'
-          ? nudge
-          : feedback.kind === 'timedOut'
-            ? timedOut
-            : undefined; // "didn't catch that": the card's own default line.
+  const message = feedbackText(feedback, covered);
 
   // Ends the question with an outcome and its XP, once, then moves on.
   const finish = (outcome: 'needsPractice' | 'skipped') => {
@@ -101,11 +108,17 @@ export function ResultScreen({ n }: { n: number }) {
   };
 
   // Switching modes here keeps the student on this result; the retry control below changes to match.
-  const setMode = (mode: 'voice' | 'keyboard') =>
+  const setMode = (mode: 'voice' | 'keyboard') => {
+    announce(mode === 'keyboard' ? 'Switched to typing.' : 'Switched to voice.');
     updateSession((s) => {
       s.inputMode = mode;
     });
+  };
   const typing = session?.inputMode === 'keyboard';
+
+  // Questions finished: the ones before this, plus this one once it has an outcome (a correct answer ends it), so
+  // the bar shows the answer just given as done, ahead of the student tapping Next (decided 2026-10-12).
+  const finished = record.outcome ? n : n - 1;
 
   const blocked = sheet !== 'none';
   const live = verdict !== 'correct';
@@ -144,7 +157,7 @@ export function ResultScreen({ n }: { n: number }) {
     <Scaffold
       topNavigation={
         <div className="result__appBar" inert={blocked}>
-          <AppBar progress={((n - 1) / questions.length) * 100} xp={session?.xp ?? 0} onClose={() => setSheet('exit')} />
+          <AppBar progress={(finished / questions.length) * 100} xp={session?.xp ?? 0} onClose={() => setSheet('exit')} />
         </div>
       }
       middleContent={

@@ -81,22 +81,31 @@ describe('combined coverage and the verdict', () => {
   });
 });
 
-describe('hints and the nudge', () => {
-  it('gives the first uncovered key point’s hint', () => {
-    expect(feedbackFor('partial', [1], [], 3)).toEqual({ kind: 'hint', keyPoint: 2 });
-    expect(feedbackFor('wrong', [], [], 3)).toEqual({ kind: 'hint', keyPoint: 1 });
+describe('hints', () => {
+  it('gives the first uncovered key point’s gentlest hint', () => {
+    expect(feedbackFor('partial', [1], [], 3)).toEqual({ kind: 'hint', keyPoint: 2, level: 1, fresh: true });
+    expect(feedbackFor('wrong', [], [], 3)).toEqual({ kind: 'hint', keyPoint: 1, level: 1, fresh: true });
   });
 
-  it('moves on to the next unused hint', () => {
-    expect(feedbackFor('wrong', [], [1], 3)).toEqual({ kind: 'hint', keyPoint: 2 });
+  it('moves on to the next key point’s hint, then to a more specific one', () => {
+    expect(feedbackFor('wrong', [], [1], 3)).toEqual({ kind: 'hint', keyPoint: 2, level: 1, fresh: true });
+    expect(feedbackFor('wrong', [], [1, 2, 3], 3)).toEqual({ kind: 'hint', keyPoint: 1, level: 2, fresh: true });
   });
 
-  it('shows the nudge after two hints', () => {
-    expect(feedbackFor('wrong', [], [1, 2], 3)).toEqual({ kind: 'nudge' });
+  it('gives a partial answer a new hint each time, getting more specific', () => {
+    // One idea left (key point 3): three different hints for it before anything repeats.
+    expect(feedbackFor('partial', [1, 2], [], 3)).toEqual({ kind: 'hint', keyPoint: 3, level: 1, fresh: true });
+    expect(feedbackFor('partial', [1, 2], [3], 3)).toEqual({ kind: 'hint', keyPoint: 3, level: 2, fresh: true });
+    expect(feedbackFor('partial', [1, 2], [3, 3], 3)).toEqual({ kind: 'hint', keyPoint: 3, level: 3, fresh: true });
   });
 
-  it('shows the nudge when no uncovered key point has a hint left', () => {
-    expect(feedbackFor('partial', [1, 2], [3], 3)).toEqual({ kind: 'nudge' });
+  it('skips key points the student has since covered', () => {
+    expect(feedbackFor('partial', [1, 2], [1, 2], 3)).toEqual({ kind: 'hint', keyPoint: 3, level: 1, fresh: true });
+  });
+
+  it('repeats the most specific hint, marked as not new, once every hint is used', () => {
+    expect(feedbackFor('partial', [1, 2], [3, 3, 3], 3)).toEqual({ kind: 'hint', keyPoint: 3, level: 3, fresh: false });
+    expect(feedbackFor('wrong', [], [1, 2, 3, 1, 2, 3, 1, 2, 3], 3)).toEqual({ kind: 'hint', keyPoint: 1, level: 3, fresh: false });
   });
 
   it('needs no hint for correct or didn’t-catch-that', () => {

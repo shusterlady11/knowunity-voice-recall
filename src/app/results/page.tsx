@@ -11,7 +11,7 @@ import { questions } from '../../content/questions';
 import { resultsCopy } from '../../content/results';
 import { announce } from '../../lib/announcer';
 import { categoryFor } from '../../lib/resultsGroups';
-import { endSession, rememberRoute, startNextPass, useSession, type Session } from '../../lib/session';
+import { endSession, getSession, rememberRoute, startNextPass, useSession, type Session } from '../../lib/session';
 import './results.css';
 
 type Category = NonNullable<ResultsSummaryProps['category']>;
@@ -24,7 +24,14 @@ type Row = ResultsSummaryProps['rows'][number];
  * 2026-10-12). No app bar, as in Figma's Results frames.
  */
 export default function ResultsPage() {
+  const router = useRouter();
   const session = useSession();
+  // Opened with nothing saved (a typed address, or a reload after /reset): there is nothing to show, so go to
+  // the home address, which starts a fresh session. Checked in an effect, since the session is read after the
+  // first render.
+  useEffect(() => {
+    if (!getSession()) router.replace('/');
+  }, [router]);
   return session ? <ResultsView session={session} /> : null;
 }
 

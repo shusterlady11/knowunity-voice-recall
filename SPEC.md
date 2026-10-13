@@ -91,7 +91,7 @@ It follows the same pattern as the Storybook story "BottomSheet › Mic permissi
 
 - **States:**
   - Ready to answer by voice.
-  - `ProgressIndicator` shows questions finished: 0 on question 1, 20 on question 2, up to 80 on question 5. Each pass starts again at 0.
+  - `ProgressIndicator` shows questions finished: 0 on question 1, 20 on question 2, up to 80 on question 5. Each pass starts again at 0. On the result screen it counts the question just answered once the answer is correct (20 after a correct question 1), ahead of Next (decided 2026-10-12).
   - The screen opens in whichever input mode the student last used, voice or keyboard. A student in keyboard mode lands on `/q/[n]/type` instead.
 - **Components:**
   - `AppBar` (close `ButtonIcon`, `ProgressIndicator`, `XpCounter`)
@@ -139,6 +139,7 @@ It follows the same pattern as the Storybook story "BottomSheet › Mic permissi
 A different code starts a new session for it. An unknown code shows "This link doesn’t work. Ask the person running the session for a new link." and goes nowhere.
 
 - **Home Screen:** the student adds this page to their Home Screen. The saved icon has to open `/s/[code]` with its code. On iOS, Home Screen web apps don't share storage with Safari, so the code can't be passed along any other way. So, opened in Safari, `/s/[code]` stays on its address and shows "Add to Home Screen" with the steps ("Tap Share, then Add to Home Screen. Open Knowie from your Home Screen to start."), and a Secondary "Continue in browser" button for testing on a computer. Opened from the icon (full screen), it goes straight on (decided 2026-10-02).
+- **Direct loads with nothing saved:** `/results` goes to `/`, which starts a fresh session. Leaving or opting out from a question or `/mic-off` opened by typing the address still shows the right end message (it starts a session on the `tour` script).
 - **`/reset`** clears the saved session and the "splash seen" flag between participants, then shows "All cleared. This phone is ready for the next participant. Open their link to start." with a `Button` Primary L **Start**, which begins the `tour` script at `/start`, so a moderator doesn't have to type anything (decided 2026-10-07). It's reached by typing the address and never appears in the student's flow.
 - **`/`, the app's home address,** resumes a session in progress, including one the student left, so progress is kept (was D5, decided 2026-10-02). A finished or opted-out session, or none, starts fresh at `/start`, on the same script if there was one, else `tour` (decided 2026-10-07).
 - **Full-screen mode:** an app manifest (`src/app/manifest.ts`, the Next.js file convention) and the page metadata make the Home Screen icon open full screen, with no Safari toolbars.
@@ -171,7 +172,7 @@ A different code starts a new session for it. An unknown code shows "This link d
 | Correct | `answer-correct` | `StatusPill` `correct` | `BottomCTA` "Two button drawer": Secondary "More info", Primary "Next" ("Finish" on the last question) | none, and no voice/keyboard toggle: there's nothing left to answer |
 | Partial | `answer-partial` | `StatusPill` `partial` | `BottomCTA` "Two button drawer / Secondary": Tertiary "Reveal answer", Secondary "Next" | live: `MicButton` `idle` / `ready` + `InputModeToggle` `voice` |
 | Wrong | `answer-error` | `StatusPill` `wrong` | same as Partial | live |
-| Partial or wrong, after both hints are used | as above | as above | same as Partial: only the card's text changes, to the nudge. Reveal answer stays Tertiary on the left (decided 2026-10-05). | live |
+| Partial or wrong, on a later try | as above | as above | same as Partial: only the card's text changes, to the next hint. Reveal answer stays Tertiary on the left (decided 2026-10-05). | live |
 | Didn't catch that | `answer-notcaught` | `StatusPill` `notCaught` | Tertiary "Reveal answer", Secondary "Skip" | live |
 
 **The answer card shows Knowie's feedback, passed as `AnswerCard`'s `message`,** as in Figma's answerCard variants. No component change is needed.
@@ -180,7 +181,7 @@ A different code starts a new session for it. An unknown code shows "This link d
 |---|---|
 | Correct | that question's correct feedback, from the content |
 | Partial or wrong | the next unused hint. Its copy includes the covered count, e.g. "You've got 2 of 3 key ideas. Think about…" |
-| Partial or wrong, after both hints are used | a fixed nudge toward Reveal, the same for every question: "You're close. Want to see the full answer?" |
+| Partial or wrong, on a later try | the next hint in the ladder (below); once every hint has been given, the most specific one again |
 | Didn't catch that | the component's default, "I couldn't understand that take." |
 
 **The student's transcript isn't shown on this screen.** It appears in the Results rows (screen 8), including exactly what a typed take said.
@@ -275,6 +276,7 @@ Built around `chatInput`, a new Storybook component made from the Figma set `cha
 
 - **Other components:** `AppBar`, `TopicPill`, `MascotSlot` 2XL, `AnswerCard` `question`. `TapToAnswer` is no longer on this screen; `chatInput`'s placeholder replaces it.
 - **Keeping the bar above the keyboard:** this has to be done by hand. On iOS, the page's `100dvh` doesn't shrink when the keyboard opens, so a bar pinned to the bottom of `Scaffold` would sit behind the keyboard. The page has to follow the visible area (the `visualViewport` API) and move the bar up. Check it on the iPhone, not just in a desktop browser.
+- **Tap target:** the whole 56px pill opens the field, not only the one-line text area inside it.
 - **Width:** `chatInput` fills the width `Scaffold` gives it, as `AnswerCard` and `ToggleGroup` already do (`width: 100%`), with no hard-coded 358px. Screen margins stay 16px everywhere (`docs/platform-constraints.md`).
 - **Actions:**
 
@@ -356,7 +358,7 @@ Built around `chatInput`, a new Storybook component made from the Figma set `cha
 - **Covered count:** "N of M key ideas", filled into the hint's copy.
 - **Hints:**
   - A partial or wrong shows the next unused hint, in key-point order.
-  - After 2 hints, the card shows the fixed nudge and the mic stays live. "Reveal answer" stays Tertiary on the left (decided 2026-10-05).
+  - **Every retry gets a new hint** (decided 2026-10-12; the fixed "You're close" nudge is gone). Each key idea has a ladder of three hints, from a gentle cue to a specific one (`src/content/questions.ts`, draft copy for the designer to review). The first hint goes to the first uncovered key idea, then the first hint for the next, and so on; then the second level for each, then the third. Once all are used, the third-level hint for the first uncovered idea is shown again, and the mic stays live. "Reveal answer" stays Tertiary on the left (decided 2026-10-05).
 - **Timing:**
   - "Thinking..." lasts at least 1.2s.
   - A `slow` take shows "Taking a moment…" at ~4s and becomes "didn't catch that" at ~10s.
@@ -440,7 +442,7 @@ Run this after any change. It should take about five minutes, most of it the wal
 | 5 | Tap mic, tap it again to stop | Partial, with hint 1 (including the covered count) on the card |
 | 6 | Tap mic, stop | Correct. XP shows 15. |
 | 7 | Next. On question 3: tap mic, stop | "Taking a moment…" at ~4s, "didn't catch that" at ~10s |
-| 8 | Skip. On question 4: record and stop three times | Wrong with hint 1, then hint 2, then the nudge, with "Reveal answer" still on the left |
+| 8 | Skip. On question 4: record and stop three times | Wrong with a different hint each time (first key idea, then second, then third), with "Reveal answer" still on the left |
 | 9 | Reveal answer, close the sheet, Next | question 5. XP shows 16. |
 | 10 | Close the app and reopen it from its icon | still on `/q/5` |
 | 11 | Record and stop, then "Finish" | Correct, then `/results` |

@@ -19,7 +19,7 @@ const content: Record<StatusPillState, { label: string; icon: ReactNode }> = {
   correct: { label: 'Correct', icon: <CheckIcon /> },
   partial: { label: 'Almost there', icon: <ArrowCounterClockwiseIcon /> },
   wrong: { label: 'Try again', icon: <ArrowsClockwiseIcon /> },
-  notCaught: { label: "Didn't catch that", icon: <QuestionMarkIcon /> },
+  notCaught: { label: 'Didn’t catch that', icon: <QuestionMarkIcon /> },
 };
 
 /** A small colored label for how one spoken answer was judged: correct, partial, wrong or not caught. Its text and icon are fixed per state. */

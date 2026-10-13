@@ -36,7 +36,7 @@ These are in Figma, Storybook or SPEC.md, but voice-ux.md doesn't list them. Mos
 |---|---|---|---|
 | "Didn't catch that" as a fourth verdict | ✅ | ✅ | In the build (screen 7). It covers voice-ux's "misheard, not wrong" principle. |
 | Reveal answer / More info sheets | ✅ Reveal answer | ✅ `BottomSheet` › Reveal answer | In the build (screen 7) |
-| Hints (at most 2), then a fixed nudge and Reveal as the primary button | ✅ The card text in answer-partial and answer-error is Knowie's feedback | ✅ `AnswerCard` `message`, `BottomCTA` "Two button drawer" | In the build (screen 7) |
+| A new hint on every retry (three per key idea, gentle to specific), with Reveal answer always on the left | ✅ The card text in answer-partial and answer-error is Knowie's feedback | ✅ `AnswerCard` `message`, `BottomCTA` "Two button drawer" | In the build (screen 7) |
 | Results screens | ✅ perfect, partial, needs improvement | ✅ `ProgressMeter`, `ResultsSummary`, `ExpandableResultRow` | In the build (screen 8). "Review all" starts a new pass. |
 | Exit confirm | ❌ | ⚠️ Composed from `BottomSheet`, `TextBlock`, `ButtonGroup` and `Button` | In the build (every question route) |
 | End screen | ❌ | ⚠️ Composed from `MascotSlot` and `TextBlock` | In the build (screen 9) |

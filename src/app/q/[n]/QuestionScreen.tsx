@@ -12,6 +12,7 @@ import { intro, questions, topic } from '../../../content/questions';
 import { bold } from '../../../content/bold';
 import { endQuestion, getSession, rememberRoute, updateSession, useSession, type Session } from '../../../lib/session';
 import { useQuestionEnter } from '../../../lib/questionEnter';
+import { announce } from '../../../lib/announcer';
 import { ExitConfirm } from '../ExitConfirm';
 import '../exitConfirm.css';
 import './question.css';
@@ -40,6 +41,9 @@ export function QuestionScreen({ n }: { n: number }) {
     if (getSession()?.inputMode === 'keyboard') return router.replace(`/q/${n}/type`);
     rememberRoute(`/q/${n}`);
     markShown();
+    // Said whenever the question opens, so a screen-reader student hears it: after Next or Skip, after
+    // cancelling a take, and for the first question.
+    announce(`Question ${n} of ${questions.length}. ${questions[n - 1].prompt.replaceAll('**', '')}`);
   }, [n, router, markShown]);
 
   // Starting to answer, or moving on, retires the welcome card for good.
@@ -55,6 +59,7 @@ export function QuestionScreen({ n }: { n: number }) {
   };
 
   const toKeyboard = () => {
+    announce('Typing your answer.');
     leaveQuestion((s) => {
       s.inputMode = 'keyboard';
     });

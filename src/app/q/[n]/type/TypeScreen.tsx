@@ -10,6 +10,7 @@ import { ChatInput } from '../../../../components/chatInput/ChatInput';
 import { intro, questions, topic } from '../../../../content/questions';
 import { bold } from '../../../../content/bold';
 import { endQuestion, questionRecord, questionRoute, rememberRoute, updateSession, useSession, type Session } from '../../../../lib/session';
+import { announce } from '../../../../lib/announcer';
 import { useQuestionEnter } from '../../../../lib/questionEnter';
 import { ExitConfirm } from '../../ExitConfirm';
 import '../../exitConfirm.css';
@@ -37,6 +38,7 @@ export function TypeScreen({ n, startTyping }: { n: number; startTyping: boolean
   useEffect(() => {
     rememberRoute(`/q/${n}`);
     markShown();
+    announce(`Question ${n} of ${questions.length}. ${questions[n - 1].prompt.replaceAll('**', '')} Type your answer.`);
   }, [n, markShown]);
 
   // Keep the bar above the iPhone keyboard. iOS doesn't shrink the page when the keyboard opens, so the bar

@@ -54,27 +54,34 @@ export function verdictFor(covered: number[], keyPointCount: number): Verdict {
 /** What the result card says, chosen when the take is judged. */
 export type Feedback =
   | { kind: 'correct' }
-  | { kind: 'hint'; keyPoint: number }
-  | { kind: 'nudge' }
+  // The next hint for a key point the student hasn't covered. `level` 1 is the gentlest; each level after it is
+  // more specific. `fresh` is false when every hint has been given and this one is the last, repeated.
+  | { kind: 'hint'; keyPoint: number; level: number; fresh: boolean }
   | { kind: 'notCaught' }
   // The judge took too long and gave up (a slow take), so the audio wasn't the problem.
   | { kind: 'timedOut' };
 
-/** After this many hints, a partial or wrong shows the nudge toward Reveal answer instead (SPEC.md › 7). */
-export const hintLimit = 2;
+/** How many hints each key point has, from gentle to specific. */
+export const hintLevels = 3;
 
 /**
- * The card's feedback for a verdict. A partial or wrong gets the next unused hint, in key-point order,
- * for a key point the student hasn't covered yet; after `hintLimit` hints, or when none is left, the nudge.
+ * The card's feedback for a verdict. A partial or wrong always gets another hint (2026-10-12; the fixed "You're
+ * close" nudge is gone): first the gentlest hint for each key point the student hasn't covered, in order, then
+ * the next level for each, and so on. `hintsUsed` lists the key point of every hint already shown, repeats
+ * included. When every hint has been given, the most specific one for the first uncovered key point is shown again;
+ * Reveal answer is the way out from there.
  */
 export function feedbackFor(verdict: Verdict, covered: number[], hintsUsed: number[], keyPointCount: number): Feedback {
   if (verdict === 'correct') return { kind: 'correct' };
   if (verdict === 'notCaught') return { kind: 'notCaught' };
-  if (hintsUsed.length >= hintLimit) return { kind: 'nudge' };
-  for (let keyPoint = 1; keyPoint <= keyPointCount; keyPoint++) {
-    if (!covered.includes(keyPoint) && !hintsUsed.includes(keyPoint)) return { kind: 'hint', keyPoint };
+  const uncovered = Array.from({ length: keyPointCount }, (_, i) => i + 1).filter((keyPoint) => !covered.includes(keyPoint));
+  const shown = (keyPoint: number) => hintsUsed.filter((used) => used === keyPoint).length;
+  for (let level = 1; level <= hintLevels; level++) {
+    for (const keyPoint of uncovered) {
+      if (shown(keyPoint) < level) return { kind: 'hint', keyPoint, level, fresh: true };
+    }
   }
-  return { kind: 'nudge' };
+  return { kind: 'hint', keyPoint: uncovered[0] ?? 1, level: hintLevels, fresh: false };
 }
 
 /** Fills a hint's {covered} and {total} with the covered count. */

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '../../components/button/Button';
 import type { EndedBy } from '../../lib/session';
 import { getSession, rememberRoute, reopenSession, useSession } from '../../lib/session';
+import { announce } from '../../lib/announcer';
 import { MessageScreen } from '../MessageScreen';
 
 // One message for each way in (SPEC.md › 9), split into a headline and the line under it.
@@ -34,6 +35,10 @@ export default function DonePage() {
   useEffect(() => {
     if (getSession()?.endedBy !== 'left') rememberRoute('/done');
   }, []);
+
+  // Said once when the message shows: the headline and the line under it.
+  const { title, caption } = messages[endedBy];
+  useEffect(() => announce(`${title} ${caption}`), [title, caption]);
 
   const actions =
     endedBy === 'left' ? (

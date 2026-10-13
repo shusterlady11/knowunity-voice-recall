@@ -36,3 +36,12 @@
   flex: 1 1 0;
   min-width: max-content;
 }
+
+/* On a narrow phone (iPhone SE and older, 320px) the two buttons' labels plus their Space/600 side padding are wider
+   than the row, so the right button ran off the screen. A tighter side padding, Space/300, gives each label the
+   room it needs, with the same type, so nothing is cut off. A media query's width can't be a token. */
+@media (max-width: 359px) {
+  .bottomCTA__row > .button[data-size='L'] .button__face {
+    padding-inline: var(--space-300);
+  }
+}

@@ -10,7 +10,7 @@ Each variant carries its own fixed label text and icon (Check / ArrowCounterCloc
 
 DON'T: don't use this for anything other than the outcome of a single spoken-answer attempt (it's not a generic status/tag component — see chips for that). Don't combine states, invent a new state without a matching feedback/* token pair, or pick colors by eye — every fill and text color here is bound to a feedback/* variable and should stay that way.
 
-**In code:** \`state\` uses Figma's options (correct, partial, wrong, notCaught), and \`leftIcon\` is Figma's "left icon" switch. Figma also has a \`Label\` text property, but its own description says the wording is fixed per state, so the code has no label prop: each state always shows "Correct", "Almost there", "Try again" or "Didn't catch that". The icon sits in an \`iconSlot\` at size 150 (12px) and is hidden from screen readers; the label carries the meaning.
+**In code:** \`state\` uses Figma's options (correct, partial, wrong, notCaught), and \`leftIcon\` is Figma's "left icon" switch. Figma also has a \`Label\` text property, but its own description says the wording is fixed per state, so the code has no label prop: each state always shows "Correct", "Almost there", "Try again" or “Didn’t catch that”. The icon sits in an \`iconSlot\` at size 150 (12px) and is hidden from screen readers; the label carries the meaning.
 
 **Known issue:** wrong and partial use near-identical rotating-arrow icons, so color is the only real difference between them. See "Open design questions" in component-spec.md.`;
 
@@ -18,7 +18,7 @@ const expected = {
   correct: { label: 'Correct', tone: 'success' },
   partial: { label: 'Almost there', tone: 'partial' },
   wrong: { label: 'Try again', tone: 'error' },
-  notCaught: { label: "Didn't catch that", tone: 'neutral' },
+  notCaught: { label: 'Didn’t catch that', tone: 'neutral' },
 } as const;
 
 const meta = {

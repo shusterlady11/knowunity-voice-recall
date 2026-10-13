@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { BottomSheetAppBar } from '../bottomSheetAppBar/BottomSheetAppBar';
 import type { BottomSheetAppBarProps } from '../bottomSheetAppBar/BottomSheetAppBar';
@@ -26,10 +29,26 @@ export function BottomSheet({ appBar, middleSection, bottomSection, label }: Bot
   const type = appBar?.type ?? 'Default';
   const name = label ?? (type === 'Default' ? undefined : (appBar?.title ?? 'Title'));
 
+  // When the content is taller than the room the sheet has, the middle scrolls. A scrolling area with nothing
+  // focusable inside can't be reached from a keyboard, so it becomes a tab stop only while it overflows.
+  const middleRef = useRef<HTMLDivElement>(null);
+  const [scrolls, setScrolls] = useState(false);
+  useEffect(() => {
+    const middle = middleRef.current;
+    if (!middle) return;
+    const check = () => setScrolls(middle.scrollHeight > middle.clientHeight);
+    check();
+    const observer = new ResizeObserver(check);
+    observer.observe(middle);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <section className="bottomSheet" role="dialog" aria-label={name}>
       <BottomSheetAppBar {...appBar} />
-      <div className="bottomSheet__middle">{middleSection}</div>
+      <div ref={middleRef} className="bottomSheet__middle" tabIndex={scrolls ? 0 : undefined}>
+        {middleSection}
+      </div>
       {bottomSection != null && <div className="bottomSheet__bottom">{bottomSection}</div>}
     </section>
   );

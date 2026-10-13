@@ -51,3 +51,9 @@
 .bottomSheet > .bottomSheetAppBar {
   flex: none;
 }
+
+/* The middle is a keyboard tab stop only while it scrolls (see BottomSheet.tsx), so it needs a visible focus ring. */
+.bottomSheet__middle:focus-visible {
+  outline: var(--stroke-heavy-border) solid var(--color-border-focus);
+  outline-offset: calc(-1 * var(--stroke-heavy-border));
+}

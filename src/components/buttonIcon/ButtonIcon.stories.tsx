@@ -77,7 +77,7 @@ const meta = {
     // Fill: Primary is the primary color (grey when disabled), Secondary the surface color, Tertiary none.
     const expectedFill =
       variant === 'Tertiary'
-        ? 'rgba(0, 0, 0, 0)'
+        ? paint('backgroundColor', 'transparent')
         : variant === 'Primary' && state !== 'Disabled'
           ? paint('backgroundColor', 'var(--color-interactive-primary)')
           : paint('backgroundColor', 'var(--color-background-surface)');
