@@ -43,30 +43,39 @@
   height: var(--icon-400);
 }
 
-/* Listening: the darker fill is the only cue on the button itself, so the recording glow
-   must always be shown behind it. The icon switches to onSubtleStrong here too (not the resting
-   brand/bold), since brand/bold only clears 2.3:1 against this darker fill, under the 3:1 minimum. */
-.micButton[data-listening-state='listening'] .micButton__face {
-  background-color: var(--color-interactive-primaryActive);
-}
-
+/* Listening: a coral fill, so the state reads as clearly different from the resting violet button. The
+   recording glow must always be shown behind it. The icon takes onListening (about 6.9:1 against the fill). */
 .micButton[data-listening-state='listening'] {
-  color: var(--color-accent-brand-onSubtleStrong);
+  color: var(--color-interactive-onListening);
 }
 
-/* Pressed (shown with interactionState, or by a real press): the bevel flattens, the face sits
-   lower, the fill is darker and the icon takes its pressed color. onSubtleStrong (not onSubtle)
-   because onSubtle only clears 2.9:1 against the darker primaryActive fill, under the 3:1 minimum. */
+.micButton[data-listening-state='listening'] .micButton__face {
+  background-color: var(--color-interactive-listening);
+}
+
+/* Pressed (shown with interactionState, or by a real press): the bevel flattens, the face sits lower, the
+   fill is darker and the icon takes its pressed color. Idle uses brand/subtle on primaryActive (about
+   11.8:1). Listening steps to listeningActive with onListeningActive (about 6.9:1). */
 .micButton[data-interaction-state='pressed'],
 .micButton[data-interaction-state='ready']:active {
   padding-top: var(--space-100);
-  color: var(--color-accent-brand-onSubtleStrong);
+  color: var(--color-accent-brand-subtle);
 }
 
 .micButton[data-interaction-state='pressed'] .micButton__face,
 .micButton[data-interaction-state='ready']:active .micButton__face {
   background-color: var(--color-interactive-primaryActive);
   box-shadow: none;
+}
+
+.micButton[data-listening-state='listening'][data-interaction-state='pressed'],
+.micButton[data-listening-state='listening'][data-interaction-state='ready']:active {
+  color: var(--color-interactive-onListeningActive);
+}
+
+.micButton[data-listening-state='listening'][data-interaction-state='pressed'] .micButton__face,
+.micButton[data-listening-state='listening'][data-interaction-state='ready']:active .micButton__face {
+  background-color: var(--color-interactive-listeningActive);
 }
 
 /* Disabled: the button is waiting while Knowie processes the answer. */
@@ -78,4 +87,19 @@
 .micButton[data-interaction-state='disabled'] .micButton__face {
   background-color: var(--color-background-surface);
   box-shadow: inset 0 0 0 var(--stroke-border) var(--color-border-strong);
+}
+
+/* Thinking: Knowie is judging the answer. Same dark disc as disabled, with three violet dots in place of the
+   mic, so the button reads as "working" rather than "unavailable". The dots are the loadingDots component. */
+.micButton[data-interaction-state='thinking'] {
+  cursor: progress;
+}
+
+.micButton[data-interaction-state='thinking'] .micButton__face {
+  background-color: var(--color-background-surface);
+  box-shadow: inset 0 0 0 var(--stroke-border) var(--color-border-strong);
+}
+
+.micButton[data-interaction-state='thinking'] .loadingDots__dot {
+  background-color: var(--color-interactive-thinking);
 }

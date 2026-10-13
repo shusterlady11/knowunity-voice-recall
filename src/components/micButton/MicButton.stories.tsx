@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, fn } from 'storybook/test';
 import { MicButton } from './MicButton';
 
-const figmaDescription = `Mic entry point for voice-based active recall. Two independent properties: "listeningState" (idle / listening) tracks whether the mic is actively capturing; "interactionState" (ready / pressed / disabled) tracks interaction/availability. 5 of 6 combinations exist — listening+disabled is intentionally omitted, since the button can't be actively listening and disabled at the same time.
+const figmaDescription = `Mic entry point for voice-based active recall. Two independent properties: "listeningState" (idle / listening) tracks whether the mic is actively capturing; "interactionState" (ready / pressed / disabled / thinking) tracks interaction/availability. 6 of 8 combinations exist — listening+disabled and listening+thinking are intentionally omitted, since the button can't be actively listening and unavailable at the same time.
 
-Use idle+ready as the resting/default state. Use pressed (with either idle or listening) for momentary press feedback only. Use idle+disabled while Knowie is processing the answer (the processing screen), paired with loadingDots. It is not a generic greyed-out/inactive button.
+Use idle+ready as the resting/default state. Use pressed (with either idle or listening) for momentary press feedback only. Use idle+thinking while Knowie is judging the answer (the processing screen): the mic is replaced by three violet loading dots on the dark disc, so the button itself shows the wait. idle+disabled is the greyed mic for a mic that can't be used right now. It is not a generic greyed-out/inactive button.
 
 Do not use this component for mic-permission-denied. Denied is handled by inputModeToggle (inputMode=keyboard, micBlocked=true): the student is in keyboard mode and micButton is not shown. Tapping the slashed mic on the toggle opens the re-enable-permission flow.
 
@@ -12,11 +12,11 @@ There is currently no icon instance-swap property — each variant's icon is har
 
 recordingGlow (the 4-ellipse halo, separate component) is not part of this button — it's a separate instance meant to sit behind micButton during Listening, composed independently so the two can animate on their own.
 
-**In code:** \`listeningState\` and \`interactionState\` use Figma's names and options, and the types don't allow the omitted listening + disabled combination. The button is a push-to-talk toggle named "Record answer": it reports whether it's listening to screen readers (pressed = listening), and a tap starts or stops recording. While disabled it is marked busy and unavailable but keeps keyboard focus, and taps are ignored. When pressed the bevel goes and the face sits 2px lower, as in Figma (\`Space/100\` top padding on the fixed frame centers the face), and a real press shows the same look. The icon takes \`accent/brand/bold\` at rest, \`accent/brand/onSubtleStrong\` whenever the fill is \`primaryActive\` (pressed, or listening) and \`icon/disabled\` when disabled.
+**In code:** \`listeningState\` and \`interactionState\` use Figma's names and options, and the types don't allow the omitted listening + disabled combination. The button is a push-to-talk toggle named "Record answer": it reports whether it's listening to screen readers (pressed = listening), and a tap starts or stops recording. While disabled it is marked busy and unavailable but keeps keyboard focus, and taps are ignored. When pressed the bevel goes and the face sits 2px lower, as in Figma (\`Space/100\` top padding on the fixed frame centers the face), and a real press shows the same look. The icon takes \`accent/brand/bold\` at rest, \`accent/brand/subtle\` on the idle pressed fill (\`interactive/primaryActive\`), \`interactive/onListening\` on the coral listening fill (\`interactive/listening\`), \`interactive/onListeningActive\` on its pressed fill (\`interactive/listeningActive\`) and \`icon/disabled\` when disabled. The thinking dots use \`interactive/thinking\` (violet, because Knowie is the one thinking) and the fill is \`background/surface\` with the same 1px ring as disabled.
 
 **Size:** \`Control/Mic\` (96px) for both the outer frame and the visible circle. The circle is well above the touch-target minimum, so there's no separate tap area.
 
-**Contrast fix (Figma, 2026-09-28):** the icon on the darker \`primaryActive\` fill (pressed, and listening) was \`accent/brand/onSubtle\`, about 2.3–2.9:1 against that fill, under the 3:1 minimum for graphics. Figma added \`accent/brand/onSubtleStrong\` (a new, more saturated violet) for those three variants; it measures about 3.1:1. \`idle/ready\` and \`idle/disabled\` are unchanged. The listening state is also the one that must be unmistakable, so recordingGlow must always be shown behind it regardless.`;
+**Listening is coral (Figma, 2026-10-12):** the listening state used to be a darker violet, which felt too close to the rest of the experience. Figma moved it to coral with new \`interactive/listening\`, \`onListening\`, \`listeningActive\`, \`onListeningActive\` tokens, and the idle pressed icon to \`accent/brand/subtle\`. Measured: listening icon 6.9:1, listening pressed icon 6.9:1, idle pressed icon 11.8:1, thinking dots on the disc 4.4:1 (all above the 3:1 minimum for graphics). recordingGlow, now coral too, must always be shown behind the listening button regardless.`;
 
 // Records taps without the click event, so Storybook doesn't serialize a click event (which froze the docs page).
 const tapSpy = fn();
@@ -35,7 +35,7 @@ const meta = {
     const listening = args.listeningState ?? 'idle';
     const interaction = args.interactionState ?? 'ready';
     const button = canvasElement.querySelector('.micButton') as HTMLElement;
-    const icon = button.querySelector('.micButton__icon') as SVGElement;
+    const icon = button.querySelector('.micButton__icon') as SVGElement | null;
     const root = getComputedStyle(document.documentElement);
     const token = (name: string) => root.getPropertyValue(name).trim();
     const color = (cssVar: string) => {
@@ -58,14 +58,19 @@ const meta = {
     // Pressed moves the face down by half of Space/100 (the frame's top padding, centered).
     const shift = face.getBoundingClientRect().top - button.getBoundingClientRect().top;
     await expect(shift).toBe(interaction === 'pressed' ? parseFloat(token('--space-100')) / 2 : 0);
-    await expect(getComputedStyle(icon).height).toBe(token('--icon-400'));
+    if (interaction === 'thinking') await expect(button.querySelectorAll('.loadingDots__dot')).toHaveLength(3);
+    else await expect(getComputedStyle(icon as SVGElement).height).toBe(token('--icon-400'));
 
     const fill =
-      interaction === 'disabled'
+      interaction === 'disabled' || interaction === 'thinking'
         ? '--color-background-surface'
-        : interaction === 'pressed' || listening === 'listening'
-          ? '--color-interactive-primaryActive'
-          : '--color-interactive-primary';
+        : listening === 'listening'
+          ? interaction === 'pressed'
+            ? '--color-interactive-listeningActive'
+            : '--color-interactive-listening'
+          : interaction === 'pressed'
+            ? '--color-interactive-primaryActive'
+            : '--color-interactive-primary';
     await expect(cs.backgroundColor).toBe(color(fill));
 
     const shadow = (cssVar: string) => {
@@ -84,15 +89,20 @@ const meta = {
     const iconColor =
       interaction === 'disabled'
         ? '--color-icon-disabled'
-        : interaction === 'pressed' || listening === 'listening'
-          ? '--color-accent-brand-onSubtleStrong'
-          : '--color-accent-brand-bold';
-    await expect(getComputedStyle(button).color).toBe(color(iconColor));
+        : listening === 'listening'
+          ? interaction === 'pressed'
+            ? '--color-interactive-onListeningActive'
+            : '--color-interactive-onListening'
+          : interaction === 'pressed'
+            ? '--color-accent-brand-subtle'
+            : '--color-accent-brand-bold';
+    if (interaction !== 'thinking') await expect(getComputedStyle(button).color).toBe(color(iconColor));
+    else await expect(getComputedStyle(button.querySelector('.loadingDots__dot') as HTMLElement).backgroundColor).toBe(color('--color-interactive-thinking'));
 
     await expect(button).toHaveAttribute('aria-pressed', listening === 'listening' ? 'true' : 'false');
     await expect(button).toHaveAccessibleName('Record answer');
 
-    if (interaction === 'disabled') {
+    if (interaction === 'disabled' || interaction === 'thinking') {
       await expect(button).toHaveAttribute('aria-disabled', 'true');
       await expect(button).toHaveAttribute('aria-busy', 'true');
       await userEvent.click(button);
@@ -120,6 +130,11 @@ export const IdlePressed: Story = {
 export const IdleDisabled: Story = {
   name: 'listeningState=idle, interactionState=disabled',
   args: { listeningState: 'idle', interactionState: 'disabled' },
+};
+
+export const IdleThinking: Story = {
+  name: 'listeningState=idle, interactionState=thinking',
+  args: { listeningState: 'idle', interactionState: 'thinking' },
 };
 
 export const ListeningReady: Story = {
