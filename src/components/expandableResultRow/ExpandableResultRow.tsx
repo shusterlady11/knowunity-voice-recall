@@ -10,7 +10,7 @@ import { IconSlot } from '../iconSlot/IconSlot';
 import './expandableResultRow.css';
 
 export type ExpandableResultRowState = 'collapsed' | 'expanded';
-export type ExpandableResultRowTone = 'success' | 'error' | 'neutral';
+export type ExpandableResultRowTone = 'success' | 'with-hints' | 'error' | 'neutral';
 
 export type ExpandableResultRowProps = {
   state?: ExpandableResultRowState;
@@ -28,6 +28,7 @@ export type ExpandableResultRowProps = {
 // The leading icon per tone, all drawn at Icon/200 (16px).
 const toneIcon: Record<ExpandableResultRowTone, ReactNode> = {
   success: <CheckIcon />,
+  'with-hints': <CheckIcon />,
   error: <XIcon />,
   neutral: <DotOutlineIcon />,
 };

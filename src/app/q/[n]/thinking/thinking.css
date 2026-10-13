@@ -1,7 +1,6 @@
-/* Processing, as in Figma's "Question / processingState". */
+/* Processing, as in Figma's "Question / thinking" frame. */
 
-/* The question, then the processing card Space/400 below it, laid out from the top like the question
-   screen so nothing moves. */
+/* The question, laid out from the top like the question screen so nothing moves. */
 .thinking__content {
   display: flex;
   flex-direction: column;
@@ -9,23 +8,42 @@
   width: 100%;
 }
 
-/* The disabled mic, in the same spot as on the question screen: 120px above the bottom edge, which there
-   is the toggle row (Space/1200 + Space/1200) plus Space/200 and Scaffold's Space/400. */
+/* The same stack as the dictating screen, so the mic stays exactly where it was when the student stopped: a
+   hint line, the mic Space/800 below it, the cancel X Space/600 below the mic, and Space/800 under the X. */
 .thinking__answer {
   box-sizing: border-box;
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  padding-bottom: calc(var(--space-1200) + var(--space-1200) + var(--space-200));
+  padding-bottom: var(--space-800);
+  /* Keeps the area's layering inside it, so it stays under the exit confirm's scrim and sheet. */
+  isolation: isolate;
 }
 
-/* The dots, centered Space/300 under the mic (Figma: 14). They take no room, so the mic doesn't move. */
-.thinking__dots {
-  position: absolute;
-  top: calc(var(--control-mic) + var(--space-300));
-  left: 50%;
+/* "Taking a moment…" fades in over motion.duration.hintFadeIn when a slow take shows it. The line is always
+   there, empty, so the mic doesn't move. */
+.thinking__hint {
+  width: 100%;
+  opacity: 0;
+  transition: opacity var(--motion-duration-hintFadeIn) var(--motion-easing-inOut);
+}
+
+.thinking__hint[data-visible] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thinking__hint {
+    transition: none;
+  }
+}
+
+.thinking__mic {
   display: flex;
-  transform: translateX(-50%);
+  margin-top: var(--space-800);
+}
+
+.thinking__answer > .buttonIcon {
+  margin-top: var(--space-600);
 }

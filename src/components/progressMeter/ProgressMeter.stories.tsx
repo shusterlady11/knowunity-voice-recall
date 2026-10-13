@@ -4,14 +4,14 @@ import { ProgressMeter } from './ProgressMeter';
 
 const figmaDescription = `Task-completion ring for the results screen. 5 variants (score=1 through score=5) - no score=0 variant exists on purpose: per the encouraging-tone business rule, the meter is omitted entirely from the layout when the student got 0 correct, not shown at 0%.
 
-Label format: plain fraction N/5 for score=1-4, 100% only at score=5 (a perfect score gets the percentage, everything else gets the fraction).
+Label format: a percentage at every score (20%, 40%, 60%, 80%, 100%), changed in Figma on 2026-10-12 from the fraction N/5. It counts only questions answered correctly on their own, with no hint.
 
 Ring and label colors are all bound to variables (background/surface for the track, accent/brand/bold for a partial fill, accent/green/bold for the full/100% fill, interactive/primary for the label text - a light near-white, correct for sitting on the dark ring, not a bug even though it can look like plain white at a glance).
 
 KNOWN LIMITATION (deferred, not fixed)
 The denominator is hardcoded to /5 for the fixed 5-question session length. Supporting a different session length (e.g. 4 questions) would need a second total variant axis crossed with score - explicitly deferred by the designer, not started.
 
-**In code:** \`score\` is 1 to 5 with no 0, so leave the meter out when nothing was correct. The size is \`Indicator/Meter\` (80px). The ring's thickness is 15% of its radius (Figma's inner radius is 85%), worked out from the size, so it's 6px at 80px and follows the size with no token of its own. The ring starts at the top and runs clockwise, and each point of score fills a fifth of it. The label uses the Body M Bold text style. It's exposed to screen readers as an image labelled "N out of 5" (with ", 100%" for a perfect score), since the ring and label are decoration for the same fact.`;
+**In code:** \`score\` is 1 to 5 with no 0, so leave the meter out when nothing was correct. The size is \`Indicator/Meter\` (80px). The ring's thickness is 15% of its radius (Figma's inner radius is 85%), worked out from the size, so it's 6px at 80px and follows the size with no token of its own. The ring starts at the top and runs clockwise, and each point of score fills a fifth of it. The label uses the Body M Bold text style and shows the percentage. It's exposed to screen readers as an image labelled with that percentage (for example "40%"), since the ring and label are decoration for the same fact.`;
 
 const meta = {
   title: 'Components/progressMeter',
@@ -57,8 +57,8 @@ const meta = {
     await expect(fill.getAttribute('stroke-dasharray')).toBe(`${(score / 5) * 100} 100`);
     await expect(getComputedStyle(svg).transform).toBe('matrix(0, -1, 1, 0, 0, 0)');
 
-    // Label: the fraction, or 100% for a perfect score, in Body M Bold, centered in the ring.
-    await expect(label).toHaveTextContent(score === 5 ? '100%' : `${score}/5`);
+    // Label: the percentage, in Body M Bold, centered in the ring.
+    await expect(label).toHaveTextContent(`${score * 20}%`);
     const ls = getComputedStyle(label);
     await expect(ls.fontSize).toBe(token('--type-body-m-bold-fontSize'));
     await expect(ls.fontWeight).toBe(token('--type-body-m-bold-fontWeight'));
@@ -72,7 +72,7 @@ const meta = {
     await expect(Math.abs(text.top + text.height / 2 - (box.top + box.height / 2))).toBeLessThan(1);
 
     await expect(meter).toHaveAttribute('role', 'img');
-    await expect(meter).toHaveAccessibleName(score === 5 ? '5 out of 5, 100%' : `${score} out of 5`);
+    await expect(meter).toHaveAccessibleName(`${score * 20}%`);
   },
 } satisfies Meta<typeof ProgressMeter>;
 

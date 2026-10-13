@@ -3,7 +3,7 @@ import { expect, fn } from 'storybook/test';
 import { ResultsSummary } from './ResultsSummary';
 import type { ResultsSummaryRow } from './ResultsSummary';
 
-const figmaDescription = `The end-of-session results list. Each of the three Property 1 variants (good-explanations / needs-practice / skipped-questions) has its own independent row 1-row 5 slots - up to 5 rows, matching the fixed 5-question session length.
+const figmaDescription = `The end-of-session results list. Each of the four Property 1 variants (good-explanations / with hints / needs-practice / skipped-questions) has its own independent row 1-row 5 slots - up to 5 rows, matching the fixed 5-question session length.
 
 USE
 Show once the recall session ends. Pick the Property 1 variant for the card being shown. Fill only as many rows as that card has content for (1-5) and leave the rest empty.
@@ -16,7 +16,10 @@ SPACING
 Rows within one card: Space/100 (4px) itemSpacing on the Items List frame. Card's own paddingBottom: Space/100 (4px), bound to the variable. Between separate top-level resultsSummary cards, when more than one is shown on a screen (e.g. Needs Practice + Skipped Questions stacked, as in "Here's how it went"): Space/200 (8px), set on the parent frame that stacks the instances, not on this component.
 
 TONE
-Default row content per variant is toned: good-explanations rows are tone=success, needs-practice rows are tone=error, skipped-questions rows are tone=neutral.
+Default row content per variant is toned: good-explanations rows are tone=success, with-hints rows are tone=with hints (blue), needs-practice rows are tone=error, skipped-questions rows are tone=neutral.
+
+WITH HINTS (added in Figma 2026-10-12)
+A concept the student got right, but only after a hint. It is separate from good-explanations on purpose: good-explanations now means answered right on the first try with no hint, and the Results ring counts only those. Title "Explained, with hints", fill accent/blue/bold, dark title as on the other cards.
 
 ROW DEFAULT STATE
 All rows default to collapsed (state=collapsed).
@@ -24,7 +27,7 @@ All rows default to collapsed (state=collapsed).
 DON'T
 Don't exceed 5 rows per variant (sessions are fixed at 5 questions). Don't repurpose a row slot for anything other than that variant's own rows - each variant's rows are independent now, not shared.
 
-**In code:** Figma's variant property is still called "Property 1", which can't be a prop name, so it's \`category\` here with Figma's three options (the stories keep Figma's variant names). Instead of five slots, the card takes a \`rows\` array of \`{ label, question, transcript }\` and draws an \`expandableResultRow\` for each, with the tone set by the category. It shows at most 5 rows, and with none it draws nothing (the "no empty cards" rule). The card's title is fixed per category.
+**In code:** Figma's variant property is still called "Property 1", which can't be a prop name, so it's \`category\` here with Figma's four options (the stories keep Figma's variant names, and \`with-hints\` is Figma's "with hints"). Instead of five slots, the card takes a \`rows\` array of \`{ label, question, transcript }\` and draws an \`expandableResultRow\` for each, with the tone set by the category. It shows at most 5 rows, and with none it draws nothing (the "no empty cards" rule). The card's title is fixed per category.
 
 **Opening rows:** all rows start collapsed, and the card keeps one row open at a time itself. For one open row across several cards on a screen, pass \`openRow\` (the open row's index, or null) and \`onOpenRowChange\` to control it from the parent.
 
@@ -42,6 +45,11 @@ const needsPractice: ResultsSummaryRow[] = [
   { label: 'Cellular respiration', question: 'Where does cellular respiration happen?', transcript: 'It happens in the chloroplasts of the cell.' },
   { label: 'Mitosis and meiosis', question: 'How is meiosis different from mitosis?', transcript: 'Meiosis makes two identical cells.' },
   { label: 'Food webs', question: 'What does a food web show?', transcript: 'It shows how much sunlight plants get.' },
+];
+
+const withHints: ResultsSummaryRow[] = [
+  { label: 'Enzyme activity', question: 'What happens to an enzyme when the temperature or pH goes too far from its ideal range?', transcript: 'The enzyme changes shape, so the substrate can no longer fit.' },
+  { label: 'Fermentation', question: 'How is fermentation different from aerobic respiration?', transcript: 'There is no oxygen, so it makes much less ATP.' },
 ];
 
 const skipped: ResultsSummaryRow[] = [
@@ -98,11 +106,11 @@ const meta = {
     await expect(cs.paddingBottom).toBe(token('--space-100'));
     await expect(cs.rowGap).toBe(token('--space-300'));
     await expect(cs.borderTopLeftRadius).toBe(token('--radius-600'));
-    const fill = { 'good-explanations': '--color-accent-green-bold', 'needs-practice': '--color-feedback-error-bold', 'skipped-questions': '--color-feedback-neutral-bold' }[category];
+    const fill = { 'good-explanations': '--color-accent-green-bold', 'with-hints': '--color-accent-blue-bold', 'needs-practice': '--color-feedback-error-bold', 'skipped-questions': '--color-feedback-neutral-bold' }[category];
     await expect(cs.backgroundColor).toBe(paint('backgroundColor', fill));
 
     // The title: fixed per category, centered, Button L style with the bound line height and spacing.
-    const titleText = { 'good-explanations': 'Good explanations', 'needs-practice': 'Needs practice', 'skipped-questions': 'Skipped questions' }[category];
+    const titleText = { 'good-explanations': 'Good explanations', 'with-hints': 'Explained, with hints', 'needs-practice': 'Needs practice', 'skipped-questions': 'Skipped questions' }[category];
     await expect(title).toHaveTextContent(titleText);
     const ts = getComputedStyle(title);
     await expect(ts.fontSize).toBe(token('--type-headline-s-fontSize'));
@@ -116,7 +124,7 @@ const meta = {
 
     // The rows: one per item (at most 5), toned by category, all collapsed, 4px apart, inside the padding.
     await expect(items).toHaveLength(rows.length);
-    const tone = { 'good-explanations': 'success', 'needs-practice': 'error', 'skipped-questions': 'neutral' }[category];
+    const tone = { 'good-explanations': 'success', 'with-hints': 'with-hints', 'needs-practice': 'error', 'skipped-questions': 'neutral' }[category];
     for (const [i, item] of items.entries()) {
       const row = item.querySelector('.expandableResultRow') as HTMLElement;
       await expect(row).toHaveAttribute('data-tone', tone);
@@ -157,6 +165,11 @@ type Story = StoryObj<typeof meta>;
 export const GoodExplanations: Story = {
   name: 'Property 1=good-explanations',
   args: { category: 'good-explanations', rows: good },
+};
+
+export const WithHints: Story = {
+  name: 'Property 1=with hints',
+  args: { category: 'with-hints', rows: withHints },
 };
 
 export const NeedsPractice: Story = {

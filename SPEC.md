@@ -112,7 +112,7 @@ It follows the same pattern as the Storybook story "BottomSheet › Mic permissi
 
 - **States:** one: listening. The student sees no transcript while speaking.
 - **Components:**
-  - `AppBar`, `TopicPill`, `MascotSlot` 2XL, `AnswerCard` `question`
+  - `TopicPill`, `MascotSlot` 2XL, `AnswerCard` `question`. No `AppBar` while listening (changed 2026-10-12, Figma frame 15917:17350): the progress, XP and close X are hidden and the middle section moves up by the bar's height; they fade back in with the result.
   - `RecordingGlow`, breathing, with no ripples and without the two outline rings (see Mocked recall › recordingGlow in this build)
   - `MicButton` `listening` / `ready`
   - `ButtonIcon` Secondary S with `src/icons/XIcon.tsx`, labelled "Cancel recording" for screen readers
@@ -124,7 +124,6 @@ It follows the same pattern as the Storybook story "BottomSheet › Mic permissi
 |---|---|
 | Tap mic (stop) | submits the take, then `/q/[n]/thinking` |
 | Cancel X | throws the take away, then `/q/[n]` |
-| Close X | exit confirm sheet |
 | Reopening the app on this route | `/q/[n]`; the take is dropped |
 
 ### 5. Entry link and reset: `/s/[code]`, `/reset`
@@ -146,22 +145,20 @@ A different code starts a new session for it. An unknown code shows "This link d
 
 ### 6. Processing: `/q/[n]/thinking`
 
-- **States:**
-  - "Thinking...", for at least 1.2s.
-  - "Taking a moment…", from ~4s, only for a `slow` take.
-  - Fallback at ~10s: goes to the result as "didn't catch that".
-
-  The text appears inside `AnswerCard` `processing`, which shows "Thinking..." by default (Figma's "Processing message" layer). "Taking a moment…" is passed as its `message`.
+- **States** (changed 2026-10-12, Figma frame 15917:17457):
+  - Thinking, for at least 1.2s: the mic is replaced by three violet dots on a dark disc. There is no "Thinking..." card and no skeleton; the wait is the button itself.
+  - "Taking a moment…", from ~4s, only for a `slow` take, in the `TapToAnswer` line above the mic (where "Tap to submit…" sits on the dictating screen), fading in over `motion.duration.hintFadeIn`.
+  - Fallback at ~10s: goes to the result as "didn't catch that", with the card saying "That took longer than it should. Tap the mic to try again." instead of "I couldn't understand that take", because the wait was ours, not the student's audio.
 - **Components:**
-  - `AppBar`, `TopicPill`, `MascotSlot` 2XL
-  - `AnswerCard` `question` + `AnswerCard` `processing`
-  - `LoadingDots`
-  - `MicButton` `idle` / `disabled`
+  - `TopicPill`, `MascotSlot` 2XL, `AnswerCard` `question`. No `AppBar`, as on the dictating screen: it fades back in with the result.
+  - `MicButton` `idle` / `thinking` (it holds the loading dots; `LoadingDots` is used inside it)
+  - `TapToAnswer`, empty until "Taking a moment…"
+  - `ButtonIcon` Secondary S with `src/icons/XIcon.tsx`, labelled "Cancel answer" for screen readers
 - **Actions:**
 
 | Action | Leads to |
 |---|---|
-| Close X | exit confirm sheet |
+| Cancel X (under the mic) | throws the take away, nothing counted, then `/q/[n]` (or `/q/[n]/type` in keyboard mode) |
 | None: this screen moves on by itself | `/q/[n]/result` when the mock's verdict is ready |
 | Reopening the app on this route | `/q/[n]`; the take is dropped |
 
@@ -208,20 +205,22 @@ A different code starts a new session for it. An unknown code shows "This link d
 ### 8. Results: `/results`
 
 - **States:**
-  - Perfect: every concept correct.
+  - Perfect: every concept correct on its own, with no hint.
   - Mixed.
   - Mostly skipped.
 
+  **What counts as correct (decided 2026-10-12):** only an answer right with no hint is "correct" here: it fills the ring, the headline count and the "strongest area" line, and lands in Good explanations. An answer that came right after a hint lands in its own card, "Explained, with hints" (the `resultsSummary` variant `with-hints`), and does not count. A retry after "didn't catch that" with no hint ever shown still counts. A revealed concept stays in Needs practice. Card order: good explanations, explained with hints, needs practice, skipped; with nothing right on its own, with hints first, then skipped, then needs practice (Figma frame 15850:9628, which uses the "Here's how it went" copy).
+
   The copy changes with each state (Figma's Results frames; placeholders in `src/content/results.ts`). Results show only the latest pass.
-  - **Which state:** perfect when all 5 are correct ("5 out of 5!"); mixed with 1–4 ("You got N of 5 concepts", naming the first correct concept as the strongest area); "Here's how it went" with none correct, when the score ring is hidden. With none correct, the skipped card comes first, as in Figma's frame; otherwise good explanations, needs practice, skipped.
+  - **Which state:** perfect when all 5 are correct on their own ("5 out of 5!"); mixed with 1–4 ("You got N of 5 concepts", N counting only answers right on their own, naming the first of those as the strongest area); "Here's how it went" with none correct, when the score ring is hidden. With none correct, the skipped card comes first, as in Figma's frame; otherwise good explanations, needs practice, skipped.
   - **Transcripts:** each take's canned transcript is stored when it's judged (none for a take that wasn't caught). Identical canned lines show once, in order.
   - **XP isn't shown here:** there's no app bar, and the XP card is out of scope.
   - **The `tour` script's later pass** answers every question fully, so "Review all" then a full pass reaches the perfect state (decided 2026-10-05).
 - **Components:**
-  - `ProgressMeter` score 1–5. It's hidden when nothing is correct.
+  - `ProgressMeter` score 1–5, shown as a percentage (20% to 100%, changed in Figma 2026-10-12). It's hidden when nothing is right on its own.
   - `HeadlineBlock` `bodyM`, `secondary` for the headline and the line under it
-  - `ResultsSummary` `good-explanations`, `needs-practice` and `skipped-questions`
-  - `ExpandableResultRow`, with tone `success`, `error` or `neutral`. A row's transcript is every take for that concept, joined: the canned transcript for a spoken take, and exactly what was typed for a typed one. This is the only place the student sees their transcript.
+  - `ResultsSummary` `good-explanations`, `with-hints`, `needs-practice` and `skipped-questions`
+  - `ExpandableResultRow`, with tone `success`, `partial` (the with-hints card), `error` or `neutral`. A row's transcript is every take for that concept, joined: the canned transcript for a spoken take, and exactly what was typed for a typed one. This is the only place the student sees their transcript.
   - `BottomCTA` "Two button drawer": Secondary "Review all", Primary "Continue"
   - No `AppBar`, as in Figma.
 - **Actions:**

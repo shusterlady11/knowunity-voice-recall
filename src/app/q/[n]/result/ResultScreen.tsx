@@ -11,7 +11,7 @@ import { MicButton } from '../../../../components/micButton/MicButton';
 import { InputModeToggle } from '../../../../components/inputModeToggle/InputModeToggle';
 import { BottomCTA } from '../../../../components/bottomCTA/BottomCTA';
 import { ChatInput } from '../../../../components/chatInput/ChatInput';
-import { nudge, questions, topic } from '../../../../content/questions';
+import { nudge, questions, timedOut, topic } from '../../../../content/questions';
 import { bold } from '../../../../content/bold';
 import { fillHint, type Verdict } from '../../../../lib/recallEngine';
 import { announce } from '../../../../lib/announcer';
@@ -63,7 +63,13 @@ export function ResultScreen({ n }: { n: number }) {
     rememberRoute(`/q/${n}/result`);
     markShown();
     const covered = saved.covered?.length ?? 0;
-    announce(saved.verdict === 'notCaught' ? verdictWord.notCaught : `${verdictWord[saved.verdict]} You covered ${covered} of ${total} key ideas.`);
+    announce(
+      saved.feedback?.kind === 'timedOut'
+        ? timedOut
+        : saved.verdict === 'notCaught'
+          ? verdictWord.notCaught
+          : `${verdictWord[saved.verdict]} You covered ${covered} of ${total} key ideas.`,
+    );
   }, [n, total, router, markShown]);
 
   if (!record?.verdict || !record.feedback) return null;
@@ -77,7 +83,9 @@ export function ResultScreen({ n }: { n: number }) {
         ? fillHint(question.hints[feedback.keyPoint - 1], covered, total)
         : feedback.kind === 'nudge'
           ? nudge
-          : undefined; // "didn't catch that": the card's own default line.
+          : feedback.kind === 'timedOut'
+            ? timedOut
+            : undefined; // "didn't catch that": the card's own default line.
 
   // Ends the question with an outcome and its XP, once, then moves on.
   const finish = (outcome: 'needsPractice' | 'skipped') => {
@@ -135,7 +143,7 @@ export function ResultScreen({ n }: { n: number }) {
   return (
     <Scaffold
       topNavigation={
-        <div inert={blocked}>
+        <div className="result__appBar" inert={blocked}>
           <AppBar progress={((n - 1) / questions.length) * 100} xp={session?.xp ?? 0} onClose={() => setSheet('exit')} />
         </div>
       }

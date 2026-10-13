@@ -81,7 +81,7 @@ const meta = {
     await expect(rowStyle.paddingLeft).toBe(token('--space-400'));
     await expect(rowStyle.borderTopLeftRadius).toBe(token('--radius-400'));
     await expect(rowStyle.rowGap).toBe(token('--space-200'));
-    const fill = { success: '--color-feedback-success-subtle', error: '--color-feedback-error-subtle', neutral: '--color-background-surface' }[tone];
+    const fill = { success: '--color-feedback-success-subtle', 'with-hints': '--color-feedback-partial-subtle', error: '--color-feedback-error-subtle', neutral: '--color-background-surface' }[tone];
     await expect(rowStyle.backgroundColor).toBe(paint('backgroundColor', fill));
 
     // The header line: icon, label and chevron, one Body M line tall (26px), so a collapsed row is 58px.
@@ -98,7 +98,7 @@ const meta = {
     await expect(iconBox.height).toBe(px('--icon-200'));
     await expect(iconBox.left).toBe(rowBox.left + px('--space-400'));
     await expect(iconBox.top + iconBox.height / 2).toBeCloseTo(rowBox.top + px('--space-400') + lineHeight / 2, 1);
-    const iconColor = { success: '--color-feedback-success-onSubtle', error: '--color-feedback-error-onSubtle', neutral: '--color-interactive-onSecondary' }[tone];
+    const iconColor = { success: '--color-feedback-success-onSubtle', 'with-hints': '--color-feedback-partial-onSubtle', error: '--color-feedback-error-onSubtle', neutral: '--color-interactive-onSecondary' }[tone];
     await expect(getComputedStyle(icon.parentElement as HTMLElement).color).toBe(paint('color', iconColor));
     await expect(label.getBoundingClientRect().left).toBe(iconBox.right + px('--space-200'));
     const ls = getComputedStyle(label);
@@ -161,6 +161,16 @@ export const CollapsedSuccess: Story = {
 export const ExpandedSuccess: Story = {
   name: 'state=expanded, tone=success',
   args: { state: 'expanded', tone: 'success' },
+};
+
+export const CollapsedWithHints: Story = {
+  name: 'state=collapsed, tone=with hints',
+  args: { state: 'collapsed', tone: 'with-hints' },
+};
+
+export const ExpandedWithHints: Story = {
+  name: 'state=expanded, tone=with hints',
+  args: { state: 'expanded', tone: 'with-hints' },
 };
 
 export const CollapsedError: Story = {

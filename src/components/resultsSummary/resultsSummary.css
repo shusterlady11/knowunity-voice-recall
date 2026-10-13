@@ -14,6 +14,10 @@
   background-color: var(--color-accent-green-bold);
 }
 
+.resultsSummary[data-category='with-hints'] {
+  background-color: var(--color-accent-blue-bold);
+}
+
 .resultsSummary[data-category='needs-practice'] {
   background-color: var(--color-feedback-error-bold);
 }
@@ -23,7 +27,7 @@
 }
 
 /* Figma sets the title in the Button L style, with its line height and letter spacing taken from the
-   font tokens. The dark on-primary color keeps it readable on all three card fills. */
+   font tokens. The dark on-primary color keeps it readable on all four card fills. */
 .resultsSummary__title {
   margin: 0;
   color: var(--color-interactive-onPrimary);

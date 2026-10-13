@@ -3,57 +3,41 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Scaffold } from '../../../../components/scaffold/Scaffold';
-import { AppBar } from '../../../../components/appBar/AppBar';
 import { MiddleSection } from '../../../../components/middleSection/MiddleSection';
-import { AnswerCard } from '../../../../components/answerCard/AnswerCard';
+import { TapToAnswer } from '../../../../components/tapToAnswer/TapToAnswer';
 import { MicButton } from '../../../../components/micButton/MicButton';
-import { LoadingDots } from '../../../../components/loadingDots/LoadingDots';
+import { ButtonIcon } from '../../../../components/buttonIcon/ButtonIcon';
+import { XIcon } from '../../../../icons/XIcon';
 import { idkTranscript, questions, topic } from '../../../../content/questions';
 import { bold } from '../../../../content/bold';
 import { defaultCode, scripts } from '../../../../content/scripts';
 import { combine, feedbackFor, judgeTake, verdictFor, xpFor, type Verdict } from '../../../../lib/recallEngine';
 import { announce } from '../../../../lib/announcer';
 import { durationMs } from '../../../../lib/motion';
-import { getSession, questionRecord, updateSession, useSession } from '../../../../lib/session';
+import { getSession, questionRecord, questionRoute, updateSession } from '../../../../lib/session';
 import { useQuestionEnter } from '../../../../lib/questionEnter';
-import { ExitConfirm } from '../../ExitConfirm';
 import { sendBackOnLoad } from '../../sendBackOnLoad';
-import '../../exitConfirm.css';
 import './thinking.css';
 
 /**
- * Processing: "Thinking..." for at least motion.duration.thinkingMin, then the result. A slow take shows
- * "Taking a moment…" at slowNotice and gives up as "didn't catch that" at slowTimeout. An "I don't know"
+ * Processing: the mic shows three dots while Knowie judges, for at least motion.duration.thinkingMin, then the
+ * result. A slow take shows "Taking a moment…" above the mic at slowNotice and gives up at slowTimeout, with a
+ * result that says the wait was too long. The X under the mic throws the take away and goes back to the question. An "I don't know"
  * take counts as a skip and goes straight to the next question, with no result screen.
  */
 export function ThinkingScreen({ n }: { n: number }) {
   const router = useRouter();
   // The same question as the screen before, so it stays put; it rises in only when opened fresh.
   const { animateIn, markShown } = useQuestionEnter(n);
-  const xp = useSession()?.xp ?? 0;
-  const [leaving, setLeaving] = useState(false);
   const [message, setMessage] = useState<string | undefined>(undefined);
   const isLast = n === questions.length;
 
-  // Where to go once judged. Held while the exit confirm is open, so the screen doesn't change under it.
-  const leavingRef = useRef(false);
-  const pendingRef = useRef<string | null>(null);
-  const goTo = useCallback(
-    (route: string) => {
-      if (leavingRef.current) pendingRef.current = route;
-      else router.replace(route);
-    },
-    [router],
-  );
-  const openExit = () => {
-    leavingRef.current = true;
-    setLeaving(true);
-  };
-  const keepGoing = useCallback(() => {
-    leavingRef.current = false;
-    setLeaving(false);
-    if (pendingRef.current) router.replace(pendingRef.current);
-  }, [router]);
+  // Set when the student cancels, so a judge that finishes during the move doesn't count the take.
+  const cancelledRef = useRef(false);
+
+  // Where to go once judged. There is no exit confirm here any more (the app bar is hidden while Knowie
+  // thinks), so nothing holds the move.
+  const goTo = useCallback((route: string) => router.replace(route), [router]);
 
   useEffect(() => {
     if (sendBackOnLoad(n, (route) => router.replace(route))) return;
@@ -87,7 +71,8 @@ export function ThinkingScreen({ n }: { n: number }) {
       if (transcript) record.transcripts = [...(record.transcripts ?? []), transcript];
       delete record.typed;
     };
-    const finish = (verdict: Verdict, covered: number[]) => {
+    const finish = (verdict: Verdict, covered: number[], timedOut = false) => {
+      if (cancelledRef.current) return;
       updateSession((s) => {
         const record = questionRecord(s, n);
         record.takes = takeNumber;
@@ -95,7 +80,7 @@ export function ThinkingScreen({ n }: { n: number }) {
         record.covered = covered;
         record.verdict = verdict;
         const hintsUsed = record.hintsUsed ?? [];
-        record.feedback = feedbackFor(verdict, covered, hintsUsed, keyPointCount);
+        record.feedback = timedOut ? { kind: 'timedOut' } : feedbackFor(verdict, covered, hintsUsed, keyPointCount);
         if (record.feedback.kind === 'hint') record.hintsUsed = [...hintsUsed, record.feedback.keyPoint];
         if (verdict === 'correct' && !record.outcome) {
           const revealed = record.revealed === true;
@@ -113,11 +98,12 @@ export function ThinkingScreen({ n }: { n: number }) {
           setMessage('Taking a moment…');
           announce('Taking a moment.');
         }, durationMs('--motion-duration-slowNotice')),
-        setTimeout(() => finish('notCaught', session?.questions[n]?.covered ?? []), durationMs('--motion-duration-slowTimeout')),
+        setTimeout(() => finish('notCaught', session?.questions[n]?.covered ?? [], true), durationMs('--motion-duration-slowTimeout')),
       );
     } else {
       timers.push(
         setTimeout(() => {
+          if (cancelledRef.current) return;
           if (take.kind === 'idk') {
             // "I don't know" is treated as Skip: no result, straight to the next question.
             updateSession((s) => {
@@ -137,31 +123,37 @@ export function ThinkingScreen({ n }: { n: number }) {
     return () => timers.forEach(clearTimeout);
   }, [n, isLast, router, goTo, markShown]);
 
+  // Throws the take away and goes back to the question (or the typing screen, in keyboard mode). Nothing is
+  // counted: the take is only counted once judged.
+  const cancel = () => {
+    cancelledRef.current = true;
+    announce('Answer cancelled.');
+    router.replace(questionRoute(n));
+  };
+
   return (
     <Scaffold
-      topNavigation={
-        <div inert={leaving}>
-          <AppBar progress={((n - 1) / questions.length) * 100} xp={xp} onClose={openExit} />
-        </div>
-      }
+      // No app bar while Knowie thinks (Figma, 2026-10-12): it fades back in with the result.
+      showTopNavSlot={false}
       middleContent={
-        <div className="thinking__content" inert={leaving}>
+        <div className="thinking__content">
           {/* No intro card once the student has answered, so Knowie's reply fits (decided 2026-10-04). */}
           <MiddleSection topic={topic} question={bold(questions[n - 1].prompt)} showIntro={false} animateIn={animateIn} />
-          <AnswerCard state="processing" message={message} />
         </div>
       }
       bottomContent={
-        <div className="thinking__answer" inert={leaving}>
-          {/* Not tappable while Knowie judges the take; the dots show it's working. */}
-          <MicButton listeningState="idle" interactionState="disabled" />
-          <div className="thinking__dots">
-            <LoadingDots />
+        <div className="thinking__answer">
+          {/* The line where the other states put their hint: empty until a slow take shows "Taking a moment…". */}
+          <div className="thinking__hint" data-visible={message ? '' : undefined}>
+            <TapToAnswer text={message ?? '\u00A0'} />
           </div>
+          {/* Not tappable while Knowie judges the take; the dots on the button show it's working. */}
+          <div className="thinking__mic">
+            <MicButton listeningState="idle" interactionState="thinking" />
+          </div>
+          <ButtonIcon variant="Secondary" size="S" icon={<XIcon />} aria-label="Cancel answer" onClick={cancel} />
         </div>
       }
-      showBottomSheetBackground={leaving}
-      bottomSheetOnly={leaving ? <ExitConfirm onKeepGoing={keepGoing} /> : undefined}
     />
   );
 }

@@ -14,6 +14,10 @@
   background-color: var(--color-feedback-success-subtle);
 }
 
+.expandableResultRow[data-tone='with-hints'] {
+  background-color: var(--color-feedback-partial-subtle);
+}
+
 .expandableResultRow[data-tone='error'] {
   background-color: var(--color-feedback-error-subtle);
 }
@@ -52,6 +56,10 @@
 
 .expandableResultRow[data-tone='success'] .expandableResultRow__icon {
   color: var(--color-feedback-success-onSubtle);
+}
+
+.expandableResultRow[data-tone='with-hints'] .expandableResultRow__icon {
+  color: var(--color-feedback-partial-onSubtle);
 }
 
 .expandableResultRow[data-tone='error'] .expandableResultRow__icon {

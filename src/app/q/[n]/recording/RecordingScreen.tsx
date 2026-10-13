@@ -1,9 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Scaffold } from '../../../../components/scaffold/Scaffold';
-import { AppBar } from '../../../../components/appBar/AppBar';
 import { MiddleSection } from '../../../../components/middleSection/MiddleSection';
 import { TapToAnswer } from '../../../../components/tapToAnswer/TapToAnswer';
 import { RecordingGlow } from '../../../../components/recordingGlow/RecordingGlow';
@@ -16,9 +15,7 @@ import { announce } from '../../../../lib/announcer';
 import { durationMs } from '../../../../lib/motion';
 import { questionRecord, rememberRoute, updateSession, useSession } from '../../../../lib/session';
 import { useQuestionEnter } from '../../../../lib/questionEnter';
-import { ExitConfirm } from '../../ExitConfirm';
 import { sendBackOnLoad } from '../../sendBackOnLoad';
-import '../../exitConfirm.css';
 import './recording.css';
 
 /** Dictating: the question stays on screen while the mic listens; no transcript, no toggle, no Skip. */
@@ -26,15 +23,12 @@ export function RecordingScreen({ n }: { n: number }) {
   const router = useRouter();
   // The same question as the screen before, so it stays put; it rises in only when opened fresh.
   const { animateIn, markShown } = useQuestionEnter(n);
-  const [leaving, setLeaving] = useState(false);
   const [hint, setHint] = useState('Listening…');
   const [hintFading, setHintFading] = useState(false);
   const session = useSession();
-  const xp = session?.xp ?? 0;
   // The welcome card, if the student hasn't started answering before: it opens here still showing, then fades
   // while the question card slides up, once Knowie is listening (decided 2026-10-05).
   const showIntro = n === 1 && session !== null && session.introSeen !== true;
-  const keepGoing = useCallback(() => setLeaving(false), []);
 
   // "Listening…" first, then "Tap to submit…" once the student has had time to start speaking. The mic is
   // mocked, so this is a timer (motion.duration.listeningHint), not speech detection; only a tap stops it.
@@ -87,18 +81,16 @@ export function RecordingScreen({ n }: { n: number }) {
 
   return (
     <Scaffold
-      topNavigation={
-        <div inert={leaving}>
-          <AppBar progress={((n - 1) / questions.length) * 100} xp={xp} onClose={() => setLeaving(true)} />
-        </div>
-      }
+      // No app bar while listening (Figma, 2026-10-12): the progress, XP and the close X come back with the
+      // result, and the cancel X under the mic is the way out, so the student is never stuck here.
+      showTopNavSlot={false}
       middleContent={
-        <div className="recording__content" inert={leaving}>
+        <div className="recording__content">
           <MiddleSection topic={topic} intro={intro} question={bold(questions[n - 1].prompt)} showIntro={showIntro} animateIn={animateIn} />
         </div>
       }
       bottomContent={
-        <div className="recording__answer" inert={leaving}>
+        <div className="recording__answer">
           <div className="recording__hint" data-fading={hintFading || undefined} onTransitionEnd={onHintFaded}>
             <TapToAnswer text={hint} />
           </div>
@@ -111,8 +103,6 @@ export function RecordingScreen({ n }: { n: number }) {
           <ButtonIcon variant="Secondary" size="S" icon={<XIcon />} aria-label="Cancel recording" onClick={cancel} />
         </div>
       }
-      showBottomSheetBackground={leaving}
-      bottomSheetOnly={leaving ? <ExitConfirm onKeepGoing={keepGoing} /> : undefined}
     />
   );
 }

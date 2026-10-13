@@ -6,7 +6,7 @@ import type { ExpandableResultRowTone } from '../expandableResultRow/ExpandableR
 import './resultsSummary.css';
 
 // Figma names this property "Property 1"; it's called category here (see the component spec).
-export type ResultsSummaryCategory = 'good-explanations' | 'needs-practice' | 'skipped-questions';
+export type ResultsSummaryCategory = 'good-explanations' | 'with-hints' | 'needs-practice' | 'skipped-questions';
 
 export type ResultsSummaryRow = {
   /** The concept the row is about. */
@@ -31,6 +31,7 @@ const MAX_ROWS = 5;
 
 const titleFor: Record<ResultsSummaryCategory, string> = {
   'good-explanations': 'Good explanations',
+  'with-hints': 'Explained, with hints',
   'needs-practice': 'Needs practice',
   'skipped-questions': 'Skipped questions',
 };
@@ -38,11 +39,12 @@ const titleFor: Record<ResultsSummaryCategory, string> = {
 // The rows take their tone from the card they're in.
 const toneFor: Record<ResultsSummaryCategory, ExpandableResultRowTone> = {
   'good-explanations': 'success',
+  'with-hints': 'with-hints',
   'needs-practice': 'error',
   'skipped-questions': 'neutral',
 };
 
-/** One end-of-session results card (good explanations, needs practice or skipped), with up to five rows. Don't show a card with no rows. */
+/** One end-of-session results card (good explanations, explained with hints, needs practice or skipped), with up to five rows. Don't show a card with no rows. */
 export function ResultsSummary({ category = 'good-explanations', rows, openRow, onOpenRowChange }: ResultsSummaryProps) {
   const titleId = useId();
   const [ownOpenRow, setOwnOpenRow] = useState<number | null>(null);

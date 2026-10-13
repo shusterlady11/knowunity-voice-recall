@@ -35,6 +35,9 @@ export const idkTranscript = 'I don’t know.';
 /** The card's text after both hints are used, the same for every question (SPEC.md › 7). */
 export const nudge = 'You’re close. Want to see the full answer?';
 
+/** What the result card says when a slow take gave up waiting (2026-10-12): the delay was ours, not the student's audio. */
+export const timedOut = 'That took longer than it should. Tap the mic to try again.';
+
 export const topic = 'Cellular energetics';
 
 /** The intro card, shown above question 1 only. */

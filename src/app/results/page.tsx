@@ -9,7 +9,9 @@ import { BottomCTA } from '../../components/bottomCTA/BottomCTA';
 import { HeadlineBlock } from '../../components/headlineBlock/HeadlineBlock';
 import { questions } from '../../content/questions';
 import { resultsCopy } from '../../content/results';
-import { endSession, rememberRoute, startNextPass, useSession } from '../../lib/session';
+import { announce } from '../../lib/announcer';
+import { categoryFor } from '../../lib/resultsGroups';
+import { endSession, rememberRoute, startNextPass, useSession, type Session } from '../../lib/session';
 import './results.css';
 
 type Category = NonNullable<ResultsSummaryProps['category']>;
@@ -17,26 +19,29 @@ type Row = ResultsSummaryProps['rows'][number];
 
 /**
  * Results (SPEC.md › 8): how the latest pass went. The score ring and a headline, then one card per group
- * (good explanations, needs practice, skipped), each row holding that concept's question and every take,
- * joined. No app bar, as in Figma's Results frames.
+ * (good explanations, explained with hints, needs practice, skipped), each row holding that concept's question
+ * and every take, joined. Only answers right with no hint count in the ring and the headline (decided
+ * 2026-10-12). No app bar, as in Figma's Results frames.
  */
 export default function ResultsPage() {
-  const router = useRouter();
   const session = useSession();
+  return session ? <ResultsView session={session} /> : null;
+}
+
+function ResultsView({ session }: { session: Session }) {
+  const router = useRouter();
   // One row open at a time, across all the cards.
   const [open, setOpen] = useState<{ category: Category; row: number } | null>(null);
 
   useEffect(() => rememberRoute('/results'), []);
 
-  if (!session) return null;
-
   // Group each question by how it ended. A question left without an outcome (the student left mid-way)
   // counts as skipped.
-  const groups: Record<Category, Row[]> = { 'good-explanations': [], 'needs-practice': [], 'skipped-questions': [] };
+  const groups: Record<Category, Row[]> = { 'good-explanations': [], 'with-hints': [], 'needs-practice': [], 'skipped-questions': [] };
   questions.forEach((q, i) => {
     const record = session.questions[i + 1];
-    const outcome = record?.outcome ?? 'skipped';
-    const category: Category = outcome === 'correct' ? 'good-explanations' : outcome === 'needsPractice' ? 'needs-practice' : 'skipped-questions';
+    // Right after a hint goes in its own card; right with no hint is the only kind that counts as a good explanation.
+    const category: Category = categoryFor(record);
     // Every take, joined. The canned transcripts repeat for takes with the same verdict, so each line shows
     // once, in order; a real engine's takes would all differ.
     const takes = [...new Set(record?.transcripts ?? [])];
@@ -44,6 +49,7 @@ export default function ResultsPage() {
     groups[category].push({ label: q.answer.title, question: q.prompt.replaceAll('**', ''), transcript });
   });
 
+  // Right with no hint: this is what the ring, the headline and the strongest area count.
   const correct = groups['good-explanations'].length;
   const total = questions.length;
   const copy =
@@ -56,11 +62,16 @@ export default function ResultsPage() {
           }
         : resultsCopy.noneCorrect;
 
-  // With nothing correct, Figma leads with what was skipped; otherwise good, needs practice, skipped.
+  // With nothing right on its own, the hints card leads, then skipped, then needs practice (Figma's Results
+  // frame 15850:9628, 2026-10-12); otherwise good, hints, needs practice, skipped.
   const order: Category[] =
     correct === 0
-      ? ['skipped-questions', 'needs-practice', 'good-explanations']
-      : ['good-explanations', 'needs-practice', 'skipped-questions'];
+      ? ['with-hints', 'skipped-questions', 'needs-practice', 'good-explanations']
+      : ['good-explanations', 'with-hints', 'needs-practice', 'skipped-questions'];
+
+  // Said once when the page opens: the headline and the line under it.
+  const spoken = `${copy.headline} ${copy.line}`;
+  useEffect(() => announce(spoken), [spoken]);
 
   const reviewAll = () => {
     startNextPass();

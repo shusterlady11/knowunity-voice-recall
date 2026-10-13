@@ -128,3 +128,22 @@
   line-height: var(--type-body-m-regular-lineHeight);
   letter-spacing: var(--type-body-m-regular-letterSpacing);
 }
+
+/* The app bar (close X, progress, XP) was hidden while listening and thinking; it fades in with the result,
+   showing the updated XP (Figma, 2026-10-12). It reuses motion.duration.hintFadeIn, the calm 400ms fade-in
+   the dictating screen's hint already uses, so no new timing is added. With reduced motion it just appears. */
+.result__appBar {
+  animation: resultAppBarIn var(--motion-duration-hintFadeIn) var(--motion-easing-inOut) backwards;
+}
+
+@keyframes resultAppBarIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .result__appBar {
+    animation: none;
+  }
+}

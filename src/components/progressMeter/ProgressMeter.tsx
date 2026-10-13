@@ -3,7 +3,7 @@ import './progressMeter.css';
 export type ProgressMeterScore = 1 | 2 | 3 | 4 | 5;
 
 export type ProgressMeterProps = {
-  /** Questions answered correctly out of 5. There is no 0: the meter is left out when nothing was correct. */
+  /** Questions answered correctly on their own, out of 5, shown as a percentage (20% per point). There is no 0: the meter is left out when nothing was correct. */
   score?: ProgressMeterScore;
 };
 
@@ -16,14 +16,15 @@ const RADIUS = 50;
 const THICKNESS = RADIUS * 0.15;
 const CENTER_LINE = RADIUS - THICKNESS / 2;
 
-/** The results-screen ring showing how many of the five questions were right. Leave it out when none were. */
+/** The results-screen ring showing the percentage of the five questions answered right on their own. Leave it out when none were. */
 export function ProgressMeter({ score = 1 }: ProgressMeterProps) {
   const isPerfect = score === TOTAL;
+  const percent = (score / TOTAL) * 100;
   return (
     <div
       className="progressMeter"
       role="img"
-      aria-label={isPerfect ? `${score} out of ${TOTAL}, 100%` : `${score} out of ${TOTAL}`}
+      aria-label={`${percent}%`}
       data-score={score}
     >
       <svg className="progressMeter__ring" viewBox="0 0 100 100" aria-hidden="true">
@@ -39,7 +40,7 @@ export function ProgressMeter({ score = 1 }: ProgressMeterProps) {
         />
       </svg>
       <span className="progressMeter__label" aria-hidden="true">
-        {isPerfect ? '100%' : `${score}/${TOTAL}`}
+        {`${percent}%`}
       </span>
     </div>
   );

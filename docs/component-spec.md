@@ -23,7 +23,7 @@ Legend: ✅ confirmed live, ready to build · ◐ built, has a known issue liste
 | Question, ready to speak | QUESTION / activeState micOn | topicPill, answerCard (question), micButton (idle + ready), toggleGroup (voice) |
 | Question, typing | Question / activeState keyboard option selected, Question / activeState keyboard open | topicPill, answerCard (question), toggleGroup (keyboard) or inputModeToggle (keyboard), input field, Keyboard |
 | Recording | Question / listeningState | micButton (listening + ready), recordingGlow |
-| Processing | Question / processingState | answerCard (processing), micButton (idle + disabled), loadingDots |
+| Processing | Question / thinking (15917:17457) | micButton (idle + thinking), buttonIcon (cancel X); the processing card and separate loadingDots were dropped 2026-10-12 |
 | Feedback | Answering / correctState, correctState finish, partialState, wrongState, notCaughtState | answerCard (answer-*), statusPill, bottomCTA |
 | Reveal answer | Reveal answer | bottomSheet overlay (answer + X), over the answer screen |
 | Last question | Lastquestion / activeState | answerCard (question), micButton (idle + ready), toggleGroup (voice) |
@@ -43,18 +43,22 @@ Component set `15878:19554`, page "New components". Documented in Figma.
 
 **When it's used:** centered above the bottom row on every voice question and answer screen. Not shown when mic permission is denied at the OS level; the toggleGroup / inputModeToggle blocked state owns that case.
 
-**States:** `listeningState` (idle / listening) × `interactionState` (ready / pressed / disabled). 5 of 6 combinations exist; listening + disabled is intentionally omitted.
+**States:** `listeningState` (idle / listening) × `interactionState` (ready / pressed / disabled / thinking). 6 combinations exist; listening + disabled and listening + thinking are intentionally omitted. *Updated 2026-10-12:* idle + thinking added in Figma (three violet dots on the dark disc, replacing disabled on the processing screen); listening is now coral.
 - idle + ready: resting, tap to speak. Icon micFilledIcon. QUESTION / activeState micOn, Lastquestion / activeState, answer screens (retry), Reveal answer, PERMISSION-MIC.
 - listening + ready: recording. Icon micFilledIcon. Question / listeningState, always with recordingGlow behind it.
-- idle + disabled: waiting while Knowie processes the answer. Icon micDisabledIcon. Question / processingState, paired with loadingDots.
+- idle + thinking: Knowie is judging the answer. Three `loadingDots` dots on the disc. Question / thinking.
+- idle + disabled: greyed mic for a mic that can't be used right now. Icon micDisabledIcon. Not placed on any screen now that thinking has its own state.
 - idle + pressed, listening + pressed: momentary press feedback only. Not placed on any screen.
 
 **Bindings:**
 - idle + ready fill → `interactive/primary`
-- idle + pressed, listening + ready, listening + pressed fill → `interactive/primaryActive`
+- idle + pressed fill → `interactive/primaryActive`, icon → `accent/brand/subtle`
+- listening + ready fill → `interactive/listening`, icon → `interactive/onListening`
+- listening + pressed fill → `interactive/listeningActive`, icon → `interactive/onListeningActive`
+- idle + thinking fill → `background/surface`, stroke → `border/strong`, dots → `interactive/thinking`
 - idle + disabled fill → `background/surface`, stroke → `border/strong`
 
-**Build note:** listening + ready has the same fill as pressed, so the button alone doesn't show that recording is on. recordingGlow must always render with listeningState=listening.
+**Build note:** recordingGlow must always render with listeningState=listening, so recording is unmistakable. Updated 2026-10-12: the coral fill now makes the button itself distinct; the glow (coral too, via `interactive/voiceFeedback/layer2` and `layer3`) stays.
 
 **Built** (`src/components/micButton`, 2026-09-24, rebuilt after Figma added the pressed shift and the `Control/Mic` token). Props `listeningState` and `interactionState` with Figma's names and options; the types don't allow listening + disabled. Icons `micFilledIcon` / `micDisabledIcon` exported from Figma into `src/icons/` (no icon prop, as in Figma). Size: `Control/Mic` (96px) for the outer frame and the face, no separate tap area. Structure matches Figma: a fixed 96px frame holding a 96px face. Pressed adds `Space/100` top padding to the frame, which centers the face 2px lower, and removes the bevel, like the main button. Icon color: `accent/brand/bold`, `accent/brand/onSubtle` when pressed, `icon/disabled` when disabled. Disabled keeps focus, sets `aria-disabled` and `aria-busy`, and ignores taps. Also `aria-pressed` = listening, and the accessible name is "Record answer".
 
@@ -375,6 +379,8 @@ The denominator is fixed at /5 (fixed session length).
 
 **Built** (`src/components/progressMeter`, 2026-09-24). Prop `score` 1 to 5 (no 0). Size `Indicator/Meter` (80px). Ring thickness is 15% of the radius (Figma's inner radius is 85%), worked out from the size (6px at 80px), so it needs no token. Drawn as an SVG ring from the top, clockwise, filling score/5; green for score 5. Label in Body M Bold, `interactive/primary`. Exposed as an image labelled "N out of 5" (", 100%" for a perfect score). The denominator is fixed at 5, as in Figma.
 
+**Updated 2026-10-12 (Figma):** the label is a percentage at every score (20%, 40%, 60%, 80%, 100%) instead of N/5, and the image is labelled with that percentage. `score` still means questions answered right on their own (no hint), out of 5; Figma's variant names stay `score=1` to `score=5`. Still no 0.
+
 
 ### resultsSummary ◐
 
@@ -394,6 +400,8 @@ Component set `15815:43943`, page "New components". Documented in Figma.
 **Known issue:** only the mixed "Here's how it went" frame uses this component (skipped-questions + needs-practice). The perfect-score and 2-of-5 frames have hand-built "Good explanations" lists.
 
 **Built** (`src/components/resultsSummary`, 2026-09-24). Figma's variant property "Property 1" can't be a prop name, so it's `category` (options as in Figma; decided with the user), and the stories keep Figma's variant names. Instead of five slots the card takes a `rows` array of `{ label, question, transcript }` (decided with the user) and draws an `expandableResultRow` per item, with the tone set by the category (success, error, neutral). It draws at most 5 rows and nothing at all for an empty list (the "no empty cards" rule). All rows start collapsed; the card keeps one row open at a time, or the parent controls it with `openRow` / `onOpenRowChange` for one open row across several cards. The card fills its container (358px in the screen gutters); padding `Space/400` on top and `Space/100` elsewhere, gap `Space/300`, rows `Space/100` apart, corners `Radius/600`; fills `accent/green/bold`, `feedback/error/bold`, `feedback/neutral/bold`. Title: fixed text per category, centered, Headline S size and weight (Figma's Button L style) with the line height `font/lineHeight/sm` and spacing `font/tracking/loose` that Figma binds. A card with three collapsed rows is 234px tall (rows are 58px with the 26px Body M line; Figma's older layers give 228px).
+
+**Updated 2026-10-12 (Figma):** a fourth variant, "with hints" (`category="with-hints"`), titled "Explained, with hints": fill `accent/blue/bold` (same value as `feedback/partial/bold`), rows toned `with-hints` (`feedback/partial/subtle` fill, `feedback/partial/onSubtle` check). It holds concepts answered right only after a hint; good-explanations now holds only those answered with no hint. `expandableResultRow` gained a `with-hints` tone for it (the designer confirmed the name, 2026-10-12).
 
 **Title color (fixed in Figma 2026-09-25):** the title is the dark `interactive/onPrimary` on all three cards, about 8.5:1 on green and 7:1 on coral. It was near-white `interactive/primary` on green and coral (about 2.1:1 and 2.5:1, under the 3:1 minimum for large text); the code follows the new binding.
 

@@ -1,5 +1,7 @@
 // The Results screen's headline and line under it, from Figma's three Results frames. PLACEHOLDER where
-// Figma's copy names a concept: the mixed line uses the first concept the student got right.
+// Figma's copy names a concept: the mixed line uses the first concept the student got right on their own.
+// "Right" here means right with no hint (2026-10-12): a concept answered after a hint is counted in its own
+// card, not in the headline, the ring or the strongest area.
 
 export const resultsCopy = {
   perfect: {

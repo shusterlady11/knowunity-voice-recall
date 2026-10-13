@@ -56,7 +56,9 @@ export type Feedback =
   | { kind: 'correct' }
   | { kind: 'hint'; keyPoint: number }
   | { kind: 'nudge' }
-  | { kind: 'notCaught' };
+  | { kind: 'notCaught' }
+  // The judge took too long and gave up (a slow take), so the audio wasn't the problem.
+  | { kind: 'timedOut' };
 
 /** After this many hints, a partial or wrong shows the nudge toward Reveal answer instead (SPEC.md › 7). */
 export const hintLimit = 2;
