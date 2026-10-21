@@ -19,7 +19,8 @@ const messages: Record<EndedBy, { title: string; caption: string }> = {
  * End screen (SPEC.md › 9): Knowie and one message, chosen by how the student got here, which the button
  * that led here saved in the session (was D3). No Figma frame; composed like the other message screens.
  * A student who left gets "Keep going", back to their question; one who opted out gets "Go back", to Mic
- * skipped. Finishing is the end: nothing to tap (decided 2026-10-07).
+ * skipped. A student who finished gets "New topic" (2026-10-21, replacing 2026-10-07's "nothing to tap"): the
+ * home address starts a fresh session at the first-run splash, since the prototype has the one topic.
  */
 export default function DonePage() {
   const router = useRouter();
@@ -45,7 +46,10 @@ export default function DonePage() {
       <Button variant="Primary" size="L" CTA="Keep going" onClick={keepGoing} />
     ) : endedBy === 'optedOut' ? (
       <Button variant="Primary" size="L" CTA="Go back" onClick={() => backTo('/mic-off')} />
-    ) : undefined;
+    ) : (
+      // The home address sees a finished session and starts a new one at the splash.
+      <Button variant="Primary" size="L" CTA="New topic" onClick={() => router.push('/')} />
+    );
 
   return (
     <MessageScreen

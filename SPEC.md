@@ -213,7 +213,7 @@ A different code starts a new session for it. An unknown code shows "This link d
   **What counts as correct (decided 2026-10-12):** only an answer right with no hint is "correct" here: it fills the ring, the headline count and the "strongest area" line, and lands in Good explanations. An answer that came right after a hint lands in its own card, "Explained, with hints" (the `resultsSummary` variant `with-hints`), and does not count. A retry after "didn't catch that" with no hint ever shown still counts. A revealed concept stays in Needs practice. Card order: good explanations, explained with hints, needs practice, skipped; with nothing right on its own, with hints first, then skipped, then needs practice (Figma frame 15850:9628, which uses the "Here's how it went" copy).
 
   The copy changes with each state (Figma's Results frames; placeholders in `src/content/results.ts`). Results show only the latest pass.
-  - **Which state** (wording approved 2026-10-21; the ring shows the percent, so the words don't repeat a count): all 5 right on their own — "All five, no hints" / "You explained every one yourself."; 1–4 — "Good start" / "Solid on [first concept right on its own]. Take another look at [first one that wasn't]."; none right on their own but some after a hint — "Hints got you there" / "Try these again on your own."; none at all — "Here's how it went" / "Pick one to try first." The ring is hidden at none. With none right on its own, the hints card comes first, then skipped, then needs practice; otherwise good explanations, hints, needs practice, skipped.
+  - **Which state** (wording approved 2026-10-21; the ring shows the percent, so the words don't repeat a count): all 5 right on their own — "All five, no hints" / "You explained every one yourself."; 1–4 — "Good start" / "Solid on [first concept right on its own]. Take another look at [first one that wasn't]."; none right on their own but some after a hint — "Hints helped" / "Try these again on your own."; none at all — "How it went" / "Pick one to try first." The ring is hidden at none. With none right on its own, the hints card comes first, then skipped, then needs practice; otherwise good explanations, hints, needs practice, skipped.
   - **Transcripts:** each take's canned transcript is stored when it's judged (none for a take that wasn't caught). Identical canned lines show once, in order.
   - **XP isn't shown here:** there's no app bar, and the XP card is out of scope.
   - **The `tour` script's later pass** answers every question fully, so "Review all" then a full pass reaches the perfect state (decided 2026-10-05).
@@ -238,7 +238,7 @@ A different code starts a new session for it. An unknown code shows "This link d
 
   | Arrived by | Message |
   |---|---|
-  | Finishing (Results → Continue) | "Nice work. You're done." |
+  | Finishing (Results → Continue) | "Nice work. You're done." with a Primary L "New topic" button (2026-10-21), which opens the home address: a fresh session at the first-run splash. The prototype has one topic, so this replays it |
   | Leaving mid-session (exit confirm → Leave) | "Progress saved. Come back any time." |
   | Opting out (`/mic-off` → No thanks) | "No problem. Maybe next time." |
 

@@ -16,11 +16,11 @@ export const resultsCopy = {
     line: (strong: string, weak: string) => `Solid on ${strong}. Take another look at ${weak}.`,
   },
   onlyHints: {
-    headline: 'Hints got you there',
+    headline: 'Hints helped',
     line: 'Try these again on your own.',
   },
   noneUnaided: {
-    headline: 'Here’s how it went',
+    headline: 'How it went',
     line: 'Pick one to try first.',
   },
 };
