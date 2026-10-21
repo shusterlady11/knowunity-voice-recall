@@ -116,7 +116,7 @@ It follows the same pattern as the Storybook story "BottomSheet › Mic permissi
   - `RecordingGlow`, breathing, with no ripples and without the two outline rings (see Mocked recall › recordingGlow in this build)
   - `MicButton` `listening` / `ready`
   - `ButtonIcon` Secondary S with `src/icons/XIcon.tsx`, labelled "Cancel recording" for screen readers
-  - `TapToAnswer` reading "Listening… tap the mic to finish" (so the stop is named from the first second, 2026-10-12; short enough for one line at 320px), then "Tap to submit…" after 3 seconds (`motion.duration.listeningHint`). The old words fade out (`hintFadeOut`, 250ms) and the new ones fade in (`hintFadeIn`, 400ms); with reduced motion they just swap. The mic is mocked, so it's a timer, not speech detection; it never stops the recording. Figma shows "Tap to submit" throughout (decided 2026-10-02).
+  - `TapToAnswer` reading "Listening…", then "Tap to submit…" after 3 seconds (the longer "tap the mic to finish" wording tried on 2026-10-12 was cut back to "Listening…" at the designer's request, 2026-10-13; screen readers still hear "Tap the mic when you're done") (`motion.duration.listeningHint`). The old words fade out (`hintFadeOut`, 250ms) and the new ones fade in (`hintFadeIn`, 400ms); with reduced motion they just swap. The mic is mocked, so it's a timer, not speech detection; it never stops the recording. Figma shows "Tap to submit" throughout (decided 2026-10-02).
   - No toggle and no Skip, as in Figma.
 - **Actions:**
 
@@ -186,7 +186,7 @@ A different code starts a new session for it. An unknown code shows "This link d
 
 **The student's transcript isn't shown on this screen.** It appears in the Results rows (screen 8), including exactly what a typed take said.
 
-**Sheets.** "Reveal answer" and "More info" open a `BottomSheet` M with `BottomSheetAppBar` `dismissOnly`. The sheet holds the answer and context, an X ("Close answer" for screen readers), and no buttons. Closing it returns to the same result. After a reveal, the hint over the mic reads "Tap to try again".
+**Sheets.** "Reveal answer" and "More info" open a `BottomSheet` M with `BottomSheetAppBar` `dismissOnly`. The sheet holds the answer and context, an X ("Close answer" for screen readers), and no buttons. Closing it returns to the same result. After a reveal, and on "didn't catch that", the hint over the mic reads "Tap to try again" (it reads "Tap to dictate" otherwise).
 
 **Bottom bar.** `BottomCTA`'s drawer runs to the screen's edges and bottom, with its buttons 28px from the bottom as in Figma's component; the 24px bottom-button rule is for plain full-width buttons (decided 2026-10-04). On the live states, `InputModeToggle` sits at the left edge beside the mic.
 

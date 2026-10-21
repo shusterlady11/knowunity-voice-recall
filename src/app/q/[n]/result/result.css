@@ -94,18 +94,11 @@
   gap: var(--space-100);
 }
 
-/* A dot, then the heading in Body M Bold, Space/200 apart. */
+/* A dot, then the heading (TextBlock M, Body M Bold), Space/200 apart. */
 .answerSheet__title {
   display: flex;
   align-items: center;
   gap: var(--space-200);
-  margin: var(--space-0);
-  color: var(--color-text-primary);
-  font-family: var(--type-body-m-bold-fontFamily);
-  font-weight: var(--type-body-m-bold-fontWeight);
-  font-size: var(--type-body-m-bold-fontSize);
-  line-height: var(--type-body-m-bold-lineHeight);
-  letter-spacing: var(--type-body-m-bold-letterSpacing);
 }
 
 .answerSheet__dot {
@@ -116,8 +109,8 @@
   background-color: var(--color-text-primary);
 }
 
-/* The underline in accent/brand/bold. Figma draws it 3px tall with no token; Stroke/Heavy border (2px) is
-   the nearest. */
+/* The underline in accent/brand/bold. Figma draws it 3px tall with no token; Stroke/Heavy border (2px) stands
+   in for it (decided 2026-10-21, docs/sprint-context.md). */
 .answerSheet__underline {
   height: var(--stroke-heavy-border);
   border-radius: var(--radius-full);

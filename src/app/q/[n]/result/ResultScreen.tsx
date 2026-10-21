@@ -170,7 +170,7 @@ export function ResultScreen({ n }: { n: number }) {
         <div className="result__answer" inert={blocked}>
           {live && !typing && (
             <>
-              <TapToAnswer text={record.revealed ? 'Tap to try again' : 'Tap to dictate'} />
+              <TapToAnswer text={record.revealed || verdict === 'notCaught' ? 'Tap to try again' : 'Tap to dictate'} />
               <div className="result__mic">
                 <div className="result__toggle">
                   <InputModeToggle inputMode="voice" micBlocked={false} onInputModeChange={(mode) => mode === 'keyboard' && setMode('keyboard')} />

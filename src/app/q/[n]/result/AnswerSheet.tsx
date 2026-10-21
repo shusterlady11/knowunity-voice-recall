@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { BottomSheet } from '../../../../components/bottomSheet/BottomSheet';
+import { TextBlock } from '../../../../components/textBlock/TextBlock';
 import type { Question } from '../../../../content/questions';
 import { announce } from '../../../../lib/announcer';
 import { focusQuietly } from '../../../../lib/focusQuietly';
@@ -39,12 +40,13 @@ export function AnswerSheet({ answer, onClose }: { answer: Question['answer']; o
         appBar={{ type: 'dismissOnly', title: answer.title, dismissLabel: 'Close answer', onDismiss: close }}
         middleSection={
           <div className="answerSheet__content">
-            {/* Built here: Figma's bulleted, underlined heading is loose layers (docs/component-gaps.md). */}
+            {/* Built here: Figma's dot and underline are loose layers (docs/component-gaps.md). The words are
+                TextBlock M, which doesn't choose a heading level, so the row marks itself as the heading. */}
             <div className="answerSheet__heading">
-              <p className="answerSheet__title" role="heading" aria-level={2}>
+              <div className="answerSheet__title" role="heading" aria-level={2}>
                 <span className="answerSheet__dot" aria-hidden="true" />
-                {answer.heading}
-              </p>
+                <TextBlock variant="M" showCaption={false} title={answer.heading} />
+              </div>
               <span className="answerSheet__underline" aria-hidden="true" />
             </div>
             <p className="answerSheet__body">{answer.body}</p>
