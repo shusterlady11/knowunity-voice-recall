@@ -42,7 +42,7 @@ export default function MicOffPage() {
           <div role="heading" aria-level={1} className="micOff__heading">
             <HeadlineBlock
               title="Let’s switch it up."
-              body="Your mic is off, so you have the option to keep learning without speaking out loud. Improving your comprehension with recall also works when you type!"
+              body="Your mic is off, so you’ll type your answers. Recall works just as well when you type. You can turn the mic back on in your phone’s settings."
             />
           </div>
         </div>

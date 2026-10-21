@@ -15,7 +15,7 @@
 //   contrast   every visible text node is 4.5:1 against what is really behind it (3:1 for large text)
 //   targets    every tappable thing is at least 44x44 (a text field counts as its whole pill)
 //   type       text that wraps keeps its line height (1.2x for headings, 1.4x for body)
-//   position   the mic and the question card stay put across the states of one question
+//   position   the mic and the question card stay put across the states of one question; the mic and the toggle sit at the same height on every screen
 //   announce   states that must be said to a screen reader changed the live region; the mic's name says what it does
 //   states     the four verdicts all render, and states that must look different do
 //
@@ -142,6 +142,10 @@ function measureInPage() {
   const micEl = document.querySelector('.micButton');
   out.micFromBottom = micEl && shown(micEl) ? Math.round((innerHeight - micEl.getBoundingClientRect().bottom) * 10) / 10 : null;
   out.micName = micEl ? micEl.getAttribute('aria-label') : null;
+  // The voice/keyboard toggle. The one above the typing bar on the result screen is left out: it sits higher by
+  // design, since the typing bar takes the mic's place above the bottom bar.
+  const toggleEl = [...document.querySelectorAll('.inputModeToggle')].find((e) => shown(e) && !e.closest('.result__typing'));
+  out.toggleFromBottom = toggleEl ? Math.round((innerHeight - toggleEl.getBoundingClientRect().bottom) * 10) / 10 : null;
   out.pillTop = top('.topicPill');
   out.pill = document.querySelector('.statusPill')?.textContent?.trim() ?? null;
   out.announcer = document.querySelector('.announcer')?.textContent ?? '';
@@ -469,6 +473,15 @@ function check({ width, states, failures }) {
     for (const s of mics) if (Math.abs(s.micFromBottom - mics[0].micFromBottom) > 1) add('position', s.name, `mic is ${s.micFromBottom}px from the bottom, ${mics[0].name} has it at ${mics[0].micFromBottom}px (task ${task})`);
     const pills = list.filter((s) => s.pillTop !== null);
     for (const s of pills) if (Math.abs(s.pillTop - pills[0].pillTop) > 1) add('position', s.name, `topic pill is at ${s.pillTop}px, ${pills[0].name} has it at ${pills[0].pillTop}px (task ${task})`);
+  }
+
+  if (process.env.SHOW_POSITIONS) for (const s of states) if (s.micFromBottom !== null || s.toggleFromBottom !== null) console.log(`${s.name}: mic ${s.micFromBottom}, toggle ${s.toggleFromBottom}`);
+  // The mic and the toggle sit at the same height on every screen that has them, not only within one question.
+  for (const key of ['micFromBottom', 'toggleFromBottom']) {
+    const all = states.filter((s) => s[key] !== null);
+    // A check that never saw the thing it measures would pass without checking anything.
+    if (all.length < 3) add('position', key, `only ${all.length} states had a ${key === 'micFromBottom' ? 'mic' : 'toggle'} to measure`);
+    for (const s of all) if (Math.abs(s[key] - all[0][key]) > 1) add('position', s.name, `${key === 'micFromBottom' ? 'mic' : 'toggle'} is ${s[key]}px from the bottom, ${all[0].name} has it at ${all[0][key]}px`);
   }
 
   // While listening, the mic's name says it stops the take.

@@ -110,7 +110,7 @@ export const MicPrimer: Story = {
   name: 'Mic permission sheet (single line)',
   args: {
     showTitle: false,
-    body: 'Turn on your microphone settings to start practicing.',
+    body: 'Turn on your microphone to start practicing. You’ll explain each answer out loud.',
     bodyStyle: 'headlineS',
     bodyEmphasis: 'primary',
   },
@@ -119,9 +119,9 @@ export const MicSkipped: Story = {
   name: 'Mic skipped',
   args: {
     title: 'Let’s switch it up.',
-    body: 'Your mic is off, so you have the option to keep learning without speaking out loud. Improving your comprehension with recall also works when you type!',
+    body: 'Your mic is off, so you’ll type your answers. Recall works just as well when you type. You can turn the mic back on in your phone’s settings.',
   },
 };
 export const Results: Story = {
-  args: { title: resultsCopy.perfect.headline, body: resultsCopy.perfect.line, bodyStyle: 'bodyM' },
+  args: { title: resultsCopy.allUnaided.headline, body: resultsCopy.allUnaided.line, bodyStyle: 'bodyM' },
 };

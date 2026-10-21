@@ -83,13 +83,17 @@ export function QuestionScreen({ n }: { n: number }) {
         <div className="question__answer" inert={leaving}>
           <TapToAnswer text="Tap to dictate" />
           {/* The welcome card stays until Knowie is listening: the dictating screen fades it out. */}
-          <MicButton onClick={() => router.push(`/q/${n}/recording`)} />
-          <ToggleGroup
-            inputMode="voice"
-            micBlocked={false}
-            onInputModeChange={(mode) => mode === 'keyboard' && toKeyboard()}
-            onSkip={skip}
-          />
+          <div className="question__mic">
+            <MicButton onClick={() => router.push(`/q/${n}/recording`)} />
+            <div className="question__row">
+              <ToggleGroup
+                inputMode="voice"
+                micBlocked={false}
+                onInputModeChange={(mode) => mode === 'keyboard' && toKeyboard()}
+                onSkip={skip}
+              />
+            </div>
+          </div>
         </div>
       }
       showBottomSheetBackground={leaving}

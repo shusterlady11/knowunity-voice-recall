@@ -20,10 +20,10 @@
   margin-top: var(--space-600);
 }
 
-/* The mic, centered, with the voice/keyboard toggle at the left edge, level with the mic's bottom. The toggle
-   takes no room, so the mic stays centered. The mic and its caption sit exactly where they do on the question
-   screen (Space/200 above the drawer, not Figma's Space/400), so the thumb target never moves; the toggle
-   keeps the spot it had (decided 2026-10-12, a small step away from Figma's offset). */
+/* The mic, centered, with the voice/keyboard toggle at the left edge, 24px lower than the mic's bottom. The
+   toggle takes no room, so the mic stays centered. The mic and the toggle sit exactly where they do on the
+   question screen (mic 128px, toggle 104px above the bottom; the 96px drawer, then Space/800 up to the mic), as
+   in Figma (2026-10-21). */
 .result__mic {
   position: relative;
   display: flex;
@@ -33,19 +33,19 @@
 
 .result__toggle {
   position: absolute;
-  bottom: var(--space-0);
+  bottom: var(--space-negative-600);
   left: var(--space-0);
 }
 
 /* The drawer runs to the screen's edges and bottom, past Scaffold's Space/400 margin, as in Figma. Its
-   own panel keeps the buttons Space/400 from the sides and Space/700 above the home bar. */
+   own panel keeps the buttons Space/400 from the sides, Space/400 above them and Space/600 above the home bar. */
 .result__bar {
   align-self: stretch;
   margin: var(--space-0) var(--space-negative-400) calc(var(--space-negative-400) - env(safe-area-inset-bottom));
 }
 
 .result__mic + .result__bar {
-  margin-top: var(--space-200);
+  margin-top: var(--space-800);
 }
 
 .result__typing + .result__bar {

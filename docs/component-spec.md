@@ -187,7 +187,7 @@ Component set `15762:36623`, page "New components". Built with its own variant, 
 
 Component set `15808:41818`, page "New components". Documented in Figma.
 
-**Description:** the action bar anchored to the bottom of the screen. Drawer layouts sit in a full-bleed 390×112 panel. Button labels come from each button's CTA text property; don't hardcode them. `Show secondaryButton` (boolean, default true) hides the secondary button in "Two button drawer" once it's been used.
+**Description:** the action bar anchored to the bottom of the screen. Drawer layouts sit in a full-bleed 390×96 panel. Button labels come from each button's CTA text property; don't hardcode them. `Show secondaryButton` (boolean, default true) hides the secondary button in "Two button drawer" once it's been used.
 
 **When it's used:** answer screens (before and after reveal), Results and SPLASH-SKIP-MIC. Question screens use toggleGroup instead.
 
@@ -217,7 +217,7 @@ Component set `15808:41818`, page "New components". Documented in Figma.
 - Labels are shorter than in the Figma designs, because L labels are set in Inter (wider than Greed Condensed) and some pairs didn't fit the 358px row: "More info" + "Next", "Reveal answer" + "Next", "Review" + "Continue". Every pair in the table above fits.
 - Button widths: the two buttons share the row equally; a button whose label needs more than half grows past the center and the other fills what's left.
 - Inside the drawer panel, Secondary buttons are filled with `interactive/secondary` (Figma overrides the fill on those instances); outside it they keep the button's own `background/surface`.
-- The panel is sized by `Space/700` above and below the 56px buttons (112px; Figma sets a raw 112px); its top line is `border/default` at `stroke/border` (Figma: raw 1px).
+- The panel is sized by `Space/400` above and `Space/600` below the 56px buttons (96px; Figma sets a raw 96px, 2026-10-21); its top line is `border/default` at `stroke/border` (Figma: raw 1px).
 - The one-button layouts are built like the two-button drawers. In Figma their outer frame also has 24/16px padding, but the panel still renders full-width at 0,0, so the result is the same.
 - Props: `layout` (Figma's five options), `showSecondaryButton` (Figma's "Show secondaryButton", "Two button drawer" only), `leftCTA` / `rightCTA`, `onLeftClick` / `onRightClick`.
 

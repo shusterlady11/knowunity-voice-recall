@@ -5,22 +5,37 @@
   width: 100%;
 }
 
-/* "Tap to dictate", the mic Space/600 below it (Figma: 21), and the toggle row Space/1200 below the mic.
-   The row sits Space/600 from the bottom edge (Scaffold's Space/400 plus Space/200 here), like every
-   bottom button. */
+/* "Tap to dictate", then the mic Space/600 below it (Figma: 21). The mic's bottom edge is 128px above the
+   screen's bottom, as on every screen with a mic: Scaffold's Space/400, plus this padding. The toggle and
+   Skip sit beside it (below). */
 .question__answer {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  padding-bottom: var(--space-200);
+  padding-bottom: calc(var(--space-1200) + var(--space-1200) + var(--space-400));
 }
 
-.question__answer > .micButton {
+/* The mic, centered, with the toggle at the left edge and Skip at the right, 24px lower than the mic's bottom
+   (Figma: both 104px above the screen's bottom, the same as on the result screens). The row takes no room, so
+   the mic stays centered; only its two buttons take taps, so it doesn't cover the mic. */
+.question__mic {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
   margin-top: var(--space-600);
 }
 
-.question__answer > .toggleGroup {
-  margin-top: var(--space-1200);
+.question__row {
+  position: absolute;
+  right: var(--space-0);
+  bottom: var(--space-negative-600);
+  left: var(--space-0);
+  pointer-events: none;
+}
+
+.question__row .toggleGroup > * {
+  pointer-events: auto;
 }

@@ -16,6 +16,7 @@ import { intro, questions, topic } from '../../content/questions';
 import { bold } from '../../content/bold';
 import { rememberRoute, updateSession } from '../../lib/session';
 import { useQuestionEnter } from '../../lib/questionEnter';
+import '../q/[n]/question.css';
 import './mic.css';
 
 /** Mic primer (SPEC.md › 2): a sheet asking to turn on the mic, over question 1 behind a scrim. */
@@ -55,9 +56,13 @@ export default function MicPage() {
         </div>
       }
       bottomContent={
-        <div className="mic__answer" inert>
+        // The question screen's own layout (its stylesheet is imported above), so the mic sits exactly where it does
+        // there, 128px from the bottom, as in Figma's PERMISSION-MIC.
+        <div className="question__answer" inert>
           <TapToAnswer text="Tap to dictate" />
-          <MicButton />
+          <div className="question__mic">
+            <MicButton />
+          </div>
         </div>
       }
       showBottomSheetBackground
@@ -70,7 +75,7 @@ export default function MicPage() {
               <MascotSlot size="3XL" expression="approving" />
               <HeadlineBlock
                 showTitle={false}
-                body="Turn on your microphone settings to start practicing."
+                body="Turn on your microphone to start practicing. You’ll explain each answer out loud."
                 bodyStyle="headlineS"
                 bodyEmphasis="primary"
               />

@@ -7,10 +7,10 @@ const figmaDescription = `The bottom action bar anchored to the base of the answ
 USE
 Pick the layout variant for the moment:
 • Two button no drawer: Secondary + Primary side by side, no panel. Gap Space/100 (4px), side padding Space/400 (16px), top/bottom padding Space/600 (24px), all bound. Hugs to 104px. Static splash pairing: SPLASH-SKIP-MIC ("No thanks" + "Continue").
-• Two button drawer: outer frame hugs to 112px; its child "bottomSheet" is a full-bleed 390px, 112px panel (fill/stroke/radius token-bound) centering the buttonRow (16px side padding, Space/100 gap, both buttons FILL). Secondary + Primary. Used for a correct answer ("More info" + "Next question", or "Finish" on the last question) and Results ("Review all" or "Review N concepts" + "Continue"). Optional boolean "Show secondaryButton" (default true) hides the secondary button; when hidden, the primary re-fills the row.
+• Two button drawer: outer frame hugs to 96px; its child "bottomSheet" is a full-bleed 390px, 96px panel (fill/stroke/radius token-bound) centering the buttonRow (16px side padding, Space/100 gap, both buttons FILL). Secondary + Primary. Used for a correct answer ("More info" + "Next question", or "Finish" on the last question) and Results ("Review all" or "Review N concepts" + "Continue"). Optional boolean "Show secondaryButton" (default true) hides the secondary button; when hidden, the primary re-fills the row.
 • Two button drawer / Secondary: same panel and buttonRow. Left button (layer "button") Tertiary, "Reveal answer"; right button (layer "secondaryButton") Secondary, fill bound to interactive/secondary. Low emphasis because the mic is the primary action (retry). Right button label: "Next question" after a partial or wrong answer, "Skip" after "Didn't catch that". "Show secondaryButton" is not wired in this variant.
-• One button drawer / primary: single full-width Primary in the 112px panel. Not placed on any screen.
-• One button drawer / secondary: single full-width Secondary in the 112px panel. Not placed on any screen.
+• One button drawer / primary: single full-width Primary in the 96px panel. Not placed on any screen.
+• One button drawer / secondary: single full-width Secondary in the 96px panel. Not placed on any screen.
 
 "Reveal answer" and "More info" open a separate bottomSheet overlay (answer, context, X to close, no buttons). That overlay is not part of this component.
 
@@ -27,7 +27,7 @@ Don't add a 3rd button to buttonRow. Don't hardcode button labels; use each butt
 
 **Inside the panel,** Secondary buttons are filled with \`interactive/secondary\` so they read against the panel, as in Figma, where those instances override the button's fill.
 
-**Differences from Figma, by decision:** the drawer panel is sized by \`Space/700\` above and below the buttons (112px in all; Figma sets a raw 112px); its top line is \`border/default\` at \`stroke/border\` (Figma uses the same color with a raw 1px width). The one-button layouts are built like the two-button drawers (in Figma their outer frame also has padding, but the panel still renders full-width, so the result is the same).`;
+**Differences from Figma, by decision:** the drawer panel is sized by \`Space/400\` above and \`Space/600\` below the buttons (96px in all; Figma sets a raw 96px); its top line is \`border/default\` at \`stroke/border\` (Figma uses the same color with a raw 1px width). The one-button layouts are built like the two-button drawers (in Figma their outer frame also has padding, but the panel still renders full-width, so the result is the same).`;
 
 // Records clicks without the event, so Storybook doesn't serialize a click event (which froze the docs page).
 const leftSpy = fn();
@@ -56,7 +56,7 @@ const meta = {
 
     const isDrawer = layout !== 'Two button no drawer';
     const expectedHeight = isDrawer
-      ? 2 * px('--space-700') + px('--control-l')
+      ? px('--space-400') + px('--space-600') + px('--control-l')
       : 2 * px('--space-600') + px('--control-l');
     await expect(bar.getBoundingClientRect().height).toBe(expectedHeight);
 

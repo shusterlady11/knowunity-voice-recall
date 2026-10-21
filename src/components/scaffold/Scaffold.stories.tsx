@@ -256,7 +256,7 @@ export const MicPermission: Story = {
           <Centered gap="var(--space-600)">
             <MascotSlot size="3XL" expression="approving" />
             <p style={{ margin: 0, textAlign: 'center', color: 'var(--color-text-primary)', font: 'var(--type-headline-s-fontWeight) var(--type-headline-s-fontSize)/var(--type-headline-s-lineHeight) var(--type-headline-s-fontFamily)' }}>
-              Turn on your microphone settings to start practicing.
+              Turn on your microphone to start practicing. You’ll explain each answer out loud.
             </p>
           </Centered>
         }

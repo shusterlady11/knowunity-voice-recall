@@ -9,14 +9,14 @@
 }
 
 /* The same stack as the dictating screen, so the mic stays exactly where it was when the student stopped: a
-   hint line, the mic Space/800 below it, the cancel X Space/600 below the mic, and Space/800 under the X. */
+   hint line, the mic Space/800 below it, the cancel X Space/600 below the mic, and Space/800 plus Space/200 under the X (the mic is 128px above the bottom). */
 .thinking__answer {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  padding-bottom: var(--space-800);
+  padding-bottom: calc(var(--space-800) + var(--space-200));
   /* Keeps the area's layering inside it, so it stays under the exit confirm's scrim and sheet. */
   isolation: isolate;
 }

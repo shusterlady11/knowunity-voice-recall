@@ -59,15 +59,22 @@ function ResultsView({ session }: { session: Session }) {
   // Right with no hint: this is what the ring, the headline and the strongest area count.
   const correct = groups['good-explanations'].length;
   const total = questions.length;
+  const hinted = groups['with-hints'].length;
   const copy =
     correct === total
-      ? resultsCopy.perfect
+      ? resultsCopy.allUnaided
       : correct > 0
         ? {
-            headline: resultsCopy.mixed.headline(correct, total),
-            line: resultsCopy.mixed.line(groups['good-explanations'][0].label.toLowerCase()),
+            headline: resultsCopy.someUnaided.headline,
+            // The first concept right on its own, and the first one that wasn't, in question order.
+            line: resultsCopy.someUnaided.line(
+              groups['good-explanations'][0].label,
+              questions.map((q) => q.answer.title).find((t) => !groups['good-explanations'].some((r) => r.label === t)) ?? '',
+            ),
           }
-        : resultsCopy.noneCorrect;
+        : hinted > 0
+          ? resultsCopy.onlyHints
+          : resultsCopy.noneUnaided;
 
   // With nothing right on its own, the hints card leads, then skipped, then needs practice (Figma's Results
   // frame 15850:9628, 2026-10-12); otherwise good, hints, needs practice, skipped.

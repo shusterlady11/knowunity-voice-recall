@@ -78,7 +78,7 @@ It follows the same pattern as the Storybook story "BottomSheet › Mic permissi
 - **States:** one. The question screen sits behind a scrim, with a sheet over it.
 - **Components:**
   - `Scaffold` with `showBottomSheetBackground`
-  - `BottomSheet` M holding `BottomSheetAppBar` Default, `MascotSlot` 3XL `approving`, `HeadlineBlock` (`showTitle` off, `headlineS`, `primary`) for "Turn on your microphone settings to start practicing.", and `ButtonGroup` Vertical L with two `Button`s
+  - `BottomSheet` M holding `BottomSheetAppBar` Default, `MascotSlot` 3XL `approving`, `HeadlineBlock` (`showTitle` off, `headlineS`, `primary`) for "Turn on your microphone to start practicing. You’ll explain each answer out loud.", and `ButtonGroup` Vertical L with two `Button`s
 - **Reference:** the Storybook story "Scaffold › Mic permission (sheet over scrim)".
 - **Actions:**
 
@@ -188,7 +188,7 @@ A different code starts a new session for it. An unknown code shows "This link d
 
 **Sheets.** "Reveal answer" and "More info" open a `BottomSheet` M with `BottomSheetAppBar` `dismissOnly`. The sheet holds the answer and context, an X ("Close answer" for screen readers), and no buttons. Closing it returns to the same result. After a reveal, and on "didn't catch that", the hint over the mic reads "Tap to try again" (it reads "Tap to dictate" otherwise).
 
-**Bottom bar.** `BottomCTA`'s drawer runs to the screen's edges and bottom, with its buttons 28px from the bottom as in Figma's component; the 24px bottom-button rule is for plain full-width buttons (decided 2026-10-04). On the live states, `InputModeToggle` sits at the left edge beside the mic.
+**Bottom bar.** `BottomCTA`'s drawer runs to the screen's edges and bottom, 96px tall: 16px above the buttons and 24px below, as in Figma's component (2026-10-21); the 24px bottom-button rule is for plain full-width buttons (decided 2026-10-04). On the live states, `InputModeToggle` sits at the left edge beside the mic; on the question screen `ToggleGroup`'s Skip sits across from it. The mic's bottom is 128px above the screen's bottom and the toggle's is 104px, on every screen that has them (Figma, 2026-10-21).
 
 **Actions:**
 
@@ -213,7 +213,7 @@ A different code starts a new session for it. An unknown code shows "This link d
   **What counts as correct (decided 2026-10-12):** only an answer right with no hint is "correct" here: it fills the ring, the headline count and the "strongest area" line, and lands in Good explanations. An answer that came right after a hint lands in its own card, "Explained, with hints" (the `resultsSummary` variant `with-hints`), and does not count. A retry after "didn't catch that" with no hint ever shown still counts. A revealed concept stays in Needs practice. Card order: good explanations, explained with hints, needs practice, skipped; with nothing right on its own, with hints first, then skipped, then needs practice (Figma frame 15850:9628, which uses the "Here's how it went" copy).
 
   The copy changes with each state (Figma's Results frames; placeholders in `src/content/results.ts`). Results show only the latest pass.
-  - **Which state:** perfect when all 5 are correct on their own ("5 out of 5!"); mixed with 1–4 ("You got N of 5 concepts", N counting only answers right on their own, naming the first of those as the strongest area); "Here's how it went" with none correct, when the score ring is hidden. With none correct, the skipped card comes first, as in Figma's frame; otherwise good explanations, needs practice, skipped.
+  - **Which state** (wording approved 2026-10-21; the ring shows the percent, so the words don't repeat a count): all 5 right on their own — "All five, no hints" / "You explained every one yourself."; 1–4 — "Good start" / "Solid on [first concept right on its own]. Take another look at [first one that wasn't]."; none right on their own but some after a hint — "Hints got you there" / "Try these again on your own."; none at all — "Here's how it went" / "Pick one to try first." The ring is hidden at none. With none right on its own, the hints card comes first, then skipped, then needs practice; otherwise good explanations, hints, needs practice, skipped.
   - **Transcripts:** each take's canned transcript is stored when it's judged (none for a take that wasn't caught). Identical canned lines show once, in order.
   - **XP isn't shown here:** there's no app bar, and the XP card is out of scope.
   - **The `tour` script's later pass** answers every question fully, so "Review all" then a full pass reaches the perfect state (decided 2026-10-05).

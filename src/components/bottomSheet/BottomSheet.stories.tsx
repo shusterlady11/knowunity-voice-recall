@@ -147,7 +147,7 @@ export const MicPermission: Story = {
     label: 'Turn on your microphone',
     middleSection: (
       <p style={{ margin: 0, textAlign: 'center', color: 'var(--color-text-primary)', font: 'var(--type-headline-s-fontWeight) var(--type-headline-s-fontSize)/var(--type-headline-s-lineHeight) var(--type-headline-s-fontFamily)' }}>
-        Turn on your microphone settings to start practicing.
+        Turn on your microphone to start practicing. You’ll explain each answer out loud.
       </p>
     ),
     bottomSection: (

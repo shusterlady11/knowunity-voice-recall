@@ -4,12 +4,3 @@
 .mic__question {
   width: 100%;
 }
-
-/* "Tap to dictate" over the mic, centered. Both sit under the sheet. */
-.mic__answer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-400);
-  width: 100%;
-}
