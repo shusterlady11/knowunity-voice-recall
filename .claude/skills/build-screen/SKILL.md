@@ -105,6 +105,7 @@ Each fact appears once on a screen, in the one element best suited to carry it. 
 Before you call a screen done, look at it beside the screen that leads to it and the one that follows:
 - It is not louder than the screen before it (saturated fills, big areas, type weight), unless it is the one peak the flow builds toward, and then through one element.
 - The mic, the primary action and the toggle sit at the same coordinates as on the neighbors. If states differ in height, the content moves, not the control.
+- An action has one name for its job everywhere it appears: if declining is "Not now" on one screen, it is not "No thanks" on the next, and "Skip" is not "Next" for the same exit. If a state needs a different name for the same job, log why in `docs/sprint-context.md`. If the label comes from Figma, report the mismatch instead of renaming it.
 - Read the copy aloud across the screens as one script. Wording that wouldn't fit on the previous screen gets rewritten. If it comes from Figma, report it instead.
 
 ### 13. Blocked states tell the way through
