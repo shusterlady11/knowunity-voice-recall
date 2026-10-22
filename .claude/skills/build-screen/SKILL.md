@@ -77,7 +77,7 @@ Colors, spacing, radius, type, sizes and motion come from `build/css/tokens.css`
 
 - 390×844, dark mode only, styled as native iOS but running as a web app. No tablet or desktop layout, no light theme, no hover-only interactions.
 - Tap targets at least 44×44; contrast and reduced motion as in `docs/platform-constraints.md`.
-- Sentence case on every label, button and heading.
+- Sentence case on every label, button and heading, and on text built from data: a stored name ("Enzymes") is lowercased where it sits inside a sentence ("Solid on enzymes"), unless it is a proper noun.
 - It's tested on a real iPhone 17 (402×874) from the Home Screen, so leave room for the safe areas.
 
 ### 8. Build every state

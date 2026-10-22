@@ -177,6 +177,8 @@ legacy one.
   includes uppercase text-case styling: a label typed in sentence case
   but displayed in all caps still breaks this rule. One exception, decided 2026-10-12: "Add to Home Screen" on the entry
   link's install steps keeps its capitals, because it is the name of the iOS menu item the student has to find.
+  The rule covers text built from data too: a name stored as a title (a concept like "Enzymes") is lowercased where it lands
+  inside a sentence ("Solid on enzymes"), and capitalized only at the start of a label or a sentence, or when it is a proper noun.
 - **Never put a hue or lightness word in a semantic name.** Words for
   what a color *is* ("violet," "light," "dark," "LightVersion") belong in
   the primitive layer only (`color/violet/500`, not

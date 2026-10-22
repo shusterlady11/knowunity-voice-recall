@@ -66,10 +66,11 @@ function ResultsView({ session }: { session: Session }) {
       : correct > 0
         ? {
             headline: resultsCopy.someUnaided.headline,
-            // The first concept right on its own, and the first one that wasn't, in question order.
+            // The first concept right on its own, and the first one that wasn't, in question order. The names sit
+            // inside a sentence, so they're lowercased (sentence case); none of the concepts is a proper noun.
             line: resultsCopy.someUnaided.line(
-              groups['good-explanations'][0].label,
-              questions.map((q) => q.answer.title).find((t) => !groups['good-explanations'].some((r) => r.label === t)) ?? '',
+              groups['good-explanations'][0].label.toLowerCase(),
+              (questions.map((q) => q.answer.title).find((t) => !groups['good-explanations'].some((r) => r.label === t)) ?? '').toLowerCase(),
             ),
           }
         : hinted > 0

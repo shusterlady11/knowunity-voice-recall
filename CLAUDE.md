@@ -26,7 +26,7 @@ Next.js web prototype of Knowunity's voice active-recall feature (student speaks
 - Never build a screen outside `scaffold` (`docs/design-system.md` §2).
 - Never build a new component when an existing one covers it, or invent one to fill a gap — flag the gap instead (`docs/design-system.md` §4).
 - Never read a primitive color/value directly from a component — go through the semantic layer. `docs/design-system.md` §4.
-- Never use anything but sentence case on labels, buttons, or headings. `docs/design-system.md` §4.
+- Never use anything but sentence case on labels, buttons, headings, or text built from data (a stored name inside a sentence is lowercase). `docs/design-system.md` §4.
 - Never say one fact twice on a screen: one element carries each number, label, icon or sentence. Remove the repeat instead of styling it differently. Build-screen skill, step 11.
 - Never build something by hand in a screen (a wrapper, an offset, a component used for another job) without logging it in `docs/component-gaps.md` as you write it, and never copy a hand-built rule a second time: it becomes a component or a slot. Build-screen skill, step 5.
 - Never add a state without its screen-reader sentence in the live region and an accessible name that says what the control does in that state. Build-screen skill, step 10.
