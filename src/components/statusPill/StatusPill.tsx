@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 import { IconSlot } from '../iconSlot/IconSlot';
-import { CheckIcon } from '../../icons/CheckIcon';
+import { CheckLightIcon } from '../../icons/CheckLightIcon';
 import { ArrowCounterClockwiseIcon } from '../../icons/ArrowCounterClockwiseIcon';
-import { ArrowsClockwiseIcon } from '../../icons/ArrowsClockwiseIcon';
+import { CrosshairIcon } from '../../icons/CrosshairIcon';
 import { QuestionMarkIcon } from '../../icons/QuestionMarkIcon';
 import './statusPill.css';
 
@@ -16,9 +16,9 @@ export type StatusPillProps = {
 // The wording and icon are fixed per state: the Figma description says they are part of the
 // state's meaning, so neither can be changed from outside.
 const content: Record<StatusPillState, { label: string; icon: ReactNode }> = {
-  correct: { label: 'Correct', icon: <CheckIcon /> },
-  partial: { label: 'Almost there', icon: <ArrowCounterClockwiseIcon /> },
-  wrong: { label: 'Try again', icon: <ArrowsClockwiseIcon /> },
+  correct: { label: 'Correct', icon: <CheckLightIcon /> },
+  partial: { label: 'Almost there', icon: <CrosshairIcon /> },
+  wrong: { label: 'Try again', icon: <ArrowCounterClockwiseIcon /> },
   notCaught: { label: 'Didn’t catch that', icon: <QuestionMarkIcon /> },
 };
 

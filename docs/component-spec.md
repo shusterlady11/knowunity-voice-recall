@@ -176,12 +176,12 @@ Component set `15762:36623`, page "New components". Built with its own variant, 
 **When it's used:** inside answerCard' answer-* variants on the feedback screens and Reveal answer. Tone comes from `state`; never hand-color it.
 
 **States:** `state`.
-- correct: "Correct". `feedback/success/bold`, label `feedback/success/onBold`, icon Check. Answering / correctState, correctState finish.
-- partial: "Almost there". `feedback/partial/bold`, label `feedback/partial/onBold`, icon ArrowCounterClockwise. Answering / partialState.
-- wrong: "Try again". `feedback/error/bold`, label `feedback/error/onBold`, icon ArrowsClockwise. Answering / wrongState.
-- notCaught: "Didn't catch that". `feedback/neutral/bold`, label `feedback/neutral/onBold`, icon QuestionMark. The app misheard; not the student being wrong. Answering / notCaughtState, Reveal answer.
+- correct: "Correct". `feedback/success/bold`, label `feedback/success/onBold`, icon Check (Weight Light, as in the frames, 2026-10-21). Answering / correctState, correctState finish.
+- partial: "Almost there". `feedback/partial/bold`, label `feedback/partial/onBold`, icon Crosshair (Weight Light; was ArrowCounterClockwise, changed 2026-10-21). Answering / partialState.
+- wrong: "Try again". `feedback/error/bold`, label `feedback/error/onBold`, icon ArrowCounterClockwise (Weight Light; was ArrowsClockwise, changed 2026-10-21). Answering / wrongState.
+- notCaught: "Didn't catch that". `feedback/neutral/bold`, label `feedback/neutral/onBold`, icon QuestionMark (Weight Light). The app misheard; not the student being wrong. Answering / notCaughtState, Reveal answer.
 
-**Known issue:** wrong and partial use near-identical rotating-arrow icons, so color is the only real difference. See "Open design questions."
+**Icons (2026-10-21):** all four are Weight Light (1.5px stroke), as in the Figma component set and frames (the component was updated to match on 2026-10-21; two frames, correctState finish and Reveal answer, may still carry Regular overrides). Partial is a crosshair and wrong an arrow counter-clockwise, so the two no longer look alike.
 
 ### bottomCTA ◐
 
