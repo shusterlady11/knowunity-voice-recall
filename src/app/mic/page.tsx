@@ -12,9 +12,8 @@ import { BottomSheet } from '../../components/bottomSheet/BottomSheet';
 import { ButtonGroup } from '../../components/buttonGroup/ButtonGroup';
 import { Button } from '../../components/button/Button';
 import { HeadlineBlock } from '../../components/headlineBlock/HeadlineBlock';
-import { intro, questions, topic } from '../../content/questions';
 import { bold } from '../../content/bold';
-import { rememberRoute, updateSession } from '../../lib/session';
+import { rememberRoute, updateSession, useTopic } from '../../lib/session';
 import { useQuestionEnter } from '../../lib/questionEnter';
 import '../q/[n]/question.css';
 import './mic.css';
@@ -22,6 +21,7 @@ import './mic.css';
 /** Mic primer (SPEC.md › 2): a sheet asking to turn on the mic, over question 1 behind a scrim. */
 export default function MicPage() {
   const router = useRouter();
+  const { name: topic, intro, questions } = useTopic();
 
   // Question 1 behind the sheet is the first question shown, so it doesn't rise in, and "Turn on" keeps it
   // still too.

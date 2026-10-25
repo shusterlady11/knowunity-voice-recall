@@ -8,9 +8,8 @@ import { MiddleSection } from '../../../components/middleSection/MiddleSection';
 import { TapToAnswer } from '../../../components/tapToAnswer/TapToAnswer';
 import { MicButton } from '../../../components/micButton/MicButton';
 import { ToggleGroup } from '../../../components/toggleGroup/ToggleGroup';
-import { intro, questions, topic } from '../../../content/questions';
 import { bold } from '../../../content/bold';
-import { endQuestion, getSession, rememberRoute, updateSession, useSession, type Session } from '../../../lib/session';
+import { endQuestion, getSession, rememberRoute, updateSession, useSession, useTopic, type Session } from '../../../lib/session';
 import { useQuestionEnter } from '../../../lib/questionEnter';
 import { announce } from '../../../lib/announcer';
 import { ExitConfirm } from '../ExitConfirm';
@@ -23,6 +22,7 @@ export function QuestionScreen({ n }: { n: number }) {
   const [leaving, setLeaving] = useState(false);
   const keepGoing = useCallback(() => setLeaving(false), []);
   const session = useSession();
+  const { name: topic, intro, questions } = useTopic();
   const xp = session?.xp ?? 0;
   // The "Welcome!" card shows only the very first time on question 1, until the student starts answering
   // (decided 2026-10-05). The question card stays. Tapping the mic hands it to the dictating screen, which
@@ -44,7 +44,7 @@ export function QuestionScreen({ n }: { n: number }) {
     // Said whenever the question opens, so a screen-reader student hears it: after Next or Skip, after
     // cancelling a take, and for the first question.
     announce(`Question ${n} of ${questions.length}. ${questions[n - 1].prompt.replaceAll('**', '')}`);
-  }, [n, router, markShown]);
+  }, [n, router, markShown, questions]);
 
   // Starting to answer, or moving on, retires the welcome card for good.
   const leaveQuestion = (change?: (s: Session) => void) =>

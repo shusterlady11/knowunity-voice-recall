@@ -10,11 +10,10 @@ import { RecordingGlow } from '../../../../components/recordingGlow/RecordingGlo
 import { MicButton } from '../../../../components/micButton/MicButton';
 import { ButtonIcon } from '../../../../components/buttonIcon/ButtonIcon';
 import { XIcon } from '../../../../icons/XIcon';
-import { intro, questions, topic } from '../../../../content/questions';
 import { bold } from '../../../../content/bold';
 import { announce } from '../../../../lib/announcer';
 import { durationMs } from '../../../../lib/motion';
-import { questionRecord, rememberRoute, updateSession, useSession } from '../../../../lib/session';
+import { questionRecord, rememberRoute, updateSession, useSession, useTopic } from '../../../../lib/session';
 import { useQuestionEnter } from '../../../../lib/questionEnter';
 import { sendBackOnLoad } from '../../sendBackOnLoad';
 import './recording.css';
@@ -27,6 +26,7 @@ export function RecordingScreen({ n }: { n: number }) {
   const [hint, setHint] = useState('Listening…');
   const [hintFading, setHintFading] = useState(false);
   const session = useSession();
+  const { name: topic, intro, questions } = useTopic();
   const xp = session?.xp ?? 0;
   // The welcome card, if the student hasn't started answering before: it opens here still showing, then fades
   // while the question card slides up, once Knowie is listening (decided 2026-10-05).

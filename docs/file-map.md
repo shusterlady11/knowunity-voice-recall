@@ -31,7 +31,8 @@ Where things live in this repo. Moved out of `CLAUDE.md` so that file holds only
 - `.claude/skills/ui-designer/SKILL.md` — visual craft, styling, tokens-to-CSS; read before styling any screen.
 - `.claude/skills/ux-motion/SKILL.md` — animation/transition implementation; read before building the mic, recording glow, or loading states.
 - `.claude/skills/interactive-prototype/SKILL.md` — high-fidelity interactive React-artifact prototyping workflow; read before prototyping a flow in an artifact.
-- `src/content/*` — the questions, topic, key points, hints, correct lines, answers, transcripts and Results copy the screens show: AP Biology, Unit 3 (Cellular energetics), approved 2026-10-07. The transcripts stay canned.
+- `src/content/topics/*` — one file per topic (Monopolies, Cell structure, Cellular energetics) with its questions, key points, hints, correct lines, answers and transcripts; `index.ts` lists them for the picker. The Cellular energetics file was approved 2026-10-07; the other two were drafted 2026-10-24 and need an accuracy review. `src/content/questions.ts` holds the shared types, and Results copy is in `results.ts`. The transcripts stay canned.
+- `src/app/pick/` — the topic picker, the first screen a student sees.
 - `src/lib/session.ts` — the saved session on the phone (script code, route, input mode, takes, XP) and the "splash seen" flag; `/reset` clears both.
 - `src/content/scripts.ts` — the scripts the entry link `/s/[code]` picks. PLACEHOLDER: `tour` and one sample participant script, `k7`.
 - `src/app/MessageScreen.tsx` — the plain centered message page (install steps, unknown link, reset, end screen).

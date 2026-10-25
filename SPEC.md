@@ -32,6 +32,7 @@ Each screen is built only after the screen that leads to it, so every button goe
 | 9 | End screen | `/done` | `src/app/done/page.tsx` | none (composed from existing components) |
 | 10 | Typing | `/q/[n]/type` | `src/app/q/[n]/type/page.tsx` | Question / activeState keyboard option selected, keyboard open |
 | 11 | Mic skipped | `/mic-off` | `src/app/mic-off/page.tsx` | SPLASH-SKIP-MIC |
+| 12 | Topic picker (2026-10-24) | `/pick` | `src/app/pick/page.tsx` | none (composed like the message screens) |
 
 `[n]` is the question number, 1–5. `src/app/page.tsx` (still the create-next-app placeholder) and `src/app/layout.tsx` get replaced as part of the first screen built, the first-run splash.
 
@@ -238,8 +239,8 @@ A different code starts a new session for it. An unknown code shows "This link d
 
   | Arrived by | Message |
   |---|---|
-  | Finishing (Results → Continue) | "Nice work. You're done." with a Primary L "New topic" button (2026-10-21), which opens the home address: a fresh session at the first-run splash. The prototype has one topic, so this replays it |
-  | Leaving mid-session (exit confirm → Leave) | "Progress saved. Come back any time." |
+  | Finishing (Results → Continue) | "Nice work. You're done." with a Primary L "New topic" button (2026-10-21), which opens the home address: a fresh session at the topic picker (2026-10-24) |
+  | Leaving mid-session (exit confirm → Leave) | "Progress saved. Come back any time." with a Primary L "Keep going" back to their question and a Secondary L "Start over" (2026-10-24), which drops the saved place and opens a fresh session at the topic picker |
   | Opting out (`/mic-off` → No thanks) | "No problem. Maybe next time." |
 
   **How it knows the way in** (was D3, decided 2026-10-05): the button that leads here saves it in the session (finished, left or opted out) before going to `/done`, so reopening the app from the Home Screen shows the same message. A student who left keeps their place instead: reopening resumes where they stopped. With nothing saved, it shows the finished message. Each message is split into a `TextBlock` L headline and the line under it, e.g. "Nice work." over "You're done."

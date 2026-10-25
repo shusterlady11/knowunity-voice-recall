@@ -7,7 +7,7 @@ import { ProgressMeter } from '../../components/progressMeter/ProgressMeter';
 import { ResultsSummary, type ResultsSummaryProps } from '../../components/resultsSummary/ResultsSummary';
 import { BottomCTA } from '../../components/bottomCTA/BottomCTA';
 import { HeadlineBlock } from '../../components/headlineBlock/HeadlineBlock';
-import { questions } from '../../content/questions';
+import { topicFor } from '../../content/topics';
 import { resultsCopy } from '../../content/results';
 import { announce } from '../../lib/announcer';
 import { categoryFor } from '../../lib/resultsGroups';
@@ -37,6 +37,7 @@ export default function ResultsPage() {
 
 function ResultsView({ session }: { session: Session }) {
   const router = useRouter();
+  const { questions } = topicFor(session.topicId);
   // One row open at a time, across all the cards.
   const [open, setOpen] = useState<{ category: Category; row: number } | null>(null);
 

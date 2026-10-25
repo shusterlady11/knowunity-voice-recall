@@ -7,6 +7,8 @@
 
 import { useMemo, useSyncExternalStore } from 'react';
 import { defaultCode } from '../content/scripts';
+import type { Topic, TopicId } from '../content/questions';
+import { topicFor } from '../content/topics';
 import { xpFor, type Feedback, type Verdict } from './recallEngine';
 
 export type InputMode = 'voice' | 'keyboard';
@@ -38,6 +40,8 @@ export type QuestionRecord = {
 export type Session = {
   /** The script code from the entry link /s/[code]. */
   code: string;
+  /** The topic picked on /pick. Missing in a session saved before topics existed: that is the default topic. */
+  topicId?: TopicId;
   /** Where to resume. Never a recording or thinking route: those resume on their question. */
   route: string;
   inputMode: InputMode;
@@ -98,13 +102,18 @@ export function useSession(): Session | null {
   return useMemo(() => (raw ? (JSON.parse(raw) as Session) : null), [raw]);
 }
 
+/** The content of the session's topic: the default topic on the server and before a session is saved. */
+export function useTopic(): Topic {
+  return topicFor(useSession()?.topicId);
+}
+
 export function getSession(): Session | null {
   return read<Session>(SESSION_KEY);
 }
 
-/** Starts a new session for a script code, at the given route. */
-export function startSession(code: string, route: string): Session {
-  const session: Session = { code, route, inputMode: 'voice', pass: 1, xp: 0, questions: {} };
+/** Starts a new session for a script code and a topic, at the given route. */
+export function startSession(code: string, route: string, topicId?: TopicId): Session {
+  const session: Session = { code, route, inputMode: 'voice', pass: 1, xp: 0, questions: {}, ...(topicId && { topicId }) };
   write(SESSION_KEY, session);
   return session;
 }

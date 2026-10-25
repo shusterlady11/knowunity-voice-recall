@@ -7,9 +7,8 @@ import { AppBar } from '../../../../components/appBar/AppBar';
 import { MiddleSection } from '../../../../components/middleSection/MiddleSection';
 import { ToggleGroup } from '../../../../components/toggleGroup/ToggleGroup';
 import { ChatInput } from '../../../../components/chatInput/ChatInput';
-import { intro, questions, topic } from '../../../../content/questions';
 import { bold } from '../../../../content/bold';
-import { endQuestion, questionRecord, questionRoute, rememberRoute, updateSession, useSession, type Session } from '../../../../lib/session';
+import { endQuestion, questionRecord, questionRoute, rememberRoute, updateSession, useSession, useTopic, type Session } from '../../../../lib/session';
 import { announce } from '../../../../lib/announcer';
 import { useQuestionEnter } from '../../../../lib/questionEnter';
 import { ExitConfirm } from '../../ExitConfirm';
@@ -26,6 +25,7 @@ type Status = 'Inactive' | 'Ready to send' | 'Long input';
 export function TypeScreen({ n, startTyping }: { n: number; startTyping: boolean }) {
   const router = useRouter();
   const session = useSession();
+  const { name: topic, intro, questions } = useTopic();
   const [leaving, setLeaving] = useState(false);
   const keepGoing = useCallback(() => setLeaving(false), []);
   const answerRef = useRef<HTMLDivElement>(null);
@@ -39,7 +39,7 @@ export function TypeScreen({ n, startTyping }: { n: number; startTyping: boolean
     rememberRoute(`/q/${n}`);
     markShown();
     announce(`Question ${n} of ${questions.length}. ${questions[n - 1].prompt.replaceAll('**', '')} Type your answer.`);
-  }, [n, markShown]);
+  }, [n, markShown, questions]);
 
   // Keep the bar above the iPhone keyboard. iOS doesn't shrink the page when the keyboard opens, so the bar
   // follows the visible area (visualViewport) up by the keyboard's height, and the page is kept from

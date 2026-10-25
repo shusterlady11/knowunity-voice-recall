@@ -9,16 +9,16 @@ import { MessageScreen } from '../MessageScreen';
 
 /**
  * Reset (SPEC.md › 5): clears the saved session and the "splash seen" flag between participants. Moderator
- * only. "Start" begins the tour at the first-run splash, so nothing has to be typed (decided 2026-10-07); a
- * participant still starts from their own link.
+ * only. "Start" begins the tour at the topic picker (was the first-run splash, 2026-10-24), so nothing has to
+ * be typed (decided 2026-10-07); a participant still starts from their own link.
  */
 export default function ResetPage() {
   const router = useRouter();
   useEffect(() => clearAll(), []);
 
   const start = () => {
-    startSession(defaultCode, '/start');
-    router.push('/start');
+    startSession(defaultCode, '/pick');
+    router.push('/pick');
   };
 
   return (

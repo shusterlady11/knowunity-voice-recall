@@ -190,10 +190,21 @@ async function walk(width) {
       failures.push({ check: 'walk', where: label, detail: String(e.message).split('\n')[0] });
     }
   }
-  const begin = async (code = 'tour', stopAtMic = false) => {
+  // The tour starts at the topic picker and the other codes skip it (their link starts the default topic), so
+  // `topic` only applies to the tour. The default topic is the original cellular energetics content.
+  let pickRecorded = false;
+  const begin = async (code = 'tour', stopAtMic = false, topic = /^cellular energetics$/i) => {
     await go('/reset');
-    if (code === 'tour') await tap(/^start$/i);
-    else {
+    if (code === 'tour') {
+      await tap(/^start$/i);
+      await page.waitForURL(/pick/);
+      await pause(400);
+      if (!pickRecorded) {
+        pickRecorded = true;
+        await state('pick', { announces: true });
+      }
+      await tap(topic);
+    } else {
       await go('/s/' + code);
       await tap(/continue in browser/i);
     }
@@ -403,6 +414,21 @@ async function walk(width) {
     await pause(900);
     await state('results-mostly-skipped', { announces: true });
   });
+  // The other topics, from the picker: question 1, then every question skipped, to see their longer prompts
+  // and concept names (Results) fit. Their verdicts are the same scripts as the first topic's.
+  for (const [slug, name] of [['monopolies', /^monopolies$/i], ['cell-structure', /^cell structure$/i]]) {
+    await step(`topic ${slug}`, async () => {
+      await begin('tour', false, name);
+      await state(`${slug}-q1`, { task: 'q1', mic: 'task' });
+      for (let n = 1; n <= 5; n++) {
+        await tap(/^skip/i);
+        await page.waitForURL(n < 5 ? new RegExp(`q/${n + 1}`) : /results/);
+        await pause(400);
+      }
+      await pause(900);
+      await state(`${slug}-results-skipped`, { announces: true });
+    });
+  }
   await step('hints only', async () => {
     await begin();
     await tap(/^skip/i);

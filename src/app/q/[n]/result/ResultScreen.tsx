@@ -11,11 +11,11 @@ import { MicButton } from '../../../../components/micButton/MicButton';
 import { InputModeToggle } from '../../../../components/inputModeToggle/InputModeToggle';
 import { BottomCTA } from '../../../../components/bottomCTA/BottomCTA';
 import { ChatInput } from '../../../../components/chatInput/ChatInput';
-import { questions, timedOut, topic } from '../../../../content/questions';
+import { timedOut } from '../../../../content/questions';
 import { bold } from '../../../../content/bold';
 import { fillHint, type Feedback, type Verdict } from '../../../../lib/recallEngine';
 import { announce } from '../../../../lib/announcer';
-import { endQuestion, getSession, questionRecord, questionRoute, rememberRoute, updateSession, useSession } from '../../../../lib/session';
+import { endQuestion, getSession, questionRecord, questionRoute, rememberRoute, updateSession, useSession, useTopic } from '../../../../lib/session';
 import { useQuestionEnter } from '../../../../lib/questionEnter';
 import { ExitConfirm } from '../../ExitConfirm';
 import { AnswerSheet } from './AnswerSheet';
@@ -46,6 +46,7 @@ export function ResultScreen({ n }: { n: number }) {
   // The same question as the screen before, so it stays put; it rises in only when opened fresh.
   const { animateIn, markShown } = useQuestionEnter(n);
   const session = useSession();
+  const { name: topic, questions } = useTopic();
   const record = session?.questions[n];
   const question = questions[n - 1];
   const total = question.keyPoints.length;

@@ -9,13 +9,13 @@ import { TapToAnswer } from '../../../../components/tapToAnswer/TapToAnswer';
 import { MicButton } from '../../../../components/micButton/MicButton';
 import { ButtonIcon } from '../../../../components/buttonIcon/ButtonIcon';
 import { XIcon } from '../../../../icons/XIcon';
-import { idkTranscript, questions, topic } from '../../../../content/questions';
+import { idkTranscript } from '../../../../content/questions';
 import { bold } from '../../../../content/bold';
 import { defaultCode, scripts } from '../../../../content/scripts';
 import { combine, feedbackFor, judgeTake, verdictFor, xpFor, type Verdict } from '../../../../lib/recallEngine';
 import { announce } from '../../../../lib/announcer';
 import { durationMs } from '../../../../lib/motion';
-import { getSession, questionRecord, questionRoute, updateSession, useSession } from '../../../../lib/session';
+import { getSession, questionRecord, questionRoute, updateSession, useSession, useTopic } from '../../../../lib/session';
 import { useQuestionEnter } from '../../../../lib/questionEnter';
 import { sendBackOnLoad } from '../../sendBackOnLoad';
 import './thinking.css';
@@ -31,6 +31,7 @@ export function ThinkingScreen({ n }: { n: number }) {
   // The same question as the screen before, so it stays put; it rises in only when opened fresh.
   const { animateIn, markShown } = useQuestionEnter(n);
   const xp = useSession()?.xp ?? 0;
+  const { name: topic, questions } = useTopic();
   const [message, setMessage] = useState<string | undefined>(undefined);
   const isLast = n === questions.length;
 
@@ -124,7 +125,7 @@ export function ThinkingScreen({ n }: { n: number }) {
       );
     }
     return () => timers.forEach(clearTimeout);
-  }, [n, isLast, router, goTo, markShown]);
+  }, [n, isLast, router, goTo, markShown, questions]);
 
   // Throws the take away and goes back to the question (or the typing screen, in keyboard mode). Nothing is
   // counted: the take is only counted once judged.
