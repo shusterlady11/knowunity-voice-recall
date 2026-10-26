@@ -26,7 +26,7 @@ export type Question = {
   transcripts: { correct: string; partial: string; wrong: string };
 };
 
-export type TopicId = 'cellularEnergetics' | 'cellStructure' | 'monopolies';
+export type TopicId = 'cellularEnergetics' | 'cellStructure' | 'monopolies' | 'americanRevolution';
 
 /** One topic a session can run on: five questions, the name on the topic pill and the intro card. */
 export type Topic = {

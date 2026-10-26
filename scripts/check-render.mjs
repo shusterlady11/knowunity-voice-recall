@@ -416,7 +416,7 @@ async function walk(width) {
   });
   // The other topics, from the picker: question 1, then every question skipped, to see their longer prompts
   // and concept names (Results) fit. Their verdicts are the same scripts as the first topic's.
-  for (const [slug, name] of [['monopolies', /^monopolies$/i], ['cell-structure', /^cell structure$/i]]) {
+  for (const [slug, name] of [['monopolies', /^monopolies$/i], ['cell-structure', /^cell structure$/i], ['american-revolution', /^american revolution$/i]]) {
     await step(`topic ${slug}`, async () => {
       await begin('tour', false, name);
       await state(`${slug}-q1`, { task: 'q1', mic: 'task' });

@@ -2,14 +2,15 @@
 // session, or an entry link with no topic, falls back to.
 
 import type { Topic, TopicId } from '../questions';
+import { americanRevolution } from './americanRevolution';
 import { cellularEnergetics } from './cellularEnergetics';
 import { cellStructure } from './cellStructure';
 import { monopolies } from './monopolies';
 
-export const topics: Record<TopicId, Topic> = { cellularEnergetics, cellStructure, monopolies };
+export const topics: Record<TopicId, Topic> = { cellularEnergetics, cellStructure, monopolies, americanRevolution };
 
 /** The topics in the order the picker shows them. */
-export const topicList: Topic[] = [monopolies, cellStructure, cellularEnergetics];
+export const topicList: Topic[] = [monopolies, cellStructure, americanRevolution, cellularEnergetics];
 
 export const defaultTopicId: TopicId = 'cellularEnergetics';
 
