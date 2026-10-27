@@ -8,7 +8,8 @@ import type { Script } from '../../content/scripts';
 /** What one take turned out to be. */
 export type Take =
   | { kind: 'points'; points: number[] }
-  | { kind: 'notCaught' }
+  // `silent`: nothing was heard at all, as opposed to something the judge couldn't make out.
+  | { kind: 'notCaught'; silent?: boolean }
   | { kind: 'idk' }
   | { kind: 'slow' };
 
@@ -57,7 +58,7 @@ export type Feedback =
   // The next hint for a key point the student hasn't covered. `level` 1 is the gentlest; each level after it is
   // more specific. `fresh` is false when every hint has been given and this one is the last, repeated.
   | { kind: 'hint'; keyPoint: number; level: number; fresh: boolean }
-  | { kind: 'notCaught' }
+  | { kind: 'notCaught'; silent?: boolean }
   // The judge took too long and gave up (a slow take), so the audio wasn't the problem.
   | { kind: 'timedOut' };
 

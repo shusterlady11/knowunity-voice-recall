@@ -85,6 +85,7 @@ Web prototype styled as iOS: 390px, dark mode only.
 - Bottom bar labels are short ("Next", not "Next question"; "Review", not "Review 3 concepts"), because L labels are set in Inter, which is wider than Greed Condensed, and the longer pairs don't fit side by side at 390px.
 - Correct: "More info" + "Next", because there's nothing to fix.
 - Partial or wrong: "Reveal answer" + "Next" with the mic live, because the student can retry or move on.
+- "Didn't catch that" says why (2026-10-27, designer): the card reads "I didn't hear anything." when no words were heard (a recording that never started, or an empty transcript), and "I couldn't understand that take." otherwise (a scripted `notCaught`, or only "um"). The pill stays "Didn't catch that".
 - "Didn't catch that": neutral tone, "Reveal answer" + "Skip", because the app misheard, not the student.
 - Skip (before first attempt, or after "Didn't catch that") counts as skipped; "Next" after partial or wrong counts as needs practice, because Results separate "didn't try" from "tried and missed."
 - "Reveal answer" / "More info" open a bottom sheet (answer, context, X, no buttons), because the student reads, then retries or moves on.

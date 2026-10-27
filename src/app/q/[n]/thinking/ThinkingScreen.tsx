@@ -90,6 +90,7 @@ export function ThinkingScreen({ n }: { n: number }) {
         record.verdict = verdict;
         const hintsUsed = record.hintsUsed ?? [];
         record.feedback = timedOut ? { kind: 'timedOut' } : feedbackFor(verdict, covered, hintsUsed, keyPointCount);
+        if (take.kind === 'notCaught' && take.silent) record.feedback = { kind: 'notCaught', silent: true };
         // Only a hint the student hasn't seen is counted; the last one repeated, once they're all used, is not.
         if (record.feedback.kind === 'hint' && record.feedback.fresh) record.hintsUsed = [...hintsUsed, record.feedback.keyPoint];
         if (verdict === 'correct' && !record.outcome) {
@@ -126,9 +127,9 @@ export function ThinkingScreen({ n }: { n: number }) {
     };
 
     const timers: ReturnType<typeof setTimeout>[] = [];
-    // A live spoken take whose recording never started has nothing to judge: "didn't catch that".
+    // A live spoken take whose recording never started has nothing to judge: "didn't catch that", nothing heard.
     if (live && !typed && !audio) {
-      timers.push(setTimeout(() => resolve({ kind: 'notCaught' }), durationMs('--motion-duration-thinkingMin')));
+      timers.push(setTimeout(() => resolve({ kind: 'notCaught', silent: true }), durationMs('--motion-duration-thinkingMin')));
       return () => timers.forEach(clearTimeout);
     }
     if (live) {

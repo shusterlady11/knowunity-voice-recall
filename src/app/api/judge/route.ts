@@ -16,9 +16,12 @@ const maxAudioBytes = 4 * 1024 * 1024;
 /** Sounds that aren't an attempt: a transcript of only these is treated as nothing heard. */
 const fillers = new Set(['um', 'uh', 'uhm', 'er', 'erm', 'hmm', 'hm', 'mm', 'ah', 'oh']);
 
+function words(transcript: string): string[] {
+  return transcript.toLowerCase().match(/[a-z0-9']+/g) ?? [];
+}
+
 function heardNothing(transcript: string): boolean {
-  const words = transcript.toLowerCase().match(/[a-z0-9']+/g) ?? [];
-  return words.every((word) => fillers.has(word));
+  return words(transcript).every((word) => fillers.has(word));
 }
 
 export async function POST(request: Request) {
@@ -49,8 +52,12 @@ export async function POST(request: Request) {
     const question = topicFor(topicId as string | undefined).questions[n - 1];
     if (audio) {
       const transcript = (await transcribe(question, audio, audio.name)).slice(0, maxAnswerLength);
-      // Silence or only "um" is "didn't catch that", not a wrong answer.
-      if (heardNothing(transcript)) return Response.json({ take: { kind: 'notCaught' } satisfies Take, transcript: '' });
+      // Silence or only "um" is "didn't catch that", not a wrong answer. No words at all is silent ("I didn't hear
+      // anything"); only fillers is something heard but not understood.
+      if (heardNothing(transcript)) {
+        const take = { kind: 'notCaught', ...(words(transcript).length === 0 && { silent: true }) } satisfies Take;
+        return Response.json({ take, transcript: '' });
+      }
       const { take } = await judgeAnswer(question, transcript);
       return Response.json({ take, transcript });
     }
