@@ -54,7 +54,11 @@ function ResultsView({ session }: { session: Session }) {
     // once, in order; a real engine's takes would all differ.
     const takes = [...new Set(record?.transcripts ?? [])];
     const transcript = takes.length ? takes.join(' ') : undefined;
-    groups[category].push({ label: q.answer.title, question: q.prompt.replaceAll('**', ''), transcript });
+    // The row's "Question" label already says what this is, so the card's "Q:" is dropped (2026-10-27). The key
+    // ideas show which ones this pass covered, from the judge or the script.
+    const question = q.prompt.replaceAll('**', '').replace(/^Q:\s*/, '');
+    const keyPoints = q.keyPoints.map((text, k) => ({ text, covered: record?.covered?.includes(k + 1) ?? false }));
+    groups[category].push({ label: q.answer.title, question, transcript, keyPoints });
   });
 
   // Right with no hint: this is what the ring, the headline and the strongest area count.

@@ -315,6 +315,12 @@ async function walk(width) {
     await page.waitForURL(/results/);
     await pause(1200);
     await state('results-mixed', { announces: true });
+    // An opened row: the question, what was said and the key ideas scorecard (2026-10-27).
+    await page.locator('.expandableResultRow__header').first().click();
+    await pause(400);
+    await state('results-row-open');
+    await page.locator('.expandableResultRow__header').first().click();
+    await pause(300);
     await tap(/review all/i);
     await page.waitForURL(/q\/1/);
     await pause(700);

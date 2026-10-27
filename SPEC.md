@@ -223,7 +223,7 @@ A different code starts a new session for it. An unknown code shows "This link d
   - `ProgressMeter` score 1–5, shown as a percentage (20% to 100%, changed in Figma 2026-10-12). It's hidden when nothing is right on its own.
   - `HeadlineBlock` `bodyM`, `secondary` for the headline and the line under it
   - `ResultsSummary` `good-explanations`, `with-hints`, `needs-practice` and `skipped-questions`
-  - `ExpandableResultRow`, with tone `success`, `partial` (the with-hints card), `error` or `neutral`. A row's transcript is every take for that concept, joined: the canned transcript for a spoken take, and exactly what was typed for a typed one. This is the only place the student sees their transcript.
+  - `ExpandableResultRow`, with tone `success`, `partial` (the with-hints card), `error` or `neutral`. A row's transcript is every take for that concept, joined: the canned transcript for a spoken take (the words heard, in a live session), and exactly what was typed for a typed one. This is the only place the student sees their transcript. Opened, a row shows "Question" (the question without its "Q:", which the label already says), "You said" (was "What you said"), then "Key ideas": each of the question's key ideas with a check if this pass covered it or an x if not, from the judge or the script (2026-10-27).
   - `BottomCTA` "Two button drawer": Secondary "Review all", Primary "Continue"
   - No `AppBar`, as in Figma.
 - **Actions:**
