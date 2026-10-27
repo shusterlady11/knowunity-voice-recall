@@ -8,9 +8,9 @@ Next.js web prototype of Knowunity's voice active-recall feature (student speaks
 
 - Read `node_modules/next/dist/docs/` before writing any Next.js code (AGENTS.md).
 - 390px, dark mode only, web app styled as native iOS — not native. `docs/platform-constraints.md`.
-- Voice in, text out. `docs/design-brief.md`.
+- Voice in, text out. A spoken reply may come later, but only on top of the on-screen text. `docs/sprint-context.md` (Real recall engine).
 - Concept — single source, don't restate: `docs/sprint-context.md`.
-- Recall engine is mocked: fake transcript, fake verdict, fake-but-present latency. `docs/platform-constraints.md`, `docs/sprint-context.md`.
+- Recall engine: a real one replaces the mock in phases (AI judge, then speech-to-text, then spoken replies). Until a phase ships, the mock covers it: fake transcript, fake verdict, fake-but-present latency. `docs/sprint-context.md` (Real recall engine), `docs/platform-constraints.md`.
 - Every screen is built from `scaffold`'s slots. `docs/design-system.md` §2.
 - All color/spacing/radius/type/motion values: `tokens/` (`tokens.json` is synced from Figma; `motion.json` is code-only). Usage rules: `docs/design-system.md`.
 - `npm run check` runs the token, fallback, generated-file and CLAUDE.md checks and prints the file and line for each problem. Run it after building or changing any component, and report findings before fixing them.
@@ -32,10 +32,10 @@ Next.js web prototype of Knowunity's voice active-recall feature (student speaks
 - Never add a state without its screen-reader sentence in the live region and an accessible name that says what the control does in that state. Build-screen skill, step 10.
 - Never use native APIs (haptics, permission sheets, nav transitions). `docs/platform-constraints.md`.
 - Never build a hover-only interaction — no hover on mobile. `docs/platform-constraints.md`.
-- Never let Knowie speak, or auto-detect end-of-speech — push-to-talk with explicit stop only. `docs/design-brief.md`, `docs/voice-ux.md`.
+- Never auto-detect end-of-speech — push-to-talk with explicit stop only — and never let a spoken reply replace the on-screen text. `docs/design-brief.md`, `docs/voice-ux.md`.
 - Never leave a required action without an escape route or non-voice fallback — "never trap the student." `docs/design-brief.md`, `docs/voice-ux.md`.
 - Never build tablet or desktop layouts, or RTL — out of scope this sprint. `docs/platform-constraints.md`.
-- Never build real STT/AI judging — out of scope this sprint. `docs/sprint-context.md` (Not building).
+- Never call a model or speech provider from the browser, or keep an API key anywhere but `.env.local`. Keys are read by server routes only. `docs/sprint-context.md` (Real recall engine).
 - Never hand-recreate the Knowie mascot freehand — export the real component from Figma. `docs/design-system.md` §1.
 - Figma is read-only. Never modify the Figma file; report differences instead.
 

@@ -51,8 +51,8 @@ These were cut from this build, each with the reason on record. Where no reason 
 
 | Cut | Reason |
 |---|---|
-| Real speech-to-text and AI judging | Estimated at 3–5 days of work you didn't want to spend now. Deferred, not ruled out. The mock is built so a real engine can replace it without touching the screens. |
-| Any real microphone use, including the browser's permission prompt | Nothing in the mocked build uses the mic: transcripts are canned and the ripples are cut. So the primer shows, but no browser prompt follows. |
+| Real speech-to-text and AI judging | Was deferred at 3–5 days. Now being built in phases (2026-10-26, `docs/sprint-context.md` › Real recall engine); the mock covers each phase until it ships. |
+| Any real microphone use, including the browser's permission prompt | Nothing in the mocked build uses the mic: transcripts are canned and the ripples are cut. So the primer shows, but no browser prompt follows. Changes when speech-to-text ships. |
 | Moderator choosing verdicts live from a second device | About 2 days of build for the phone-to-laptop link. A script in the link does the job for this test. |
 | Script visible in the link | The student would read the plan in the address. Links carry a short, meaningless code instead. |
 

@@ -12,7 +12,7 @@ import { XIcon } from '../../../../icons/XIcon';
 import { idkTranscript } from '../../../../content/questions';
 import { bold } from '../../../../content/bold';
 import { defaultCode, scripts } from '../../../../content/scripts';
-import { combine, feedbackFor, judgeTake, verdictFor, xpFor, type Verdict } from '../../../../lib/recallEngine';
+import { combine, feedbackFor, judgeTake, verdictFor, xpFor, type Take, type Verdict } from '../../../../lib/recallEngine';
 import { announce } from '../../../../lib/announcer';
 import { durationMs } from '../../../../lib/motion';
 import { getSession, questionRecord, questionRoute, updateSession, useSession, useTopic } from '../../../../lib/session';
@@ -52,7 +52,10 @@ export function ThinkingScreen({ n }: { n: number }) {
     // This take is the next one in the question's chain. It's only counted once judged, so a take dropped
     // by a reload doesn't use up a step of the script.
     const takeNumber = (session?.questions[n]?.takes ?? 0) + 1;
-    const take = judgeTake(script, session?.pass ?? 1, n, takeNumber);
+    const typed = session?.questions[n]?.typed;
+    // A live session sends a typed answer to the real judge; a spoken one keeps the script until speech-to-text
+    // exists (docs/sprint-context.md › Real recall engine).
+    const live = session?.live === true && Boolean(typed);
 
     // Saves the verdict and the card's feedback for the result screen, then goes there. Choosing the hint
     // here, once per take, means reopening the result doesn't use up another. A correct answer ends the
@@ -60,8 +63,7 @@ export function ThinkingScreen({ n }: { n: number }) {
     const keyPointCount = questions[n - 1].keyPoints.length;
     // The take's canned transcript, by how much this take covered on its own; nothing for a take that
     // wasn't caught, since nothing was heard.
-    const typed = session?.questions[n]?.typed;
-    const transcriptFor = (): string | null => {
+    const transcriptFor = (take: Take): string | null => {
       // A typed take shows exactly what was typed (SPEC.md › 8).
       if (typed) return typed;
       if (take.kind === 'idk') return idkTranscript;
@@ -69,17 +71,17 @@ export function ThinkingScreen({ n }: { n: number }) {
       const own = verdictFor(take.points, keyPointCount);
       return questions[n - 1].transcripts[own === 'notCaught' ? 'wrong' : own];
     };
-    const addTranscript = (record: { transcripts?: string[]; typed?: string }) => {
-      const transcript = transcriptFor();
+    const addTranscript = (record: { transcripts?: string[]; typed?: string }, take: Take) => {
+      const transcript = transcriptFor(take);
       if (transcript) record.transcripts = [...(record.transcripts ?? []), transcript];
       delete record.typed;
     };
-    const finish = (verdict: Verdict, covered: number[], timedOut = false) => {
+    const finish = (take: Take, verdict: Verdict, covered: number[], timedOut = false) => {
       if (cancelledRef.current) return;
       updateSession((s) => {
         const record = questionRecord(s, n);
         record.takes = takeNumber;
-        addTranscript(record);
+        addTranscript(record, take);
         record.covered = covered;
         record.verdict = verdict;
         const hintsUsed = record.hintsUsed ?? [];
@@ -94,35 +96,89 @@ export function ThinkingScreen({ n }: { n: number }) {
       });
       goTo(`/q/${n}/result`);
     };
+    // The judge took too long (or failed): a result that says the wait was ours, with nothing new covered.
+    const giveUp = () => finish({ kind: 'slow' }, 'notCaught', session?.questions[n]?.covered ?? [], true);
+    // Moves on from a judged take, the same for a scripted and a real one.
+    const resolve = (take: Take) => {
+      if (cancelledRef.current) return;
+      if (take.kind === 'idk') {
+        // "I don't know" is treated as Skip: no result, straight to the next question.
+        updateSession((s) => {
+          const record = questionRecord(s, n);
+          record.takes = takeNumber;
+          addTranscript(record, take);
+          record.outcome = 'skipped';
+        });
+        return goTo(isLast ? '/results' : `/q/${n + 1}`);
+      }
+      if (take.kind === 'notCaught') return finish(take, 'notCaught', session?.questions[n]?.covered ?? []);
+      if (take.kind === 'slow') return giveUp();
+      const covered = combine(session?.questions[n]?.covered ?? [], take);
+      finish(take, verdictFor(covered, keyPointCount), covered);
+    };
+    const showSlowNotice = () => {
+      setMessage('Taking a moment…');
+      announce('Taking a moment.');
+    };
 
     const timers: ReturnType<typeof setTimeout>[] = [];
+    if (live) {
+      // The judge's answer is held until thinkingMin has passed, so a fast reply doesn't flash the dots. It
+      // gets the slow take's notice and limit: "Taking a moment…" at slowNotice, giving up at slowTimeout.
+      const controller = new AbortController();
+      let judged: Take | null = null;
+      let minPassed = false;
+      let settled = false;
+      const settle = (then: () => void) => {
+        if (settled) return;
+        settled = true;
+        timers.forEach(clearTimeout);
+        then();
+      };
+      const settleIfReady = () => {
+        const take = judged;
+        if (take && minPassed) settle(() => resolve(take));
+      };
+      timers.push(
+        setTimeout(() => {
+          minPassed = true;
+          settleIfReady();
+        }, durationMs('--motion-duration-thinkingMin')),
+        setTimeout(showSlowNotice, durationMs('--motion-duration-slowNotice')),
+        setTimeout(() => settle(() => {
+          controller.abort();
+          giveUp();
+        }), durationMs('--motion-duration-slowTimeout')),
+      );
+      fetch('/api/judge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topicId: session?.topicId, n, answer: typed }),
+        signal: controller.signal,
+      })
+        .then((response) => (response.ok ? response.json() : Promise.reject(new Error(`judge ${response.status}`))))
+        .then((body: { take: Take }) => {
+          judged = body.take;
+          settleIfReady();
+        })
+        .catch(() => {
+          // Leaving the screen aborts the request; that isn't a failure to report.
+          if (!controller.signal.aborted) settle(giveUp);
+        });
+      return () => {
+        timers.forEach(clearTimeout);
+        controller.abort();
+      };
+    }
+
+    const take = judgeTake(script, session?.pass ?? 1, n, takeNumber);
     if (take.kind === 'slow') {
       timers.push(
-        setTimeout(() => {
-          setMessage('Taking a moment…');
-          announce('Taking a moment.');
-        }, durationMs('--motion-duration-slowNotice')),
-        setTimeout(() => finish('notCaught', session?.questions[n]?.covered ?? [], true), durationMs('--motion-duration-slowTimeout')),
+        setTimeout(showSlowNotice, durationMs('--motion-duration-slowNotice')),
+        setTimeout(giveUp, durationMs('--motion-duration-slowTimeout')),
       );
     } else {
-      timers.push(
-        setTimeout(() => {
-          if (cancelledRef.current) return;
-          if (take.kind === 'idk') {
-            // "I don't know" is treated as Skip: no result, straight to the next question.
-            updateSession((s) => {
-              const record = questionRecord(s, n);
-              record.takes = takeNumber;
-              addTranscript(record);
-              record.outcome = 'skipped';
-            });
-            return goTo(isLast ? '/results' : `/q/${n + 1}`);
-          }
-          if (take.kind === 'notCaught') return finish('notCaught', session?.questions[n]?.covered ?? []);
-          const covered = combine(session?.questions[n]?.covered ?? [], take);
-          finish(verdictFor(covered, keyPointCount), covered);
-        }, durationMs('--motion-duration-thinkingMin')),
-      );
+      timers.push(setTimeout(() => resolve(take), durationMs('--motion-duration-thinkingMin')));
     }
     return () => timers.forEach(clearTimeout);
   }, [n, isLast, router, goTo, markShown, questions]);

@@ -54,6 +54,11 @@ export type Session = {
   introSeen?: boolean;
   /** How the student reached the end screen, saved by the button that leads there (was D3). */
   endedBy?: EndedBy;
+  /**
+   * Typed answers go to the real judge instead of the script (docs/sprint-context.md › Real recall engine).
+   * Set by "Start live session" on /reset and carried into every session started from this one.
+   */
+  live?: boolean;
 };
 
 export type EndedBy = 'finished' | 'left' | 'optedOut';
@@ -111,9 +116,9 @@ export function getSession(): Session | null {
   return read<Session>(SESSION_KEY);
 }
 
-/** Starts a new session for a script code and a topic, at the given route. */
-export function startSession(code: string, route: string, topicId?: TopicId): Session {
-  const session: Session = { code, route, inputMode: 'voice', pass: 1, xp: 0, questions: {}, ...(topicId && { topicId }) };
+/** Starts a new session for a script code and a topic, at the given route; `live` sends typed answers to the real judge. */
+export function startSession(code: string, route: string, topicId?: TopicId, live?: boolean): Session {
+  const session: Session = { code, route, inputMode: 'voice', pass: 1, xp: 0, questions: {}, ...(topicId && { topicId }), ...(live && { live }) };
   write(SESSION_KEY, session);
   return session;
 }

@@ -196,7 +196,7 @@ async function walk(width) {
   const begin = async (code = 'tour', stopAtMic = false, topic = /^cellular energetics$/i) => {
     await go('/reset');
     if (code === 'tour') {
-      await tap(/^start$/i);
+      await tap(/^start scripted session$/i);
       await page.waitForURL(/pick/);
       await pause(400);
       if (!pickRecorded) {

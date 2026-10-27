@@ -141,7 +141,7 @@ A different code starts a new session for it. An unknown code shows "This link d
 
 - **Home Screen:** the student adds this page to their Home Screen. The saved icon has to open `/s/[code]` with its code. On iOS, Home Screen web apps don't share storage with Safari, so the code can't be passed along any other way. So, opened in Safari, `/s/[code]` stays on its address and shows "Add to Home Screen" with the steps ("Tap Share, then Add to Home Screen. Open Knowie from your Home Screen to start."), and a Secondary "Continue in browser" button for testing on a computer. Opened from the icon (full screen), it goes straight on (decided 2026-10-02).
 - **Direct loads with nothing saved:** `/results` goes to `/`, which starts a fresh session. Leaving or opting out from a question or `/mic-off` opened by typing the address still shows the right end message (it starts a session on the `tour` script).
-- **`/reset`** clears the saved session and the "splash seen" flag between participants, then shows "All cleared. This phone is ready for the next participant. Open their link to start." with a `Button` Primary L **Start**, which begins the `tour` script at `/start`, so a moderator doesn't have to type anything (decided 2026-10-07). It's reached by typing the address and never appears in the student's flow.
+- **`/reset`** clears the saved session and the "splash seen" flag between participants, then shows "All cleared. This phone is ready for the next participant. Open their link, or start a session here." with a vertical `ButtonGroup` L: `Button` Primary L **Start live session** and Secondary L **Start scripted session** (2026-10-26). Both begin the `tour` script at `/pick`, so a moderator doesn't have to type anything (decided 2026-10-07). A live session sends typed answers to the real judge (`/api/judge`); spoken answers, and every answer in a scripted session or one opened from a participant's link, follow the script. The choice carries into "Start over" and "New topic". It's reached by typing the address and never appears in the student's flow.
 - **`/`, the app's home address,** resumes a session in progress, including one the student left, so progress is kept (was D5, decided 2026-10-02). A finished or opted-out session, or none, starts fresh at `/start`, on the same script if there was one, else `tour` (decided 2026-10-07).
 - **Full-screen mode:** an app manifest (`src/app/manifest.ts`, the Next.js file convention) and the page metadata make the Home Screen icon open full screen, with no Safari toolbars.
 
@@ -310,8 +310,8 @@ Built around `chatInput`, a new Storybook component made from the Figma set `cha
 ## Out of scope
 
 - **The engine:**
-  - real speech-to-text and AI judging (deferred, estimated at 3–5 days; the mock is built so a real engine can replace it)
-  - any real microphone use: no browser mic prompt, and no voice-driven ripples in `RecordingGlow`
+  - real speech-to-text and AI judging, until each phase of the real engine ships (`docs/sprint-context.md` › Real recall engine)
+  - until speech-to-text ships, any real microphone use: no browser mic prompt, and no voice-driven ripples in `RecordingGlow`
 - **Rewards:**
   - the XP card: its stats aren't a Figma component yet
   - "Say it back"

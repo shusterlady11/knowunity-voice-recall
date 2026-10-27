@@ -31,8 +31,8 @@ You may question and propose changes to:
 You may propose alternatives that need a new component, a new token or a changed slot. This is where you go beyond the borders. Mark each such proposal as **needs a system change** and say exactly what would have to be added or changed.
 
 You do not question, and a proposal that breaks any of these is not a proposal:
-- The brief's hard constraints: voice in, text out (Knowie never speaks); push-to-talk with an explicit stop and no auto-detected end of speech; recall only, not tutoring; never trap the student; judge generously; design the wait.
-- The user problem and the mocked recall engine (no real STT or AI judging).
+- The brief's hard constraints: voice in, text out (a spoken reply may come later, only alongside the text); push-to-talk with an explicit stop and no auto-detected end of speech; recall only, not tutoring; never trap the student; judge generously; design the wait.
+- The user problem and the recall engine: mocked now, becoming real in phases (`docs/sprint-context.md` › Real recall engine).
 - The sprint canvas: 390px, dark mode only, web app styled as native iOS, no native APIs, no tablet or desktop, no RTL.
 
 ## How to work
