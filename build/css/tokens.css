@@ -40,7 +40,6 @@
   --motion-waveform-barWidth: 3px; /** 3px wide bars and dots in the voice waveform. Not on the space scale (nearest are 2 and 4); kept at 3 as reviewed. USE: the dictating screen's waveform. PAIR: motion.waveform.barGap. */
   --motion-waveform-barGap: 3px; /** 3px between waveform bars, so one bar every 6px. USE: the dictating screen's waveform. PAIR: motion.waveform.barWidth. */
   --motion-waveform-restHeight: 3px; /** 3px, the height of a waveform bar with no voice: a dot. USE: the dictating screen's waveform. */
-  --motion-waveform-maxHeight: 200px; /** 200px, the height of the loudest waveform bar at the mic; it is also the canvas height. USE: the dictating screen's waveform. */
   --motion-waveform-attack: 0.18; /** How fast the level climbs toward a louder voice, per 16.7ms frame. Fast, like a VU meter. USE: the dictating screen's waveform. PAIR: motion.waveform.release. */
   --motion-waveform-release: 0.08; /** How fast the level falls toward a quieter voice, per 16.7ms frame. Slow, so bars don't twitch. USE: the dictating screen's waveform. PAIR: motion.waveform.attack. */
   --motion-waveform-curve: 0.7; /** Exponent applied to the 0 to 1 level, so quiet speech still lifts the bars. USE: the dictating screen's waveform. */

@@ -1,10 +1,11 @@
 /* The voice waveform behind the mic: bars that grow with the student's voice and travel out to both screen
-   edges. It sits between the glow and the mic button (DOM order), takes no room and no taps. */
+   edges, never taller than the mic button less Space/200 above and below. It sits between the glow and the
+   mic button (DOM order), takes no room and no taps. */
 .voiceWaveform {
   position: absolute;
   top: 50%;
   left: 50%;
-  height: var(--motion-waveform-maxHeight);
+  height: calc(var(--control-mic) - 2 * var(--space-200));
   transform: translate(-50%, -50%);
   pointer-events: none;
   /* Fades out over motion.duration.hintFadeOut when dictation ends... */

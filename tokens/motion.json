@@ -261,14 +261,6 @@
         },
         "$description": "3px, the height of a waveform bar with no voice: a dot. USE: the dictating screen's waveform."
       },
-      "maxHeight": {
-        "$type": "dimension",
-        "$value": {
-          "value": 200,
-          "unit": "px"
-        },
-        "$description": "200px, the height of the loudest waveform bar at the mic; it is also the canvas height. USE: the dictating screen's waveform."
-      },
       "attack": {
         "$type": "number",
         "$value": 0.18,

@@ -66,7 +66,8 @@ export function VoiceWaveform({ stream, active }: { stream: MediaStream | null; 
     const barWidth = tokenNumber('--motion-waveform-barWidth');
     const pitch = barWidth + tokenNumber('--motion-waveform-barGap');
     const restHeight = tokenNumber('--motion-waveform-restHeight');
-    const maxHeight = tokenNumber('--motion-waveform-maxHeight');
+    // The tallest bar fills the canvas, whose height the stylesheet sets from the mic button (voiceWaveform.css).
+    const maxHeight = parseFloat(getComputedStyle(canvas).height);
     const interval = durationMs('--motion-duration-waveformSample');
     const color = getComputedStyle(document.documentElement).getPropertyValue('--color-accent-coral-bold').trim();
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
