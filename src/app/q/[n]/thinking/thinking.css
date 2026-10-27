@@ -21,8 +21,8 @@
   isolation: isolate;
 }
 
-/* "Taking a moment…" fades in over motion.duration.hintFadeIn when a slow take shows it. The line is always
-   there, empty, so the mic doesn't move. */
+/* "Thinking…" fades in over motion.duration.hintFadeIn as the screen opens; a slow take swaps it for "Taking a
+   moment…". */
 .thinking__hint {
   width: 100%;
   opacity: 0;

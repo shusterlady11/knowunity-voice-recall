@@ -33,7 +33,7 @@ export function ThinkingScreen({ n }: { n: number }) {
   const { animateIn, markShown } = useQuestionEnter(n);
   const xp = useSession()?.xp ?? 0;
   const { name: topic, questions } = useTopic();
-  const [message, setMessage] = useState<string | undefined>(undefined);
+  const [message, setMessage] = useState<string>('Thinking…');
   const isLast = n === questions.length;
 
   // Set when the student cancels, so a judge that finishes during the move doesn't count the take.
@@ -224,9 +224,9 @@ export function ThinkingScreen({ n }: { n: number }) {
       }
       bottomContent={
         <div className="thinking__answer">
-          {/* The line where the other states put their hint: empty until a slow take shows "Taking a moment…". */}
-          <div className="thinking__hint" data-visible={message ? '' : undefined}>
-            <TapToAnswer text={message ?? '\u00A0'} />
+          {/* The line where the other states put their hint: "Thinking…", then "Taking a moment…" for a slow take. */}
+          <div className="thinking__hint" data-visible="">
+            <TapToAnswer text={message} />
           </div>
           {/* Not tappable while Knowie judges the take; the dots on the button show it's working. */}
           <div className="thinking__mic">
