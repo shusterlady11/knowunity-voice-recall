@@ -182,7 +182,7 @@ A different code starts a new session for it. An unknown code shows "This link d
 | Verdict | Card text |
 |---|---|
 | Correct | that question's correct feedback, from the content |
-| Partial or wrong | the next unused hint. Its copy includes the covered count, e.g. "You've got 2 of 3 key ideas. Think about…" |
+| Partial or wrong | the next unused hint, with the key ideas already covered named in front: "You got the active site fit. Think about…" (2026-10-27). The opening changes with the hint's level: "You got", "You explained", "Nice work on". With nothing covered, the hint stands alone. |
 | Partial or wrong, on a later try | the next hint in the ladder (below); once every hint has been given, the most specific one again |
 | Didn't catch that | the component's default, "I couldn't understand that take." |
 
@@ -342,7 +342,7 @@ Built around `chatInput`, a new Storybook component made from the Figma set `cha
 
 **Content** (supplied by the designer, stored in a new file under `src/content/`):
 - 5 questions from what the participants just studied.
-- For each question: 2–4 key points, one pre-written hint per key point (its copy can include the covered count, filled in by the engine), a correct-feedback line, the "More info" / Reveal context, and a canned transcript for each verdict it can get (shown in Results).
+- For each question: 2–4 key points, a short name per key point (said back in hints), three pre-written hints per key point, a correct-feedback line, the "More info" / Reveal context, and a canned transcript for each verdict it can get (shown in Results).
 
 **Scripts** (new, stored with the content; the code in `/s/[code]` picks one):
 - **Each question gets its own chain of takes.** Each take lists the key points it covers, for example `q1: 1,2 > 3`.
@@ -357,7 +357,7 @@ Built around `chatInput`, a new Storybook component made from the Figma set `cha
 **The engine** (new, `src/lib/recallEngine/`) is one piece with a fake setting. Given a take, it returns which key points that take covered, the same shape a real engine would return. Everything else is worked out from that:
 
 - **Verdict from combined coverage** across all of this question's takes: all key points covered is correct, some is partial, none is wrong.
-- **Covered count:** "N of M key ideas", filled into the hint's copy.
+- **What was covered:** the short names of the covered key points (`keyPointNames`), put in front of the hint by `fillHint` (2026-10-27; it was a count, "N of M key ideas", which told the student nothing about what they got).
 - **Hints:**
   - A partial or wrong shows the next unused hint, in key-point order.
   - **Every retry gets a new hint** (decided 2026-10-12; the fixed "You're close" nudge is gone). Each key idea has a ladder of three hints, from a gentle cue to a specific one (`src/content/questions.ts`, draft copy for the designer to review). The first hint goes to the first uncovered key idea, then the first hint for the next, and so on; then the second level for each, then the third. Once all are used, the third-level hint for the first uncovered idea is shown again, and the mic stays live. "Reveal answer" stays Tertiary on the left (decided 2026-10-05).
@@ -388,7 +388,7 @@ Built around `chatInput`, a new Storybook component made from the Figma set `cha
 - "Recording cancelled."
 - "Thinking."
 - "Taking a moment."
-- each verdict with its covered count, e.g. "Partial. You covered 2 of 3 key ideas."
+- each verdict with the card's words, e.g. "Partial. You got the active site fit. Think about…"
 
 **recordingGlow in this build.** Only the two filled circles show, and they breathe; the two outline rings are removed. The breathing follows `docs/recordingglow-listening-spec.md` §3:
 - a 3400ms loop that rises for the first 25% and falls for the rest

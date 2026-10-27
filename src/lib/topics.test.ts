@@ -15,8 +15,12 @@ describe.each(topicList)('topic $id', (topic) => {
     expect(q.hints).toHaveLength(q.keyPoints.length);
     q.hints.forEach((ladder) => {
       expect(ladder).toHaveLength(hintLevels);
-      ladder.forEach((hint) => expect(hint).toContain('{covered} of {total}'));
+      // The engine names what was covered in front of the hint (2026-10-27), so no hint carries a count.
+      ladder.forEach((hint) => expect(hint).not.toMatch(/\{covered\}|\{total\}|key ideas/));
     });
+    // A short name per key point, said inside a sentence: no full stop at the end.
+    expect(q.keyPointNames).toHaveLength(q.keyPoints.length);
+    q.keyPointNames.forEach((name) => expect(name).toMatch(/^\S.*[^.]$/));
     expect(q.prompt).toMatch(/^\*\*Q:\*\* .*\*\*[^*]+\*\*/);
     expect(q.correct).not.toBe('');
     expect(q.answer.title).not.toBe('');

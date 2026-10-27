@@ -49,7 +49,6 @@ export function ResultScreen({ n }: { n: number }) {
   const { name: topic, questions } = useTopic();
   const record = session?.questions[n];
   const question = questions[n - 1];
-  const total = question.keyPoints.length;
   const isLast = n === questions.length;
   // Worked out at the tap, so it follows the input mode the student is in by then.
   const nextRoute = () => (isLast ? '/results' : questionRoute(n + 1));
@@ -64,11 +63,11 @@ export function ResultScreen({ n }: { n: number }) {
       feedback.kind === 'correct'
         ? question.correct
         : feedback.kind === 'hint'
-          ? fillHint(question.hints[feedback.keyPoint - 1][feedback.level - 1], covered, total)
+          ? fillHint(question.hints[feedback.keyPoint - 1][feedback.level - 1], covered, question.keyPointNames, feedback.level)
           : feedback.kind === 'timedOut'
             ? timedOut
             : undefined,
-    [question, total],
+    [question],
   );
 
   // Remember this result; with no judged take (opened some other way), go back to the question.
@@ -77,17 +76,17 @@ export function ResultScreen({ n }: { n: number }) {
     if (!saved?.verdict) return router.replace(`/q/${n}`);
     rememberRoute(`/q/${n}/result`);
     markShown();
-    const covered = saved.covered?.length ?? 0;
-    // The card's own words are the part the student acts on, so they are said too (not only the verdict).
+    // The card's own words are the part the student acts on, so they are said too (not only the verdict). They
+    // name what was covered, so the verdict isn't followed by a count as well.
     const card = saved.feedback ? feedbackText(saved.feedback, saved.covered ?? []) : undefined;
     announce(
       saved.feedback?.kind === 'timedOut'
         ? `${timedOut} Tap the mic to try again.`
         : saved.verdict === 'notCaught'
           ? verdictWord.notCaught
-          : `${verdictWord[saved.verdict]} ${covered > 0 ? `You covered ${covered} of ${total} key ideas.` : ''} ${card ?? ''}`.replace(/\s+/g, ' ').trim(),
+          : `${verdictWord[saved.verdict]} ${card ?? ''}`.trim(),
     );
-  }, [n, total, router, markShown, feedbackText]);
+  }, [n, router, markShown, feedbackText]);
 
   if (!record?.verdict || !record.feedback) return null;
   const { verdict, feedback } = record;

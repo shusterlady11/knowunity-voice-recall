@@ -84,11 +84,26 @@ export function feedbackFor(verdict: Verdict, covered: number[], hintsUsed: numb
   return { kind: 'hint', keyPoint: uncovered[0] ?? 1, level: hintLevels, fresh: false };
 }
 
-/** Fills a hint's {covered} and {total} with the covered count. */
-export function fillHint(hint: string, covered: number[], keyPointCount: number): string {
-  // With nothing covered, "You've got 0 of 3 key ideas." is the bluntest line there is, so the hint stands alone.
-  if (covered.length === 0) return hint.replace(/^[^.]*\{covered\}[^.]*\.\s*/, '');
-  return hint.replace('{covered}', String(covered.length)).replace('{total}', String(keyPointCount));
+/**
+ * The opening that names what the student got, one per hint level, so a retry doesn't repeat itself
+ * (2026-10-27, designer: name the idea, not a count, which told the student nothing).
+ */
+const gotOpenings = ['You got', 'You explained', 'Nice work on'];
+
+/** Names in a sentence: "a", "a and b", "a, b and c". */
+function listed(names: string[]): string {
+  return names.length < 2 ? (names[0] ?? '') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
+
+/**
+ * A hint with what the student already got named in front of it: "You got the active site fit. Think about…".
+ * `names` are the question's key point names; `level` is the hint's, from 1. With nothing covered there is
+ * nothing to credit, so the hint stands alone.
+ */
+export function fillHint(hint: string, covered: number[], names: string[], level: number): string {
+  const got = covered.map((keyPoint) => names[keyPoint - 1]).filter(Boolean);
+  if (got.length === 0) return hint;
+  return `${gotOpenings[(level - 1) % gotOpenings.length]} ${listed(got)}. ${hint}`;
 }
 
 /** XP for how a question ended (SPEC.md › How the mocked recall behaves › XP). */
