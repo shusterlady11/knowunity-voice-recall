@@ -15,6 +15,7 @@ import { timedOut } from '../../../../content/questions';
 import { bold } from '../../../../content/bold';
 import { fillHint, type Feedback, type Verdict } from '../../../../lib/recallEngine';
 import { announce } from '../../../../lib/announcer';
+import { unlockAudio } from '../../../../lib/microphone';
 import { endQuestion, getSession, questionRecord, questionRoute, rememberRoute, updateSession, useSession, useTopic } from '../../../../lib/session';
 import { useQuestionEnter } from '../../../../lib/questionEnter';
 import { ExitConfirm } from '../../ExitConfirm';
@@ -175,7 +176,10 @@ export function ResultScreen({ n }: { n: number }) {
                 <div className="result__toggle">
                   <InputModeToggle inputMode="voice" micBlocked={false} onInputModeChange={(mode) => mode === 'keyboard' && setMode('keyboard')} />
                 </div>
-                <MicButton listeningState="idle" interactionState="ready" onClick={() => router.push(`/q/${n}/recording`)} />
+                <MicButton listeningState="idle" interactionState="ready" onClick={() => {
+              unlockAudio();
+              router.push(`/q/${n}/recording`);
+            }} />
               </div>
             </>
           )}

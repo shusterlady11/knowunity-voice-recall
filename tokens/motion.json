@@ -109,6 +109,22 @@
         "$type": "duration",
         "$value": "{motion.duration.introExit}",
         "$description": "The same 600ms as motion.duration.introExit, as a reference so the two always match: the next question rising into place while it fades in, the same pace as the question card sliding up when the welcome card leaves, so arriving and leaving read as one motion (decided 2026-10-07). USE: middleSection's question card and Knowie entering when a new question opens (animateIn). PAIR: motion.easing.inOut and Space/600 of rise. RULE: under prefers-reduced-motion, fade in with no rise."
+      },
+      "waveformSample": {
+        "$type": "duration",
+        "$value": {
+          "value": 50,
+          "unit": "ms"
+        },
+        "$description": "50ms between samples pushed into the voice waveform's history; each sample then travels outward from the mic. USE: the dictating screen's waveform. PAIR: motion.waveform.* . RULE: under prefers-reduced-motion, no travel; bars hold a fixed shape and follow the level 4 times a second."
+      },
+      "waveformFadeIn": {
+        "$type": "duration",
+        "$value": {
+          "value": 200,
+          "unit": "ms"
+        },
+        "$description": "200ms for the voice waveform to fade in when listening starts, with ease-out. USE: the dictating screen's waveform. PAIR: motion.duration.hintFadeOut for the fade out."
       }
     },
     "easing": {
@@ -218,6 +234,70 @@
           "unit": "px"
         },
         "$description": "20px blur on the glow's outer circle, so it reads as a soft halo. Part of the breathing animation, so it lives here, not in Figma (docs/recordingglow-listening-spec.md §3). USE: recordingGlow's outer circle."
+      }
+    },
+    "waveform": {
+      "barWidth": {
+        "$type": "dimension",
+        "$value": {
+          "value": 3,
+          "unit": "px"
+        },
+        "$description": "3px wide bars and dots in the voice waveform. Not on the space scale (nearest are 2 and 4); kept at 3 as reviewed. USE: the dictating screen's waveform. PAIR: motion.waveform.barGap."
+      },
+      "barGap": {
+        "$type": "dimension",
+        "$value": {
+          "value": 3,
+          "unit": "px"
+        },
+        "$description": "3px between waveform bars, so one bar every 6px. USE: the dictating screen's waveform. PAIR: motion.waveform.barWidth."
+      },
+      "restHeight": {
+        "$type": "dimension",
+        "$value": {
+          "value": 3,
+          "unit": "px"
+        },
+        "$description": "3px, the height of a waveform bar with no voice: a dot. USE: the dictating screen's waveform."
+      },
+      "maxHeight": {
+        "$type": "dimension",
+        "$value": {
+          "value": 200,
+          "unit": "px"
+        },
+        "$description": "200px, the height of the loudest waveform bar at the mic; it is also the canvas height. USE: the dictating screen's waveform."
+      },
+      "attack": {
+        "$type": "number",
+        "$value": 0.18,
+        "$description": "How fast the level climbs toward a louder voice, per 16.7ms frame. Fast, like a VU meter. USE: the dictating screen's waveform. PAIR: motion.waveform.release."
+      },
+      "release": {
+        "$type": "number",
+        "$value": 0.08,
+        "$description": "How fast the level falls toward a quieter voice, per 16.7ms frame. Slow, so bars don't twitch. USE: the dictating screen's waveform. PAIR: motion.waveform.attack."
+      },
+      "curve": {
+        "$type": "number",
+        "$value": 0.7,
+        "$description": "Exponent applied to the 0 to 1 level, so quiet speech still lifts the bars. USE: the dictating screen's waveform."
+      },
+      "gateOpen": {
+        "$type": "number",
+        "$value": 0.025,
+        "$description": "Mic RMS above which the noise gate opens and the bars follow the voice. Starting value, to tune on a real device. USE: the dictating screen's waveform. PAIR: motion.waveform.gateClose."
+      },
+      "gateClose": {
+        "$type": "number",
+        "$value": 0.015,
+        "$description": "Mic RMS below which the noise gate closes and the bars fall back to dots. Lower than gateOpen so it doesn't flutter. Starting value, to tune on a real device. USE: the dictating screen's waveform."
+      },
+      "fullScaleRms": {
+        "$type": "number",
+        "$value": 0.25,
+        "$description": "Mic RMS that reads as full height. Starting value, to tune on a real device. USE: the dictating screen's waveform."
       }
     }
   }

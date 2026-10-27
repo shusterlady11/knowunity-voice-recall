@@ -14,6 +14,7 @@ import { bold } from '../../../../content/bold';
 import { announce } from '../../../../lib/announcer';
 import { durationMs } from '../../../../lib/motion';
 import { dropRecording, holdRecording, startRecording, type Recording } from '../../../../lib/microphone';
+import { VoiceWaveform } from './VoiceWaveform';
 import { getSession, questionRecord, rememberRoute, updateSession, useSession, useTopic } from '../../../../lib/session';
 import { useQuestionEnter } from '../../../../lib/questionEnter';
 import { sendBackOnLoad } from '../../sendBackOnLoad';
@@ -74,6 +75,16 @@ export function RecordingScreen({ n }: { n: number }) {
   // The live recording, once the mic has opened; null in a scripted session or if it never started.
   const recording = useRef<Promise<Recording | null> | null>(null);
   const stopping = useRef(false);
+  // The mic's stream for the waveform, and whether dictation has ended (the waveform fades out as it does).
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [ended, setEnded] = useState(false);
+  // Lets the waveform fade out (motion.duration.hintFadeOut) before the screen is replaced; without this the
+  // route change would cut it off. Reduced motion has no fade, so no wait.
+  const fadeOut = () => {
+    setEnded(true);
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return Promise.resolve();
+    return new Promise<void>((resolve) => setTimeout(resolve, durationMs('--motion-duration-hintFadeOut')));
+  };
 
   // Stopping submits the take to the processing screen, which judges and counts it. Both taps replace this
   // route, so going back never lands on a recording that has ended.
@@ -86,11 +97,13 @@ export function RecordingScreen({ n }: { n: number }) {
     });
     // Held for the processing screen to send. A recording that never started sends nothing: "didn't catch that".
     const live = await recording.current;
-    if (live) holdRecording(n, await live.stop());
+    const [take] = await Promise.all([live?.stop(), fadeOut()]);
+    if (take) holdRecording(n, take);
     router.replace(`/q/${n}/thinking`);
   }, [n, router]);
-  const cancel = () => {
+  const cancel = async () => {
     announce('Recording cancelled.');
+    await fadeOut();
     router.replace(`/q/${n}`);
   };
 
@@ -104,6 +117,7 @@ export function RecordingScreen({ n }: { n: number }) {
     const started = startRecording().then(
       (r) => {
         if (closed) r.cancel();
+        else setStream(r.stream);
         return closed ? null : r;
       },
       () => {
@@ -151,6 +165,7 @@ export function RecordingScreen({ n }: { n: number }) {
             <div className="recording__glow">
               <RecordingGlow />
             </div>
+            <VoiceWaveform stream={stream} active={!ended} />
             <MicButton listeningState="listening" interactionState="ready" onClick={stop} />
           </div>
           <ButtonIcon variant="Secondary" size="S" icon={<XIcon />} aria-label="Cancel recording" onClick={cancel} />

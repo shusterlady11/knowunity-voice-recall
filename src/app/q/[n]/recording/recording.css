@@ -59,6 +59,9 @@
 }
 
 .recording__answer > .buttonIcon {
+  position: relative;
+  /* Above the voice waveform, which spans the screen and passes behind it. */
+  z-index: 1;
   margin-top: var(--space-600);
 }
 
