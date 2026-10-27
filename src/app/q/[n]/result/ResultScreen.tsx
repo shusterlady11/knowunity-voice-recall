@@ -184,7 +184,12 @@ export function ResultScreen({ n }: { n: number }) {
             // In keyboard mode, the typing bar takes the mic's place (decided 2026-10-05): tapping it opens the
             // typing screen, ready to type. The toggle switches back to the mic here.
             <div className="result__typing">
-              <InputModeToggle inputMode="keyboard" micBlocked={false} onInputModeChange={(mode) => mode === 'voice' && setMode('voice')} />
+              <InputModeToggle
+                inputMode="keyboard"
+                micBlocked={session?.micBlocked === true}
+                onInputModeChange={(mode) => mode === 'voice' && setMode('voice')}
+                onBlockedMicClick={() => router.push('/mic-blocked')}
+              />
               <div className="result__bar-input" onFocusCapture={() => router.push(`/q/${n}/type?focus`)}>
                 <ChatInput status="Inactive" showLeadingButton={false} showMic={false} />
               </div>

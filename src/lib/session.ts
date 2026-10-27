@@ -59,6 +59,11 @@ export type Session = {
    * Set by "Start live session" on /reset and carried into every session started from this one.
    */
   live?: boolean;
+  /**
+   * The browser refused the mic in a live session: answers are typed, the toggle shows a slashed mic, and
+   * tapping it opens /mic-blocked (docs/sprint-context.md › Decisions, OS mic denied).
+   */
+  micBlocked?: boolean;
 };
 
 export type EndedBy = 'finished' | 'left' | 'optedOut';

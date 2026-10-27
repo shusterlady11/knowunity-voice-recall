@@ -47,7 +47,7 @@
           "value": 3000,
           "unit": "ms"
         },
-        "$description": "3000ms after recording starts, the hint under the question changes from \"Listening…\" to \"Tap to submit…\", once the student has had time to start speaking. The mic is mocked, so this is a timer, not speech detection. USE: the dictating screen's tapToAnswer hint. DON'T: stop the recording or submit anything; only the student's tap does that (docs/voice-ux.md)."
+        "$description": "3000ms after recording starts, the hint under the question changes from \"Listening…\" to \"Tap to submit…\", once the student has had time to start speaking. A timer, not speech detection, in live and scripted sessions alike. USE: the dictating screen's tapToAnswer hint. DON'T: stop the recording or submit anything; only the student's tap does that (docs/voice-ux.md)."
       },
       "hintFadeOut": {
         "$type": "duration",
@@ -88,6 +88,14 @@
           "unit": "ms"
         },
         "$description": "10000ms into a slow judgment, it gives up and shows \"didn't catch that\", so the student can try again instead of waiting forever. USE: the processing screen, slow takes only. PAIR: motion.duration.slowNotice."
+      },
+      "recordingMax": {
+        "$type": "duration",
+        "$value": {
+          "value": 180000,
+          "unit": "ms"
+        },
+        "$description": "180000ms (3 minutes) into a live recording, it submits what was recorded, so a forgotten recording can't run on and fail to upload (designer, 2026-10-26). A safety net, not end-of-speech detection: a real answer never reaches it. USE: the dictating screen in a live session only."
       },
       "introExit": {
         "$type": "duration",

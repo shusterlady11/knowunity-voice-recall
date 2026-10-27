@@ -18,7 +18,7 @@ As of 2026-09-30. This compares the states in `docs/voice-ux.md` with the Figma 
 | Cancel & re-record before send (Must) | ✅ The X beside the mic on listeningState (`buttonIcon` Secondary S) | ✅ `ButtonIcon`, `src/icons/XIcon.tsx` | Part of screen 4. The X throws the take away and returns to ready. |
 | Text fallback turn (Must) | ✅ keyboard option selected and keyboard open, now built on `chatInput` (Inactive, Long input) | ✅ `ChatInput` (Inactive, Typing, Ready to send, Long input), `ToggleGroup`, `InputModeToggle`, `ButtonIcon` | Screen 10. `chatInput` becomes a Storybook component (rules in `docs/chatinput-decisions.md`). Keeping the bar above the iOS keyboard needs `visualViewport` handling. |
 | Mic permission primer + OS prompt (Must) | ✅ SPLASH-FIRST-TIME, PERMISSION-MIC | ✅ Stories: `BottomSheet` › Mic permission and `Scaffold` › Mic permission | Screens 1 and 2. The OS prompt itself is cut (see Cuts). The splash's close button is loose layers with no component. |
-| Permission denied → text (Must) | ⚠️ SPLASH-SKIP-MIC covers "Not now". No screen shows a blocked mic. | ✅ `ToggleGroup` and `InputModeToggle` with `micBlocked=true` | Screens 3 and 11. A real browser denial can't happen, since the mic is mocked, so "Not now" is the only way in. |
+| Permission denied → text (Must) | ✅ Live sessions (2026-10-26): a refused mic gives keyboard mode with the slashed mic, which opens `/mic-blocked`. Scripted sessions: SPLASH-SKIP-MIC covers "Not now". | ✅ `ToggleGroup` and `InputModeToggle` with `micBlocked=true` | `/mic-blocked` has no Figma frame; composed like the other message screens. |
 | Skip a term (Must) | ✅ On idle and "didn't catch that" | ✅ `Button` Tertiary S | Screens 3, 7 and 10 |
 | Empty / silent recording (If time) | ✅ notCaughtState ("Didn't catch that") | ✅ `AnswerCard` answer-notcaught, `StatusPill` notCaught | Screen 7, triggered by a `notCaught` take in the script |
 | Noisy / garbled transcript (If time) | ✅ Same notCaughtState | ✅ Same | Same as above |
@@ -51,8 +51,8 @@ These were cut from this build, each with the reason on record. Where no reason 
 
 | Cut | Reason |
 |---|---|
-| Real speech-to-text and AI judging | Was deferred at 3–5 days. Now being built in phases (2026-10-26, `docs/sprint-context.md` › Real recall engine); the mock covers each phase until it ships. |
-| Any real microphone use, including the browser's permission prompt | Nothing in the mocked build uses the mic: transcripts are canned and the ripples are cut. So the primer shows, but no browser prompt follows. Changes when speech-to-text ships. |
+| Real speech-to-text and AI judging | Was deferred at 3–5 days. Built in live sessions on 2026-10-26 (`docs/sprint-context.md` › Real recall engine); scripted sessions keep the mock. |
+| Any real microphone use, including the browser's permission prompt | Nothing in the mocked build uses the mic: transcripts are canned and the ripples are cut. So the primer shows, but no browser prompt follows. Scripted sessions only since 2026-10-26: live sessions use the real mic. |
 | Moderator choosing verdicts live from a second device | About 2 days of build for the phone-to-laptop link. A script in the link does the job for this test. |
 | Script visible in the link | The student would read the plan in the address. Links carry a short, meaningless code instead. |
 

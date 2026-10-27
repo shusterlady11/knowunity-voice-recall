@@ -244,6 +244,8 @@ async function walk(width) {
     await state('not-found');
     await go('/mic-off');
     await state('mic-off');
+    await go('/mic-blocked');
+    await state('mic-blocked', { announces: true });
     await go('/done');
     await state('done-nothing-saved');
     await go('/results');

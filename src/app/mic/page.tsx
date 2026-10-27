@@ -13,7 +13,9 @@ import { ButtonGroup } from '../../components/buttonGroup/ButtonGroup';
 import { Button } from '../../components/button/Button';
 import { HeadlineBlock } from '../../components/headlineBlock/HeadlineBlock';
 import { bold } from '../../content/bold';
-import { rememberRoute, updateSession, useTopic } from '../../lib/session';
+import { announce } from '../../lib/announcer';
+import { requestMic } from '../../lib/microphone';
+import { getSession, rememberRoute, updateSession, useTopic } from '../../lib/session';
 import { useQuestionEnter } from '../../lib/questionEnter';
 import '../q/[n]/question.css';
 import './mic.css';
@@ -39,6 +41,18 @@ export default function MicPage() {
       session.introSeen = false;
     });
     router.push(route);
+  };
+  // In a live session "Turn on" asks the browser for the mic here, where the student has just said yes to it
+  // (docs/voice-ux.md › 3). Refused, they type, with a slashed mic (docs/sprint-context.md › Decisions).
+  const turnOn = async () => {
+    if (getSession()?.live && !(await requestMic())) {
+      updateSession((session) => {
+        session.micBlocked = true;
+      });
+      announce('Your mic is blocked, so you can type your answers instead.');
+      return answer('keyboard', '/q/1/type');
+    }
+    answer('voice', '/q/1');
   };
 
   // Question 1 behind the sheet, drawn like the question screen. `inert` keeps taps and screen readers in
@@ -84,7 +98,7 @@ export default function MicPage() {
           bottomSection={
             <ButtonGroup variant="Vertical" size="L">
               {/* No browser prompt: the mic is mocked (docs/sprint-context.md). Not now puts the student in keyboard mode. */}
-              <Button variant="Primary" size="L" CTA="Turn on" onClick={() => answer('voice', '/q/1')} />
+              <Button variant="Primary" size="L" CTA="Turn on" onClick={turnOn} />
               <Button variant="Secondary" size="L" CTA="Not now" onClick={() => answer('keyboard', '/mic-off')} />
             </ButtonGroup>
           }

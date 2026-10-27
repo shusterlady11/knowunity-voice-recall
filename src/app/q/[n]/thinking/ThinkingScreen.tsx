@@ -14,6 +14,7 @@ import { bold } from '../../../../content/bold';
 import { defaultCode, scripts } from '../../../../content/scripts';
 import { combine, feedbackFor, judgeTake, verdictFor, xpFor, type Take, type Verdict } from '../../../../lib/recallEngine';
 import { announce } from '../../../../lib/announcer';
+import { heldRecording, recordingFileName } from '../../../../lib/microphone';
 import { durationMs } from '../../../../lib/motion';
 import { getSession, questionRecord, questionRoute, updateSession, useSession, useTopic } from '../../../../lib/session';
 import { useQuestionEnter } from '../../../../lib/questionEnter';
@@ -53,9 +54,11 @@ export function ThinkingScreen({ n }: { n: number }) {
     // by a reload doesn't use up a step of the script.
     const takeNumber = (session?.questions[n]?.takes ?? 0) + 1;
     const typed = session?.questions[n]?.typed;
-    // A live session sends a typed answer to the real judge; a spoken one keeps the script until speech-to-text
-    // exists (docs/sprint-context.md › Real recall engine).
-    const live = session?.live === true && Boolean(typed);
+    // A live session sends what was typed, or the recording, to the real judge (docs/sprint-context.md › Real
+    // recall engine); a scripted one reads the script. `heard` is the transcript of a live spoken take.
+    const live = session?.live === true;
+    const audio = live && !typed ? heldRecording(n) : null;
+    let heard: string | undefined;
 
     // Saves the verdict and the card's feedback for the result screen, then goes there. Choosing the hint
     // here, once per take, means reopening the result doesn't use up another. A correct answer ends the
@@ -64,8 +67,9 @@ export function ThinkingScreen({ n }: { n: number }) {
     // The take's canned transcript, by how much this take covered on its own; nothing for a take that
     // wasn't caught, since nothing was heard.
     const transcriptFor = (take: Take): string | null => {
-      // A typed take shows exactly what was typed (SPEC.md › 8).
+      // A typed take shows exactly what was typed (SPEC.md › 8); a live spoken one, what was heard.
       if (typed) return typed;
+      if (live) return heard || null;
       if (take.kind === 'idk') return idkTranscript;
       if (take.kind !== 'points') return null;
       const own = verdictFor(take.points, keyPointCount);
@@ -122,6 +126,11 @@ export function ThinkingScreen({ n }: { n: number }) {
     };
 
     const timers: ReturnType<typeof setTimeout>[] = [];
+    // A live spoken take whose recording never started has nothing to judge: "didn't catch that".
+    if (live && !typed && !audio) {
+      timers.push(setTimeout(() => resolve({ kind: 'notCaught' }), durationMs('--motion-duration-thinkingMin')));
+      return () => timers.forEach(clearTimeout);
+    }
     if (live) {
       // The judge's answer is held until thinkingMin has passed, so a fast reply doesn't flash the dots. It
       // gets the slow take's notice and limit: "Taking a moment…" at slowNotice, giving up at slowTimeout.
@@ -150,14 +159,21 @@ export function ThinkingScreen({ n }: { n: number }) {
           giveUp();
         }), durationMs('--motion-duration-slowTimeout')),
       );
-      fetch('/api/judge', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topicId: session?.topicId, n, answer: typed }),
-        signal: controller.signal,
-      })
+      // Typed words go as JSON; a recording as form data, transcribed on the server before it's judged.
+      let request: RequestInit;
+      if (audio) {
+        const form = new FormData();
+        if (session?.topicId) form.set('topicId', session.topicId);
+        form.set('n', String(n));
+        form.set('audio', audio, recordingFileName(audio));
+        request = { body: form };
+      } else {
+        request = { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topicId: session?.topicId, n, answer: typed }) };
+      }
+      fetch('/api/judge', { method: 'POST', ...request, signal: controller.signal })
         .then((response) => (response.ok ? response.json() : Promise.reject(new Error(`judge ${response.status}`))))
-        .then((body: { take: Take }) => {
+        .then((body: { take: Take; transcript?: string }) => {
+          heard = body.transcript;
           judged = body.take;
           settleIfReady();
         })

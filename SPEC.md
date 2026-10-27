@@ -85,7 +85,7 @@ It follows the same pattern as the Storybook story "BottomSheet › Mic permissi
 
 | Action | Leads to |
 |---|---|
-| Turn on | `/q/1`, voice mode. No browser prompt appears: the mic is mocked. |
+| Turn on | `/q/1`, voice mode. In a scripted session no browser prompt appears: the mic is mocked. In a live session the browser's mic prompt appears here; if it's refused, `/q/1/type` in keyboard mode with the mic blocked (see Mic blocked). |
 | Not now | `/mic-off` |
 
 ### 3. Question: `/q/[n]`
@@ -123,7 +123,7 @@ It follows the same pattern as the Storybook story "BottomSheet › Mic permissi
 
 | Action | Leads to |
 |---|---|
-| Tap mic (stop) | submits the take, then `/q/[n]/thinking` |
+| Tap mic (stop) | submits the take, then `/q/[n]/thinking`. In a live session the mic really records from the moment this screen opens, and the recording goes with the take; at `motion.duration.recordingMax` (3 minutes) it submits itself as if tapped. If the browser refuses the mic, `/q/[n]/type` in keyboard mode with the mic blocked. |
 | Cancel X | throws the take away, then `/q/[n]` |
 | Reopening the app on this route | `/q/[n]`; the take is dropped |
 
@@ -141,7 +141,8 @@ A different code starts a new session for it. An unknown code shows "This link d
 
 - **Home Screen:** the student adds this page to their Home Screen. The saved icon has to open `/s/[code]` with its code. On iOS, Home Screen web apps don't share storage with Safari, so the code can't be passed along any other way. So, opened in Safari, `/s/[code]` stays on its address and shows "Add to Home Screen" with the steps ("Tap Share, then Add to Home Screen. Open Knowie from your Home Screen to start."), and a Secondary "Continue in browser" button for testing on a computer. Opened from the icon (full screen), it goes straight on (decided 2026-10-02).
 - **Direct loads with nothing saved:** `/results` goes to `/`, which starts a fresh session. Leaving or opting out from a question or `/mic-off` opened by typing the address still shows the right end message (it starts a session on the `tour` script).
-- **`/reset`** clears the saved session and the "splash seen" flag between participants, then shows "All cleared. This phone is ready for the next participant. Open their link, or start a session here." with a vertical `ButtonGroup` L: `Button` Primary L **Start live session** and Secondary L **Start scripted session** (2026-10-26). Both begin the `tour` script at `/pick`, so a moderator doesn't have to type anything (decided 2026-10-07). A live session sends typed answers to the real judge (`/api/judge`); spoken answers, and every answer in a scripted session or one opened from a participant's link, follow the script. The choice carries into "Start over" and "New topic". It's reached by typing the address and never appears in the student's flow.
+- **`/reset`** clears the saved session and the "splash seen" flag between participants, then shows "All cleared. This phone is ready for the next participant. Open their link, or start a session here." with a vertical `ButtonGroup` L: `Button` Primary L **Start live session** and Secondary L **Start scripted session** (2026-10-26). Both begin the `tour` script at `/pick`, so a moderator doesn't have to type anything (decided 2026-10-07). A live session sends typed answers, and spoken ones as recordings, to the real judge (`/api/judge`), which transcribes a recording with OpenAI gpt-transcribe and judges the words; silence or only filler is "didn't catch that", and Results show the words heard. Every answer in a scripted session, or one opened from a participant's link, follows the script.
+- **Mic blocked: `/mic-blocked`** (2026-10-26, live sessions only). When the browser refuses the mic, the student types: the toggle shows its `micBlocked` slashed mic, and tapping it opens this message screen (composed like `/reset`): "Turn on your mic", "To answer out loud, open Settings › Apps › Safari › Microphone and choose Allow. Then tap Try again.", with a vertical `ButtonGroup` L: Primary **Try again** (asks the browser again; allowed, back to the question in voice mode; refused, the caption starts "It's still off.") and Secondary **Keep typing** (back to the question or result). Not remembered as a route. The choice carries into "Start over" and "New topic". It's reached by typing the address and never appears in the student's flow.
 - **`/`, the app's home address,** resumes a session in progress, including one the student left, so progress is kept (was D5, decided 2026-10-02). A finished or opted-out session, or none, starts fresh at `/start`, on the same script if there was one, else `tour` (decided 2026-10-07).
 - **Full-screen mode:** an app manifest (`src/app/manifest.ts`, the Next.js file convention) and the page metadata make the Home Screen icon open full screen, with no Safari toolbars.
 
@@ -311,7 +312,7 @@ Built around `chatInput`, a new Storybook component made from the Figma set `cha
 
 - **The engine:**
   - real speech-to-text and AI judging, until each phase of the real engine ships (`docs/sprint-context.md` › Real recall engine)
-  - until speech-to-text ships, any real microphone use: no browser mic prompt, and no voice-driven ripples in `RecordingGlow`
+  - in scripted sessions, any real microphone use: no browser mic prompt, and no voice-driven ripples in `RecordingGlow`
 - **Rewards:**
   - the XP card: its stats aren't a Figma component yet
   - "Say it back"

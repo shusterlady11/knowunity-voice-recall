@@ -37,7 +37,10 @@ Where things live in this repo. Moved out of `CLAUDE.md` so that file holds only
 - `src/content/scripts.ts` — the scripts the entry link `/s/[code]` picks. PLACEHOLDER: `tour` and one sample participant script, `k7`.
 - `src/app/MessageScreen.tsx` — the plain centered message page (install steps, unknown link, reset, end screen).
 - `src/lib/recallEngine/judge.ts` — the real judge: asks Claude which key points an answer covers. Server only, since it reads `ANTHROPIC_API_KEY` from `.env.local`.
-- `src/app/api/judge/route.ts` — `POST /api/judge`, the server route a live session's typed answers go to.
+- `src/lib/recallEngine/transcribe.ts` — speech-to-text with OpenAI gpt-transcribe. Server only, since it reads `OPENAI_API_KEY` from `.env.local`.
+- `src/app/api/judge/route.ts` — `POST /api/judge`, the server route a live session's answers go to: typed words as JSON, or a recording, which it transcribes before judging.
+- `src/lib/microphone.ts` — the real mic for live sessions: asks permission, records a take, and holds it for the processing screen.
+- `src/app/mic-blocked/` — the screen the slashed mic opens when the browser has refused the mic.
 - `eval/judge/` — sample answers with the key points each should cover (`samples.ts`, for the designer to review), and the eval that checks the real judge against them: `npm run eval:judge`. It calls Claude, about $1 a run, so it isn't part of `npm run check`.
 - `src/lib/recallEngine/` — the scripted recall engine: reads a script's take for a question and works out coverage, the verdict, the hint or nudge, and XP. Unit tests run with `npm run test:unit`.
 - `src/lib/motion.ts` — `durationMs()`, for reading a motion duration token in code (timers).
