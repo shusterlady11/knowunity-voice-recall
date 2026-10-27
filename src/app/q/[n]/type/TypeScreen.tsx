@@ -134,8 +134,9 @@ export function TypeScreen({ n, startTyping }: { n: number; startTyping: boolean
           {showRow && (
             <ToggleGroup
               inputMode="keyboard"
-              micBlocked={false}
+              micBlocked={session?.micBlocked === true}
               onInputModeChange={(mode) => mode === 'voice' && toVoice()}
+              onBlockedMicClick={() => router.push('/mic-blocked')}
               onSkip={skip}
             />
           )}

@@ -4,7 +4,9 @@ import { expect, fn } from 'storybook/test';
 import { ExpandableResultRow } from './ExpandableResultRow';
 import type { ExpandableResultRowProps, ExpandableResultRowState } from './ExpandableResultRow';
 
-const figmaDescription = `One row in the results screen's Good Explanations / Needs Practice / skipped-questions lists. \`state\` (collapsed/expanded) controls the chevron rotation and whether the transcript detail is shown — accordion logic (only one row open at a time) is real interaction logic to build in code, not something this static set can demonstrate beyond a reference frame. \`tone\` (success/error/neutral) sets the leading icon (Check/X/DotOutline) and the row fill from the feedback token set. \`transcript\` holds only the raw spoken-answer text — the "What you said:" label is fixed structure, not a property. Never put a summary or hint in \`transcript\`.
+const figmaDescription = `One row in the results screen's Good Explanations / Needs Practice / skipped-questions lists. \`state\` (collapsed/expanded) controls the chevron rotation and whether the transcript detail is shown — accordion logic (only one row open at a time) is real interaction logic to build in code, not something this static set can demonstrate beyond a reference frame. \`tone\` (success/error/neutral) sets the leading icon (Check/X/DotOutline) and the row fill from the feedback token set. \`transcript\` holds only the raw spoken-answer text — the "What you said:" label is fixed structure, not a property.
+
+**Changed in code (2026-10-27, designer, from user testing; not yet in Figma):** the label reads "You said", and an optional \`keyPoints\` list adds a **Key ideas** scorecard under it: each of the question's key ideas with the header's Check (\`feedback/success/onSubtle\`) or X (\`feedback/error/onSubtle\`) before it, so the student sees which parts they got and which they missed. Each mark has an accessible name, "Got it" or "Missed", read before the idea. Leave \`keyPoints\` out and there is no scorecard. Never put a summary or hint in \`transcript\`.
 
 **In code:** \`state\`, \`tone\` and \`transcript\` use Figma's names and options. Figma types the concept name and the question into the layers instead of exposing them (and no layer is linked to the \`transcript\` property), so code adds two required props, \`label\` and \`question\`. The transcript is shown in curly quotes; leave it out for a skipped question and the row says "Not answered.", as the neutral variant does.
 
@@ -45,6 +47,11 @@ const meta = {
     question: 'Describe natural selection in your own words.',
     transcript:
       'Natural selection is when organisms with traits that help them survive and reproduce pass those traits to their offspring more often, so over time those traits become more common in the population.',
+    keyPoints: [
+      { text: 'Individuals in a population vary in their traits', covered: true },
+      { text: 'Traits that help survival and reproduction are passed on more often', covered: true },
+      { text: 'Over generations, those traits become more common in the population', covered: false },
+    ],
     onToggle: (next) => toggleSpy(next),
   },
   argTypes: { onToggle: { control: false } },
@@ -127,7 +134,7 @@ const meta = {
       const [questionLabel, question, saidLabel, said] = [...detail!.querySelectorAll('p')] as HTMLElement[];
       await expect(questionLabel).toHaveTextContent('Question');
       await expect(question).toHaveTextContent(args.question);
-      await expect(saidLabel).toHaveTextContent('What you said');
+      await expect(saidLabel).toHaveTextContent('You said');
       await expect(said).toHaveTextContent(args.transcript ? `“${args.transcript}”` : 'Not answered.');
       const cap = getComputedStyle(questionLabel);
       await expect(cap.fontSize).toBe(token('--type-caption-m-bold-fontSize'));
@@ -138,6 +145,33 @@ const meta = {
       await expect(body.lineHeight).toBe(token('--type-body-s-regular-lineHeight'));
       await expect(body.color).toBe(paint('color', '--color-text-primary'));
       await expect(question.getBoundingClientRect().left).toBe(rowBox.left + px('--space-400') + px('--space-700'));
+
+      // Key ideas: a label like the others, then one line per idea, its mark named for a screen reader and drawn
+      // in the header's success or error color, 8px before the text and centred on its first line.
+      const ideas = [...detail!.querySelectorAll('.expandableResultRow__keyPoint')] as HTMLElement[];
+      const ideasLabel = detail!.querySelectorAll('p')[4] as HTMLElement | undefined;
+      if (!args.keyPoints?.length) {
+        await expect(ideasLabel).toBeUndefined();
+        await expect(ideas).toHaveLength(0);
+      } else {
+        await expect(ideasLabel).toHaveTextContent('Key ideas');
+        await expect(ideas).toHaveLength(args.keyPoints.length);
+        for (const [i, idea] of ideas.entries()) {
+          const { text, covered } = args.keyPoints[i];
+          const mark = idea.querySelector('.expandableResultRow__mark') as HTMLElement;
+          const words = idea.querySelector('.expandableResultRow__quote') as HTMLElement;
+          await expect(mark).toHaveAttribute('role', 'img');
+          await expect(mark).toHaveAccessibleName(covered ? 'Got it' : 'Missed');
+          await expect(getComputedStyle(mark).color).toBe(paint('color', covered ? '--color-feedback-success-onSubtle' : '--color-feedback-error-onSubtle'));
+          await expect(words).toHaveTextContent(text);
+          await expect(getComputedStyle(words).fontSize).toBe(token('--type-body-s-regular-fontSize'));
+          await expect(getComputedStyle(words).color).toBe(paint('color', '--color-text-primary'));
+          const slot = (mark.querySelector('.iconSlot') as HTMLElement).getBoundingClientRect();
+          await expect(slot.width).toBe(px('--icon-200'));
+          await expect(words.getBoundingClientRect().left).toBe(slot.right + px('--space-200'));
+          await expect(slot.top + slot.height / 2).toBeCloseTo(words.getBoundingClientRect().top + px('--type-body-s-regular-lineHeight') / 2, 1);
+        }
+      }
     }
 
     // Tapping the header asks for the other state; a second tap asks for the original one again.
@@ -191,4 +225,9 @@ export const CollapsedNeutral: Story = {
 export const ExpandedNeutral: Story = {
   name: 'state=expanded, tone=neutral',
   args: { state: 'expanded', tone: 'neutral', transcript: undefined },
+};
+
+export const ExpandedWithoutKeyIdeas: Story = {
+  name: 'state=expanded, no key ideas',
+  args: { state: 'expanded', tone: 'success', keyPoints: undefined },
 };

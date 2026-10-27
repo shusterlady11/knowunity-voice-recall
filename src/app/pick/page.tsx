@@ -30,7 +30,8 @@ export default function PickPage() {
   const pick = (id: TopicId, name: string) => {
     announce(`${name} selected.`);
     const route = hasSeenSplash() ? '/q/1' : '/start';
-    startSession(getSession()?.code ?? defaultCode, route, id);
+    const previous = getSession();
+    startSession(previous?.code ?? defaultCode, route, id, previous?.live);
     router.push(route);
   };
 

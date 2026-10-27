@@ -36,7 +36,15 @@ Don't exceed 5 rows per variant (sessions are fixed at 5 questions). Don't repur
 **Title color:** the dark \`interactive/onPrimary\` on all three cards, about 8.5:1 on green and 7:1 on coral (Figma changed it from near-white, which was only about 2.1:1 and 2.5:1).`;
 
 const good: ResultsSummaryRow[] = [
-  { label: 'Natural selection', question: 'Describe natural selection in your own words.', transcript: 'Natural selection is when organisms with traits that help them survive and reproduce pass those traits on more often.' },
+  {
+    label: 'Natural selection',
+    question: 'Describe natural selection in your own words.',
+    transcript: 'Natural selection is when organisms with traits that help them survive and reproduce pass those traits on more often.',
+    keyPoints: [
+      { text: 'Individuals in a population vary in their traits', covered: false },
+      { text: 'Traits that help survival and reproduction are passed on more often', covered: true },
+    ],
+  },
   { label: 'Photosynthesis', question: 'What does a plant make during photosynthesis?', transcript: 'Plants use light, water and carbon dioxide to make sugar and oxygen.' },
   { label: 'The water cycle', question: 'Explain how water moves through the water cycle.', transcript: 'Water evaporates, condenses into clouds and falls again as rain or snow.' },
 ];

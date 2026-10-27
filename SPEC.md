@@ -85,7 +85,7 @@ It follows the same pattern as the Storybook story "BottomSheet › Mic permissi
 
 | Action | Leads to |
 |---|---|
-| Turn on | `/q/1`, voice mode. No browser prompt appears: the mic is mocked. |
+| Turn on | `/q/1`, voice mode. In a scripted session no browser prompt appears: the mic is mocked. In a live session the browser's mic prompt appears here; if it's refused, `/q/1/type` in keyboard mode with the mic blocked (see Mic blocked). |
 | Not now | `/mic-off` |
 
 ### 3. Question: `/q/[n]`
@@ -123,7 +123,7 @@ It follows the same pattern as the Storybook story "BottomSheet › Mic permissi
 
 | Action | Leads to |
 |---|---|
-| Tap mic (stop) | submits the take, then `/q/[n]/thinking` |
+| Tap mic (stop) | submits the take, then `/q/[n]/thinking`. In a live session the mic really records from the moment this screen opens, and the recording goes with the take; at `motion.duration.recordingMax` (3 minutes) it submits itself as if tapped. If the browser refuses the mic, `/q/[n]/type` in keyboard mode with the mic blocked. |
 | Cancel X | throws the take away, then `/q/[n]` |
 | Reopening the app on this route | `/q/[n]`; the take is dropped |
 
@@ -141,7 +141,8 @@ A different code starts a new session for it. An unknown code shows "This link d
 
 - **Home Screen:** the student adds this page to their Home Screen. The saved icon has to open `/s/[code]` with its code. On iOS, Home Screen web apps don't share storage with Safari, so the code can't be passed along any other way. So, opened in Safari, `/s/[code]` stays on its address and shows "Add to Home Screen" with the steps ("Tap Share, then Add to Home Screen. Open Knowie from your Home Screen to start."), and a Secondary "Continue in browser" button for testing on a computer. Opened from the icon (full screen), it goes straight on (decided 2026-10-02).
 - **Direct loads with nothing saved:** `/results` goes to `/`, which starts a fresh session. Leaving or opting out from a question or `/mic-off` opened by typing the address still shows the right end message (it starts a session on the `tour` script).
-- **`/reset`** clears the saved session and the "splash seen" flag between participants, then shows "All cleared. This phone is ready for the next participant. Open their link to start." with a `Button` Primary L **Start**, which begins the `tour` script at `/start`, so a moderator doesn't have to type anything (decided 2026-10-07). It's reached by typing the address and never appears in the student's flow.
+- **`/reset`** clears the saved session and the "splash seen" flag between participants, then shows "All cleared. This phone is ready for the next participant. Open their link, or start a session here." with a vertical `ButtonGroup` L: `Button` Primary L **Start live session** and Secondary L **Start scripted session** (2026-10-26). Both begin the `tour` script at `/pick`, so a moderator doesn't have to type anything (decided 2026-10-07). A live session sends typed answers, and spoken ones as recordings, to the real judge (`/api/judge`), which transcribes a recording with OpenAI gpt-transcribe and judges the words; silence or only filler is "didn't catch that", and Results show the words heard. Every answer in a scripted session, or one opened from a participant's link, follows the script.
+- **Mic blocked: `/mic-blocked`** (2026-10-26, live sessions only). When the browser refuses the mic, the student types: the toggle shows its `micBlocked` slashed mic, and tapping it opens this message screen (composed like `/reset`): "Turn on your mic", "To answer out loud, open Settings › Apps › Safari › Microphone and choose Allow. Then tap Try again.", with a vertical `ButtonGroup` L: Primary **Try again** (asks the browser again; allowed, back to the question in voice mode; refused, the caption starts "It's still off.") and Secondary **Keep typing** (back to the question or result). Not remembered as a route. The choice carries into "Start over" and "New topic". It's reached by typing the address and never appears in the student's flow.
 - **`/`, the app's home address,** resumes a session in progress, including one the student left, so progress is kept (was D5, decided 2026-10-02). A finished or opted-out session, or none, starts fresh at `/start`, on the same script if there was one, else `tour` (decided 2026-10-07).
 - **Full-screen mode:** an app manifest (`src/app/manifest.ts`, the Next.js file convention) and the page metadata make the Home Screen icon open full screen, with no Safari toolbars.
 
@@ -181,7 +182,7 @@ A different code starts a new session for it. An unknown code shows "This link d
 | Verdict | Card text |
 |---|---|
 | Correct | that question's correct feedback, from the content |
-| Partial or wrong | the next unused hint. Its copy includes the covered count, e.g. "You've got 2 of 3 key ideas. Think about…" |
+| Partial or wrong | the next unused hint, with the key ideas already covered named in front: "You got the active site fit. Think about…" (2026-10-27). The opening changes with the hint's level: "You got", "You explained", "Nice work on". With nothing covered, the hint stands alone. |
 | Partial or wrong, on a later try | the next hint in the ladder (below); once every hint has been given, the most specific one again |
 | Didn't catch that | the component's default, "I couldn't understand that take." |
 
@@ -222,7 +223,7 @@ A different code starts a new session for it. An unknown code shows "This link d
   - `ProgressMeter` score 1–5, shown as a percentage (20% to 100%, changed in Figma 2026-10-12). It's hidden when nothing is right on its own.
   - `HeadlineBlock` `bodyM`, `secondary` for the headline and the line under it
   - `ResultsSummary` `good-explanations`, `with-hints`, `needs-practice` and `skipped-questions`
-  - `ExpandableResultRow`, with tone `success`, `partial` (the with-hints card), `error` or `neutral`. A row's transcript is every take for that concept, joined: the canned transcript for a spoken take, and exactly what was typed for a typed one. This is the only place the student sees their transcript.
+  - `ExpandableResultRow`, with tone `success`, `partial` (the with-hints card), `error` or `neutral`. A row's transcript is every take for that concept, joined: the canned transcript for a spoken take (the words heard, in a live session), and exactly what was typed for a typed one. This is the only place the student sees their transcript. Opened, a row shows "Question" (the question without its "Q:", which the label already says), "You said" (was "What you said"), then "Key ideas": each of the question's key ideas with a check if this pass covered it or an x if not, from the judge or the script (2026-10-27).
   - `BottomCTA` "Two button drawer": Secondary "Review all", Primary "Continue"
   - No `AppBar`, as in Figma.
 - **Actions:**
@@ -310,8 +311,8 @@ Built around `chatInput`, a new Storybook component made from the Figma set `cha
 ## Out of scope
 
 - **The engine:**
-  - real speech-to-text and AI judging (deferred, estimated at 3–5 days; the mock is built so a real engine can replace it)
-  - any real microphone use: no browser mic prompt, and no voice-driven ripples in `RecordingGlow`
+  - real speech-to-text and AI judging, until each phase of the real engine ships (`docs/sprint-context.md` › Real recall engine)
+  - in scripted sessions, any real microphone use: no browser mic prompt, and no voice-driven ripples in `RecordingGlow`
 - **Rewards:**
   - the XP card: its stats aren't a Figma component yet
   - "Say it back"
@@ -341,7 +342,7 @@ Built around `chatInput`, a new Storybook component made from the Figma set `cha
 
 **Content** (supplied by the designer, stored in a new file under `src/content/`):
 - 5 questions from what the participants just studied.
-- For each question: 2–4 key points, one pre-written hint per key point (its copy can include the covered count, filled in by the engine), a correct-feedback line, the "More info" / Reveal context, and a canned transcript for each verdict it can get (shown in Results).
+- For each question: 2–4 key points, a short name per key point (said back in hints), three pre-written hints per key point, a correct-feedback line, the "More info" / Reveal context, and a canned transcript for each verdict it can get (shown in Results).
 
 **Scripts** (new, stored with the content; the code in `/s/[code]` picks one):
 - **Each question gets its own chain of takes.** Each take lists the key points it covers, for example `q1: 1,2 > 3`.
@@ -356,7 +357,7 @@ Built around `chatInput`, a new Storybook component made from the Figma set `cha
 **The engine** (new, `src/lib/recallEngine/`) is one piece with a fake setting. Given a take, it returns which key points that take covered, the same shape a real engine would return. Everything else is worked out from that:
 
 - **Verdict from combined coverage** across all of this question's takes: all key points covered is correct, some is partial, none is wrong.
-- **Covered count:** "N of M key ideas", filled into the hint's copy.
+- **What was covered:** the short names of the covered key points (`keyPointNames`), put in front of the hint by `fillHint` (2026-10-27; it was a count, "N of M key ideas", which told the student nothing about what they got).
 - **Hints:**
   - A partial or wrong shows the next unused hint, in key-point order.
   - **Every retry gets a new hint** (decided 2026-10-12; the fixed "You're close" nudge is gone). Each key idea has a ladder of three hints, from a gentle cue to a specific one (`src/content/questions.ts`, draft copy for the designer to review). The first hint goes to the first uncovered key idea, then the first hint for the next, and so on; then the second level for each, then the third. Once all are used, the third-level hint for the first uncovered idea is shown again, and the mic stays live. "Reveal answer" stays Tertiary on the left (decided 2026-10-05).
@@ -387,7 +388,7 @@ Built around `chatInput`, a new Storybook component made from the Figma set `cha
 - "Recording cancelled."
 - "Thinking."
 - "Taking a moment."
-- each verdict with its covered count, e.g. "Partial. You covered 2 of 3 key ideas."
+- each verdict with the card's words, e.g. "Partial. You got the active site fit. Think about…"
 
 **recordingGlow in this build.** Only the two filled circles show, and they breathe; the two outline rings are removed. The breathing follows `docs/recordingglow-listening-spec.md` §3:
 - a 3400ms loop that rises for the first 25% and falls for the rest

@@ -18,6 +18,10 @@ talking tutor (the brief rules out voice output entirely: see Non-Goals). The
 student speaks; Knowie answers in **text**. That's a much smaller, safer design
 problem than two-way voice conversation.
 
+> 2026-10-26: Knowie may later read its reply aloud, alongside the on-screen text and
+> never instead of it. The point stands: this is still not a voice assistant or a
+> conversation. See `docs/sprint-context.md` › Real recall engine.
+
 The good news: you don't need new rules for it. Nielsen Norman Group's core
 finding on voice is that *classic usability principles still apply:* error
 prevention, visibility of system status, flexibility, and recognition over

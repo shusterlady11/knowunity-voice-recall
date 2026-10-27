@@ -57,10 +57,10 @@ If the stronger pattern would need a component, prop, variant or slot that does 
 
 Proposals must not break any rule in `docs/design-system.md`, `CLAUDE.md` or the brief. In particular:
 - Every screen is built from `scaffold`'s slots. Only values in `tokens/`: no new colors, spacing, radii, type or motion values. Sentence case.
-- Voice in, text out; Knowie never speaks. Push-to-talk with explicit stop, no auto-detected end of speech. Recall only, not tutoring. Never trap the student. Judge generously. Design the wait.
+- Voice in, text out; a spoken reply may come later, only alongside the text. Push-to-talk with explicit stop, no auto-detected end of speech. Recall only, not tutoring. Never trap the student. Judge generously. Design the wait.
 - 390px, dark mode only. No native APIs, no hover-only interactions, no tablet or desktop layouts, no RTL.
 - Decisions already made in `docs/sprint-context.md` and the brief's "Decided" items are not reopened. Check them before proposing.
-- Do not propose real STT or real AI judging. The recall engine is mocked.
+- The recall engine is becoming real in phases (AI judge, speech-to-text, spoken replies; `docs/sprint-context.md` › Real recall engine). Don't propose streaming or real-time voice, which that decision ruled out.
 
 If a stronger idea needs a rule broken, drop it or shrink it until it fits. A proposal that needs a rule broken is not a proposal. (Reconsidering the system itself is `critic-pattern`'s job, not yours.)
 

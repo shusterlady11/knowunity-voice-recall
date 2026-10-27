@@ -82,6 +82,8 @@ describe('combined coverage and the verdict', () => {
 });
 
 describe('hints', () => {
+  const names = ['lowering activation energy', 'the active site fit', 'enzymes being reusable'];
+
   it('gives the first uncovered key point’s gentlest hint', () => {
     expect(feedbackFor('partial', [1], [], 3)).toEqual({ kind: 'hint', keyPoint: 2, level: 1, fresh: true });
     expect(feedbackFor('wrong', [], [], 3)).toEqual({ kind: 'hint', keyPoint: 1, level: 1, fresh: true });
@@ -113,12 +115,18 @@ describe('hints', () => {
     expect(feedbackFor('notCaught', [], [], 3)).toEqual({ kind: 'notCaught' });
   });
 
-  it('leaves out the count sentence when nothing is covered', () => {
-    expect(fillHint('You’ve got {covered} of {total} key ideas. Think about the energy.', [], 3)).toBe('Think about the energy.');
+  it('credits nothing when nothing is covered', () => {
+    expect(fillHint('Think about the energy.', [], names, 1)).toBe('Think about the energy.');
   });
 
-  it('fills in the covered count', () => {
-    expect(fillHint('You’ve got {covered} of {total} key ideas.', [1, 2], 3)).toBe('You’ve got 2 of 3 key ideas.');
+  it('names what was covered, with an opening that changes by hint level', () => {
+    expect(fillHint('Think about the shape.', [1], names, 1)).toBe('You got lowering activation energy. Think about the shape.');
+    expect(fillHint('Think about the shape.', [1, 3], names, 2)).toBe('You explained lowering activation energy and enzymes being reusable. Think about the shape.');
+    expect(fillHint('Think about the shape.', [3], names, 3)).toBe('Nice work on enzymes being reusable. Think about the shape.');
+  });
+
+  it('lists three names with commas', () => {
+    expect(fillHint('Hint.', [1, 2, 3], [...names, 'x'], 1)).toBe('You got lowering activation energy, the active site fit and enzymes being reusable. Hint.');
   });
 });
 

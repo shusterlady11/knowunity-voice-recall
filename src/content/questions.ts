@@ -7,9 +7,14 @@ export type Question = {
   /** The 3 ideas a good answer covers (the scripts assume 3). Scripts refer to them by number, from 1. */
   keyPoints: string[];
   /**
+   * A short name for each key point, in the same order, said back to the student in a hint: "You got the
+   * active site fit." Lowercase unless a proper noun, since it sits inside a sentence (2026-10-27).
+   */
+  keyPointNames: string[];
+  /**
    * A ladder of hints per key point, in the same order, each one more specific than the last (2026-10-12: the
-   * fixed "You're close" nudge is gone; every retry gets a new hint). {covered} and {total} are filled in with
-   * the covered count, e.g. "You've got 2 of 3 key ideas".
+   * fixed "You're close" nudge is gone; every retry gets a new hint). The engine puts the names of the key
+   * points already covered in front (fillHint).
    */
   hints: string[][];
   /** Knowie's line on a correct answer. */

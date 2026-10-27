@@ -35,7 +35,8 @@ export default function DonePage() {
   const keepGoing = () => backTo(getSession()?.route ?? '/q/1');
   // A new session on the same script, at the topic picker: the saved place is dropped (2026-10-24).
   const startOver = () => {
-    startSession(getSession()?.code ?? defaultCode, '/pick');
+    const previous = getSession();
+    startSession(previous?.code ?? defaultCode, '/pick', undefined, previous?.live);
     router.push('/pick');
   };
 

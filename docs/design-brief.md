@@ -52,6 +52,7 @@ These pull in different directions and both are yours to design for. Activation 
 These don't move.
 
 - **Voice in, text out.** Knowie never speaks. The student's voice is the input; every response is on screen.
+  *(2026-10-26: Knowie may later read its reply aloud, always alongside the text. See `docs/sprint-context.md` › Real recall engine.)*
 - **Push-to-talk with an explicit send.** The student starts recording and stops it themselves. No auto-endpointing, no guessing when someone has finished talking.
 - **Recall only, not tutoring.** If a student asks a question, this doesn't branch into a conversation.
 - **Never trap the student.** Every required action has a way out, including for a student who can't speak right now.
@@ -62,6 +63,7 @@ And for the prototype itself:
 
 - **Mobile iOS only.** 390px wide, dark mode.
 - **The recall is mocked.** No real speech recognition, no real judging. You're designing the experience, not building the engine.
+  *(2026-10-26: superseded. A real judge and speech-to-text replace the mock in phases. See `docs/sprint-context.md` › Real recall engine.)*
 
 ---
 

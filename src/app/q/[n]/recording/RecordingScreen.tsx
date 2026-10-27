@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Scaffold } from '../../../../components/scaffold/Scaffold';
 import { AppBar } from '../../../../components/appBar/AppBar';
@@ -13,12 +13,16 @@ import { XIcon } from '../../../../icons/XIcon';
 import { bold } from '../../../../content/bold';
 import { announce } from '../../../../lib/announcer';
 import { durationMs } from '../../../../lib/motion';
-import { questionRecord, rememberRoute, updateSession, useSession, useTopic } from '../../../../lib/session';
+import { dropRecording, holdRecording, startRecording, type Recording } from '../../../../lib/microphone';
+import { getSession, questionRecord, rememberRoute, updateSession, useSession, useTopic } from '../../../../lib/session';
 import { useQuestionEnter } from '../../../../lib/questionEnter';
 import { sendBackOnLoad } from '../../sendBackOnLoad';
 import './recording.css';
 
-/** Dictating: the question stays on screen while the mic listens; no transcript, no toggle, no Skip. */
+/**
+ * Dictating: the question stays on screen while the mic listens; no transcript, no toggle, no Skip. In a live
+ * session the mic really records (docs/sprint-context.md › Real recall engine); in a scripted one it's mocked.
+ */
 export function RecordingScreen({ n }: { n: number }) {
   const router = useRouter();
   // The same question as the screen before, so it stays put; it rises in only when opened fresh.
@@ -32,8 +36,8 @@ export function RecordingScreen({ n }: { n: number }) {
   // while the question card slides up, once Knowie is listening (decided 2026-10-05).
   const showIntro = n === 1 && session !== null && session.introSeen !== true;
 
-  // "Listening…" first, then "Tap to submit…" once the student has had time to start speaking. The mic is
-  // mocked, so this is a timer (motion.duration.listeningHint), not speech detection; only a tap stops it.
+  // "Listening…" first, then "Tap to submit…" once the student has had time to start speaking. It's a timer
+  // (motion.duration.listeningHint), not speech detection; only a tap stops it.
   // The old words fade out, then the new ones fade in; with reduced motion they just swap.
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -67,19 +71,61 @@ export function RecordingScreen({ n }: { n: number }) {
     return () => cancelAnimationFrame(frame);
   }, [n, router, markShown]);
 
+  // The live recording, once the mic has opened; null in a scripted session or if it never started.
+  const recording = useRef<Promise<Recording | null> | null>(null);
+  const stopping = useRef(false);
+
   // Stopping submits the take to the processing screen, which judges and counts it. Both taps replace this
   // route, so going back never lands on a recording that has ended.
-  const stop = () => {
+  const stop = useCallback(async () => {
+    if (stopping.current) return;
+    stopping.current = true;
     // A spoken take: clear any typed text left from a dropped typed take, so it isn't used as this one's words.
     updateSession((s) => {
       delete questionRecord(s, n).typed;
     });
+    // Held for the processing screen to send. A recording that never started sends nothing: "didn't catch that".
+    const live = await recording.current;
+    if (live) holdRecording(n, await live.stop());
     router.replace(`/q/${n}/thinking`);
-  };
+  }, [n, router]);
   const cancel = () => {
     announce('Recording cancelled.');
     router.replace(`/q/${n}`);
   };
+
+  // A live session opens the mic as the screen opens. If the browser refuses it, the student types instead:
+  // keyboard mode with a slashed mic (docs/sprint-context.md › Decisions, OS mic denied). The recording
+  // submits itself at motion.duration.recordingMax, a safety net a real answer never reaches.
+  useEffect(() => {
+    if (!getSession()?.live) return;
+    dropRecording();
+    let closed = false;
+    const started = startRecording().then(
+      (r) => {
+        if (closed) r.cancel();
+        return closed ? null : r;
+      },
+      () => {
+        if (closed) return null;
+        updateSession((s) => {
+          s.micBlocked = true;
+          s.inputMode = 'keyboard';
+        });
+        announce('Your mic is blocked, so you can type your answer instead.');
+        router.replace(`/q/${n}/type`);
+        return null;
+      },
+    );
+    recording.current = started;
+    const cap = setTimeout(stop, durationMs('--motion-duration-recordingMax'));
+    // Leaving by any route but stop (cancel, close, reload) throws the recording away; after stop it's already done.
+    return () => {
+      closed = true;
+      clearTimeout(cap);
+      started.then((r) => r?.cancel());
+    };
+  }, [n, router, stop]);
 
   return (
     <Scaffold

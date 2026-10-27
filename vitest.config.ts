@@ -22,6 +22,15 @@ export default defineConfig({
           environment: 'node',
         },
       },
+      // The real judge against sample answers (eval/judge/). It calls Claude, so it runs only on `npm run eval:judge`.
+      {
+        test: {
+          name: 'judge',
+          include: ['eval/judge/**/*.eval.ts'],
+          environment: 'node',
+          testTimeout: 60_000,
+        },
+      },
       {
         extends: true,
         plugins: [

@@ -15,7 +15,7 @@ export default function Home() {
   useEffect(() => {
     const saved = getSession();
     const ended = saved?.endedBy === 'finished' || saved?.endedBy === 'optedOut';
-    const session = saved && !ended ? saved : startSession(saved?.code ?? defaultCode, '/pick');
+    const session = saved && !ended ? saved : startSession(saved?.code ?? defaultCode, '/pick', undefined, saved?.live);
     router.replace(session.route);
   }, [router]);
 

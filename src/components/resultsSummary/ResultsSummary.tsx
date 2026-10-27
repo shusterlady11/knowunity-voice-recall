@@ -2,7 +2,7 @@
 
 import { useId, useState } from 'react';
 import { ExpandableResultRow } from '../expandableResultRow/ExpandableResultRow';
-import type { ExpandableResultRowTone } from '../expandableResultRow/ExpandableResultRow';
+import type { ExpandableResultRowKeyPoint, ExpandableResultRowTone } from '../expandableResultRow/ExpandableResultRow';
 import './resultsSummary.css';
 
 // Figma names this property "Property 1"; it's called category here (see the component spec).
@@ -15,6 +15,8 @@ export type ResultsSummaryRow = {
   question: string;
   /** What the student said, word for word. Leave it out for a skipped question. */
   transcript?: string;
+  /** The question's key ideas, each marked got it or missed. Leave it out to show no scorecard. */
+  keyPoints?: ExpandableResultRowKeyPoint[];
 };
 
 export type ResultsSummaryProps = {
@@ -73,6 +75,7 @@ export function ResultsSummary({ category = 'good-explanations', rows, openRow, 
               label={row.label}
               question={row.question}
               transcript={row.transcript}
+              keyPoints={row.keyPoints}
               onToggle={() => toggle(index)}
             />
           </li>

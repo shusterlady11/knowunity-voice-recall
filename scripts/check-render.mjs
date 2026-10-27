@@ -196,7 +196,7 @@ async function walk(width) {
   const begin = async (code = 'tour', stopAtMic = false, topic = /^cellular energetics$/i) => {
     await go('/reset');
     if (code === 'tour') {
-      await tap(/^start$/i);
+      await tap(/^start scripted session$/i);
       await page.waitForURL(/pick/);
       await pause(400);
       if (!pickRecorded) {
@@ -244,6 +244,8 @@ async function walk(width) {
     await state('not-found');
     await go('/mic-off');
     await state('mic-off');
+    await go('/mic-blocked');
+    await state('mic-blocked', { announces: true });
     await go('/done');
     await state('done-nothing-saved');
     await go('/results');
@@ -313,6 +315,12 @@ async function walk(width) {
     await page.waitForURL(/results/);
     await pause(1200);
     await state('results-mixed', { announces: true });
+    // An opened row: the question, what was said and the key ideas scorecard (2026-10-27).
+    await page.locator('.expandableResultRow__header').first().click();
+    await pause(400);
+    await state('results-row-open');
+    await page.locator('.expandableResultRow__header').first().click();
+    await pause(300);
     await tap(/review all/i);
     await page.waitForURL(/q\/1/);
     await pause(700);

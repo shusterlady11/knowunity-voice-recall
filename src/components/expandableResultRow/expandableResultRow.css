@@ -122,3 +122,36 @@
   line-height: var(--type-body-s-regular-lineHeight);
   letter-spacing: var(--type-body-s-regular-letterSpacing);
 }
+
+/* Key ideas (2026-10-27, code only, not in Figma yet): one line per idea, the row header's check or x before
+   it, in the header's success and error colors. */
+.expandableResultRow__keyPoints {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-200);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.expandableResultRow__keyPoint {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-200);
+}
+
+/* The 16px icon sits on the first line of the text: its line is Body S's line height. */
+.expandableResultRow__mark {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: var(--type-body-s-regular-lineHeight);
+}
+
+.expandableResultRow__keyPoint[data-covered='true'] .expandableResultRow__mark {
+  color: var(--color-feedback-success-onSubtle);
+}
+
+.expandableResultRow__keyPoint[data-covered='false'] .expandableResultRow__mark {
+  color: var(--color-feedback-error-onSubtle);
+}

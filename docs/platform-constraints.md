@@ -51,6 +51,10 @@ What follows from that:
 **The recall itself is mocked.** No real speech-to-text, no real AI judging. You
 are designing and building the experience, not the engine.
 
+> 2026-10-26: superseded. A real engine replaces this mock in phases; see
+> `docs/sprint-context.md` › Real recall engine. The points below still apply to any phase
+> not yet built, and the one about latency applies for good.
+
 In practice:
 
 - **The transcript is fake.** You decide what the student "said." Hard-code a
