@@ -55,8 +55,9 @@ export type Session = {
   /** How the student reached the end screen, saved by the button that leads there (was D3). */
   endedBy?: EndedBy;
   /**
-   * Typed answers go to the real judge instead of the script (docs/sprint-context.md › Real recall engine).
-   * Set by "Start live session" on /reset and carried into every session started from this one.
+   * Spoken and typed answers go to the real recognizer and judge instead of the script (docs/sprint-context.md ›
+   * Real recall engine). On unless it is false: a session is live by default (2026-10-28, designer), and only
+   * "Start scripted session" on /reset turns it off. Carried into every session started from this one.
    */
   live?: boolean;
   /**
@@ -121,9 +122,14 @@ export function getSession(): Session | null {
   return read<Session>(SESSION_KEY);
 }
 
-/** Starts a new session for a script code and a topic, at the given route; `live` sends typed answers to the real judge. */
-export function startSession(code: string, route: string, topicId?: TopicId, live?: boolean): Session {
-  const session: Session = { code, route, inputMode: 'voice', pass: 1, xp: 0, questions: {}, ...(topicId && { topicId }), ...(live && { live }) };
+/** Whether answers are really listened to and judged: every session is, unless it was started scripted. */
+export function isLive(session: Session | null): boolean {
+  return session !== null && session.live !== false;
+}
+
+/** Starts a new session for a script code and a topic, at the given route. Live unless `live` is false. */
+export function startSession(code: string, route: string, topicId?: TopicId, live = true): Session {
+  const session: Session = { code, route, inputMode: 'voice', pass: 1, xp: 0, questions: {}, live, ...(topicId && { topicId }) };
   write(SESSION_KEY, session);
   return session;
 }

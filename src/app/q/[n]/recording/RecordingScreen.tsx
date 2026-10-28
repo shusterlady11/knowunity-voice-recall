@@ -15,7 +15,7 @@ import { announce } from '../../../../lib/announcer';
 import { durationMs } from '../../../../lib/motion';
 import { dropRecording, holdRecording, startRecording, type Recording } from '../../../../lib/microphone';
 import { VoiceWaveform } from './VoiceWaveform';
-import { getSession, questionRecord, rememberRoute, updateSession, useSession, useTopic } from '../../../../lib/session';
+import { getSession, isLive, questionRecord, rememberRoute, updateSession, useSession, useTopic } from '../../../../lib/session';
 import { useQuestionEnter } from '../../../../lib/questionEnter';
 import { sendBackOnLoad } from '../../sendBackOnLoad';
 import './recording.css';
@@ -111,7 +111,7 @@ export function RecordingScreen({ n }: { n: number }) {
   // keyboard mode with a slashed mic (docs/sprint-context.md › Decisions, OS mic denied). The recording
   // submits itself at motion.duration.recordingMax, a safety net a real answer never reaches.
   useEffect(() => {
-    if (!getSession()?.live) return;
+    if (!isLive(getSession())) return;
     dropRecording();
     let closed = false;
     const started = startRecording().then(

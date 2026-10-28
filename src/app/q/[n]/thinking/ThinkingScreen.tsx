@@ -16,7 +16,7 @@ import { combine, feedbackFor, judgeTake, verdictFor, xpFor, type Take, type Ver
 import { announce } from '../../../../lib/announcer';
 import { heldRecording, recordingFileName } from '../../../../lib/microphone';
 import { durationMs } from '../../../../lib/motion';
-import { getSession, questionRecord, questionRoute, updateSession, useSession, useTopic } from '../../../../lib/session';
+import { getSession, isLive, questionRecord, questionRoute, updateSession, useSession, useTopic } from '../../../../lib/session';
 import { useQuestionEnter } from '../../../../lib/questionEnter';
 import { sendBackOnLoad } from '../../sendBackOnLoad';
 import './thinking.css';
@@ -56,7 +56,7 @@ export function ThinkingScreen({ n }: { n: number }) {
     const typed = session?.questions[n]?.typed;
     // A live session sends what was typed, or the recording, to the real judge (docs/sprint-context.md › Real
     // recall engine); a scripted one reads the script. `heard` is the transcript of a live spoken take.
-    const live = session?.live === true;
+    const live = isLive(session);
     const audio = live && !typed ? heldRecording(n) : null;
     let heard: string | undefined;
 

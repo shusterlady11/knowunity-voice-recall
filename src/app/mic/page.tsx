@@ -15,7 +15,7 @@ import { HeadlineBlock } from '../../components/headlineBlock/HeadlineBlock';
 import { bold } from '../../content/bold';
 import { announce } from '../../lib/announcer';
 import { requestMic } from '../../lib/microphone';
-import { getSession, rememberRoute, updateSession, useTopic } from '../../lib/session';
+import { getSession, isLive, rememberRoute, updateSession, useTopic } from '../../lib/session';
 import { useQuestionEnter } from '../../lib/questionEnter';
 import '../q/[n]/question.css';
 import './mic.css';
@@ -45,7 +45,7 @@ export default function MicPage() {
   // In a live session "Turn on" asks the browser for the mic here, where the student has just said yes to it
   // (docs/voice-ux.md › 3). Refused, they type, with a slashed mic (docs/sprint-context.md › Decisions).
   const turnOn = async () => {
-    if (getSession()?.live && !(await requestMic())) {
+    if (isLive(getSession()) && !(await requestMic())) {
       updateSession((session) => {
         session.micBlocked = true;
       });

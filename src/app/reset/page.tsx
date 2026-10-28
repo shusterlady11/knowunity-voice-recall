@@ -11,8 +11,9 @@ import { MessageScreen } from '../MessageScreen';
 /**
  * Reset (SPEC.md › 5): clears the saved session and the "splash seen" flag between participants. Moderator
  * only. Either button begins the tour at the topic picker (was the first-run splash, 2026-10-24), so nothing
- * has to be typed (decided 2026-10-07): "Start live session" sends typed answers to the real judge, "Start
- * scripted session" keeps every verdict scripted (2026-10-26). A participant's own link is always scripted.
+ * has to be typed (decided 2026-10-07): "Start live session" listens to spoken answers and judges them and
+ * typed ones, "Start scripted session" keeps every verdict scripted (2026-10-26). Every other way in, a
+ * participant's link included, is live (2026-10-28).
  */
 export default function ResetPage() {
   const router = useRouter();
