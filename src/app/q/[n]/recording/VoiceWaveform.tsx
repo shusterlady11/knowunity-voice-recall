@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { durationMs, tokenNumber } from '../../../../lib/motion';
-import { unlockAudio } from '../../../../lib/microphone';
+import { unlockAudio, waveformSupported } from '../../../../lib/microphone';
 import { barHeight, barOpacity, gateIsOpen, rms, smooth, targetFor, type WaveformTuning } from '../../../../lib/waveform';
 import './voiceWaveform.css';
 
@@ -49,7 +49,7 @@ export function VoiceWaveform({ stream, active }: { stream: MediaStream | null; 
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!stream || !running || !canvas) return;
+    if (!stream || !running || !canvas || !waveformSupported()) return;
     const ctx2d = canvas.getContext('2d');
     const audio = unlockAudio();
     if (!ctx2d || !audio) return;
