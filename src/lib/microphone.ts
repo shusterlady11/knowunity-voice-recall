@@ -17,21 +17,10 @@ export type Recording = {
 let audioContext: AudioContext | null = null;
 
 /**
- * Whether the voice waveform may listen to the mic. Not on iPhone or iPad (every browser there is Safari's engine):
- * a second listener on the stream that is being recorded can leave the recording silent or cut short, and a good
- * recording matters more than the effect. Found in a live test on an iPhone, 2026-10-28.
- */
-export function waveformSupported(): boolean {
-  const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  return !iOS;
-}
-
-/**
  * The one audio context the voice waveform listens through. Call `unlockAudio()` inside a tap (the mic buttons
- * do) so Safari lets it run; the waveform resumes it again when it starts. Returns null where the waveform is off.
+ * do) so Safari lets it run; the waveform resumes it again when it starts.
  */
 export function unlockAudio(): AudioContext | null {
-  if (!waveformSupported()) return null;
   try {
     audioContext ??= new AudioContext();
     if (audioContext.state === 'suspended') void audioContext.resume();
