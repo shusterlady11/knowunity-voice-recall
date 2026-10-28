@@ -1,7 +1,11 @@
 /* Typing, as in Figma's "Question / activeState keyboard option selected" and "keyboard open". */
 
-/* The question, laid out from the top like the question screen. */
+/* The question, laid out from the top like the question screen, with Knowie's last reply Space/400 below it on a
+   retry (the same stack as the result screen). */
 .type__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-400);
   width: 100%;
 }
 

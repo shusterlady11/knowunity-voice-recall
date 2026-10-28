@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation';
 import { Scaffold } from '../../../../components/scaffold/Scaffold';
 import { AppBar } from '../../../../components/appBar/AppBar';
 import { MiddleSection } from '../../../../components/middleSection/MiddleSection';
+import { AnswerCard } from '../../../../components/answerCard/AnswerCard';
 import { ToggleGroup } from '../../../../components/toggleGroup/ToggleGroup';
 import { ChatInput } from '../../../../components/chatInput/ChatInput';
 import { bold } from '../../../../content/bold';
 import { endQuestion, questionRecord, questionRoute, rememberRoute, updateSession, useSession, useTopic, type Session } from '../../../../lib/session';
 import { announce } from '../../../../lib/announcer';
 import { useQuestionEnter } from '../../../../lib/questionEnter';
+import { cardState, replyMessage } from '../../replyCard';
 import { ExitConfirm } from '../../ExitConfirm';
 import '../../exitConfirm.css';
 import './type.css';
@@ -32,14 +34,21 @@ export function TypeScreen({ n, startTyping }: { n: number; startTyping: boolean
   const isLast = n === questions.length;
   const showIntro = n === 1 && session !== null && session.introSeen !== true;
 
+  // A retry after a partial, wrong or not-caught take keeps Knowie's last reply under the question, so the
+  // student can build on it while they type. Nothing on a question not yet answered, or a correct one.
+  const last = session?.questions[n];
+  const reply = last?.verdict && last.verdict !== 'correct' && last.feedback ? { verdict: last.verdict, message: replyMessage(questions[n - 1], last.feedback, last.covered ?? []) } : null;
+
+  const replyText = reply?.message;
+
   // Remember the question: in keyboard mode, reopening it comes back here.
   // A new question rises into place; the same one shown again doesn't.
   const { animateIn, markShown } = useQuestionEnter(n);
   useEffect(() => {
     rememberRoute(`/q/${n}`);
     markShown();
-    announce(`Question ${n} of ${questions.length}. ${questions[n - 1].prompt.replaceAll('**', '')} Type your answer.`);
-  }, [n, markShown, questions]);
+    announce(`Question ${n} of ${questions.length}. ${questions[n - 1].prompt.replaceAll('**', '')} ${replyText ?? ''} Type your answer.`.replace('  ', ' '));
+  }, [n, markShown, questions, replyText]);
 
   // Keep the bar above the iPhone keyboard. iOS doesn't shrink the page when the keyboard opens, so the bar
   // follows the visible area (visualViewport) up by the keyboard's height, and the page is kept from
@@ -116,6 +125,7 @@ export function TypeScreen({ n, startTyping }: { n: number; startTyping: boolean
       middleContent={
         <div className="type__content" inert={leaving}>
           <MiddleSection topic={topic} intro={intro} question={bold(questions[n - 1].prompt)} showIntro={showIntro} animateIn={animateIn} />
+          {reply && <AnswerCard state={cardState[reply.verdict]} message={reply.message} />}
         </div>
       }
       bottomContent={

@@ -12,8 +12,9 @@ import { InputModeToggle } from '../../../../components/inputModeToggle/InputMod
 import { BottomCTA } from '../../../../components/bottomCTA/BottomCTA';
 import { ChatInput } from '../../../../components/chatInput/ChatInput';
 import { timedOut } from '../../../../content/questions';
+import { cardState, replyMessage } from '../../replyCard';
 import { bold } from '../../../../content/bold';
-import { fillHint, type Feedback, type Verdict } from '../../../../lib/recallEngine';
+import { type Feedback, type Verdict } from '../../../../lib/recallEngine';
 import { announce } from '../../../../lib/announcer';
 import { unlockAudio } from '../../../../lib/microphone';
 import { endQuestion, getSession, questionRecord, questionRoute, rememberRoute, updateSession, useSession, useTopic } from '../../../../lib/session';
@@ -23,13 +24,6 @@ import { AnswerSheet } from './AnswerSheet';
 import '../../exitConfirm.css';
 import './result.css';
 
-const cardState: Record<Verdict, 'answer-correct' | 'answer-partial' | 'answer-error' | 'answer-notcaught'> = {
-  correct: 'answer-correct',
-  partial: 'answer-partial',
-  wrong: 'answer-error',
-  notCaught: 'answer-notcaught',
-};
-
 // Said to screen readers with the covered count, in the status pill's own words.
 const verdictWord: Record<Verdict, string> = {
   correct: 'Correct.',
@@ -37,9 +31,6 @@ const verdictWord: Record<Verdict, string> = {
   wrong: 'Try again.',
   notCaught: 'Didn’t catch that.',
 };
-
-// Why a take wasn't caught: nothing heard at all, or something the judge couldn't make out.
-const notCaughtReason = { silent: 'I didn’t hear anything.', unclear: 'I couldn’t understand that take.' };
 
 /**
  * Result: the verdict on the latest take. Correct ends the question; partial, wrong and "didn't catch that"
@@ -60,21 +51,8 @@ export function ResultScreen({ n }: { n: number }) {
   const [sheet, setSheet] = useState<'none' | 'exit' | 'answer'>('none');
   const closeSheet = useCallback(() => setSheet('none'), []);
 
-  // What the result card says for a feedback: the hint, the correct line, the slow-take line or why a take
-  // wasn't caught.
-  const feedbackText = useCallback(
-    (feedback: Feedback, covered: number[]): string | undefined =>
-      feedback.kind === 'correct'
-        ? question.correct
-        : feedback.kind === 'hint'
-          ? fillHint(question.hints[feedback.keyPoint - 1][feedback.level - 1], covered, question.keyPointNames, feedback.level)
-          : feedback.kind === 'timedOut'
-            ? timedOut
-            : feedback.kind === 'notCaught'
-              ? notCaughtReason[feedback.silent ? 'silent' : 'unclear']
-              : undefined,
-    [question],
-  );
+  // What the result card says for a feedback (shared with the typing screen).
+  const feedbackText = useCallback((feedback: Feedback, covered: number[]) => replyMessage(question, feedback, covered), [question]);
 
   // Remember this result; with no judged take (opened some other way), go back to the question.
   useEffect(() => {
