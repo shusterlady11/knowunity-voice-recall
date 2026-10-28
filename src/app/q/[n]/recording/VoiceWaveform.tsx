@@ -124,6 +124,13 @@ export function VoiceWaveform({ stream, active }: { stream: MediaStream | null; 
       ctx2d.globalAlpha = 1;
     };
 
+    // Tuning aid: run localStorage.setItem('waveformDebug', '1') in the console to log the mic's real level once a
+    // second while dictating, so the gate and full-scale tokens can be set from what the mic actually does.
+    let debug = false;
+    try {
+      debug = localStorage.getItem('waveformDebug') === '1';
+    } catch {}
+    let lastLog = 0;
     let gate = false;
     let amplitude = 0;
     let last = performance.now();
@@ -139,8 +146,15 @@ export function VoiceWaveform({ stream, active }: { stream: MediaStream | null; 
         lastRefresh = now;
         dt = 16.7;
       }
+      // Some browsers (Safari most of all) suspend the context when the mic opens; keep asking it to run.
+      if (audio.state !== 'running') void audio.resume();
       analyser.getFloatTimeDomainData(block);
       const level = rms(block);
+      if (debug && now - lastLog > 1000) {
+        lastLog = now;
+        const track = stream.getAudioTracks()[0];
+        console.log('[waveform]', { rms: +level.toFixed(4), gateOpen: gate, amplitude: +amplitude.toFixed(2), context: audio.state, track: track?.readyState, muted: track?.muted });
+      }
       gate = gateIsOpen(gate, level, tuning);
       amplitude = smooth(amplitude, targetFor(level, gate, tuning), dt, tuning);
 
