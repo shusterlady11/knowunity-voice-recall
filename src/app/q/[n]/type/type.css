@@ -11,12 +11,8 @@
 
 /* The toggle row, then the typing bar 20px below it (Space/400 plus Space/100; Figma), 24px from the bottom
    edge (Scaffold's Space/400 plus Space/200), like every bottom button. The toggle's bottom is 104px above the
-   edge, as on every screen with the toggle. When the iPhone keyboard is open, the area moves up
-   by the keyboard's height (--type-keyboard, measured from the visible area in TypeScreen.tsx), less the
-   home-bar padding Scaffold adds below it, since the keyboard covers the home bar. */
+   edge, as on every screen with the toggle. */
 .type__answer {
-  --type-keyboard: var(--space-0);
-
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -24,5 +20,24 @@
   gap: calc(var(--space-400) + var(--space-100));
   width: 100%;
   padding-bottom: var(--space-200);
-  transform: translateY(calc(-1 * max(var(--space-0), var(--type-keyboard) - env(safe-area-inset-bottom))));
+}
+
+/* With the iPhone keyboard open, the screen is cut down to the visible area (--type-visible-height and
+   --type-visible-top, measured from visualViewport in TypeScreen.tsx), so the question keeps the room above the
+   bar and the bar can grow without covering it. The keyboard covers the home bar, so the bar's room for it
+   goes too. */
+.scaffold:has(.type__answer[data-keyboard]) {
+  height: var(--type-visible-height);
+  transform: translateY(var(--type-visible-top));
+}
+
+.type__answer[data-keyboard] {
+  margin-bottom: calc(-1 * env(safe-area-inset-bottom));
+}
+
+/* With the keyboard open there is room for three lines of the answer, not six: more would push the question out
+   of view. The field scrolls inside past that, and keeps its six lines once the keyboard is down. */
+.type__answer[data-keyboard] .chatInput__text {
+  max-height: calc(var(--font-lineHeight-body-md) * 3);
+  overflow-y: auto;
 }

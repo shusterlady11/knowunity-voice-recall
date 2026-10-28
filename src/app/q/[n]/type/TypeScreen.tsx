@@ -50,15 +50,27 @@ export function TypeScreen({ n, startTyping }: { n: number; startTyping: boolean
     announce(`Question ${n} of ${questions.length}. ${questions[n - 1].prompt.replaceAll('**', '')} ${replyText ?? ''} Type your answer.`.replace('  ', ' '));
   }, [n, markShown, questions, replyText]);
 
-  // Keep the bar above the iPhone keyboard. iOS doesn't shrink the page when the keyboard opens, so the bar
-  // follows the visible area (visualViewport) up by the keyboard's height, and the page is kept from
-  // scrolling so the question stays in view. Check this on the iPhone.
+  // Keep the screen above the iPhone keyboard. iOS doesn't shrink the page when the keyboard opens, so the
+  // screen is cut down to the visible area (visualViewport): the question gets the room that is left, and the
+  // typing bar grows into real space instead of over the question card. The page itself is kept from scrolling.
+  // Check this on the iPhone.
   useEffect(() => {
     const viewport = window.visualViewport;
-    if (!viewport) return;
+    const answer = answerRef.current;
+    const screen = answer?.closest<HTMLElement>('.scaffold');
+    if (!viewport || !answer || !screen) return;
     const follow = () => {
       const keyboard = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
-      answerRef.current?.style.setProperty('--type-keyboard', `${keyboard}px`);
+      // A real keyboard is over 100px; less is the browser's own toolbar moving, which dvh already follows.
+      const up = keyboard > 100;
+      answer.toggleAttribute('data-keyboard', up);
+      if (up) {
+        screen.style.setProperty('--type-visible-height', `${viewport.height}px`);
+        screen.style.setProperty('--type-visible-top', `${viewport.offsetTop}px`);
+      } else {
+        screen.style.removeProperty('--type-visible-height');
+        screen.style.removeProperty('--type-visible-top');
+      }
       if (window.scrollY !== 0) window.scrollTo(0, 0);
     };
     follow();
@@ -67,6 +79,8 @@ export function TypeScreen({ n, startTyping }: { n: number; startTyping: boolean
     return () => {
       viewport.removeEventListener('resize', follow);
       viewport.removeEventListener('scroll', follow);
+      screen.style.removeProperty('--type-visible-height');
+      screen.style.removeProperty('--type-visible-top');
     };
   }, []);
 
