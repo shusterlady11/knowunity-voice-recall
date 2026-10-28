@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '../../components/button/Button';
 import { ButtonGroup } from '../../components/buttonGroup/ButtonGroup';
 import { defaultCode } from '../../content/scripts';
+import { setWaveformEnabled } from '../../lib/microphone';
 import { clearAll, startSession } from '../../lib/session';
 import { MessageScreen } from '../MessageScreen';
 
@@ -17,7 +18,13 @@ import { MessageScreen } from '../MessageScreen';
  */
 export default function ResetPage() {
   const router = useRouter();
-  useEffect(() => clearAll(), []);
+  useEffect(() => {
+    clearAll();
+    // /reset?waveform=off turns the voice waveform off on this phone, ?waveform=on back on (for telling whether
+    // it affects the recording).
+    const waveform = new URLSearchParams(location.search).get('waveform');
+    if (waveform === 'off' || waveform === 'on') setWaveformEnabled(waveform === 'on');
+  }, []);
 
   const start = (live: boolean) => {
     startSession(defaultCode, '/pick', undefined, live);

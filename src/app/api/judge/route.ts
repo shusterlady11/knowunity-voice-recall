@@ -52,6 +52,8 @@ export async function POST(request: Request) {
     const question = topicFor(topicId as string | undefined).questions[n - 1];
     if (audio) {
       const transcript = (await transcribe(question, audio, audio.name)).slice(0, maxAnswerLength);
+      // For telling a silent recording from an unclear one in the host's logs: sizes and counts, never the words.
+      console.log('[judge] audio', { bytes: audio.size, type: audio.type, words: words(transcript).length });
       // Silence or only "um" is "didn't catch that", not a wrong answer. No words at all is silent ("I didn't hear
       // anything"); only fillers is something heard but not understood.
       if (heardNothing(transcript)) {

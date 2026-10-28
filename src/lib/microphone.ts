@@ -16,11 +16,37 @@ export type Recording = {
 
 let audioContext: AudioContext | null = null;
 
+const WAVEFORM_KEY = 'knowie.waveform';
+
+/**
+ * Whether the voice waveform may listen to the mic. On unless a tester turned it off with /reset?waveform=off
+ * (and back on with ?waveform=on), to tell whether it affects what gets recorded: on an iPhone it listens to the
+ * same stream the recorder is using, which Safari may not allow.
+ */
+export function waveformEnabled(): boolean {
+  try {
+    return localStorage.getItem(WAVEFORM_KEY) !== 'off';
+  } catch {
+    return true;
+  }
+}
+
+/** Turns the waveform on or off for this browser; read from /reset's address. */
+export function setWaveformEnabled(on: boolean) {
+  try {
+    if (on) localStorage.removeItem(WAVEFORM_KEY);
+    else localStorage.setItem(WAVEFORM_KEY, 'off');
+  } catch {
+    // Not stored: the waveform stays on.
+  }
+}
+
 /**
  * The one audio context the voice waveform listens through. Call `unlockAudio()` inside a tap (the mic buttons
- * do) so Safari lets it run; the waveform resumes it again when it starts.
+ * do) so Safari lets it run; the waveform resumes it again when it starts. Null when the waveform is off.
  */
 export function unlockAudio(): AudioContext | null {
+  if (!waveformEnabled()) return null;
   try {
     audioContext ??= new AudioContext();
     if (audioContext.state === 'suspended') void audioContext.resume();
