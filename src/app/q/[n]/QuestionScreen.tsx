@@ -12,6 +12,7 @@ import { bold } from '../../../content/bold';
 import { endQuestion, getSession, rememberRoute, updateSession, useSession, useTopic, type Session } from '../../../lib/session';
 import { useQuestionEnter } from '../../../lib/questionEnter';
 import { announce } from '../../../lib/announcer';
+import { unlockAudio } from '../../../lib/microphone';
 import { ExitConfirm } from '../ExitConfirm';
 import '../exitConfirm.css';
 import './question.css';
@@ -84,7 +85,10 @@ export function QuestionScreen({ n }: { n: number }) {
           <TapToAnswer text="Tap to dictate" />
           {/* The welcome card stays until Knowie is listening: the dictating screen fades it out. */}
           <div className="question__mic">
-            <MicButton onClick={() => router.push(`/q/${n}/recording`)} />
+            <MicButton onClick={() => {
+              unlockAudio();
+              router.push(`/q/${n}/recording`);
+            }} />
             <div className="question__row">
               <ToggleGroup
                 inputMode="voice"

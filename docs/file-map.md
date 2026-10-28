@@ -43,7 +43,8 @@ Where things live in this repo. Moved out of `CLAUDE.md` so that file holds only
 - `src/app/mic-blocked/` — the screen the slashed mic opens when the browser has refused the mic.
 - `eval/judge/` — sample answers with the key points each should cover (`samples.ts`, for the designer to review), and the eval that checks the real judge against them: `npm run eval:judge`. It calls Claude, about $1 a run, so it isn't part of `npm run check`.
 - `src/lib/recallEngine/` — the scripted recall engine: reads a script's take for a question and works out coverage, the verdict, the hint or nudge, and XP. Unit tests run with `npm run test:unit`.
-- `src/lib/motion.ts` — `durationMs()`, for reading a motion duration token in code (timers).
+- `src/lib/motion.ts` — `durationMs()` and `tokenNumber()`, for reading a motion token in code (timers, canvas).
+- `src/lib/waveform.ts` — the maths for the dictating screen's voice waveform (noise gate, level curve, smoothing, bar shape). `src/app/q/[n]/recording/VoiceWaveform.tsx` draws it.
 - `src/lib/questionEnter.ts` — `useQuestionEnter()`: whether a question screen's `middleSection` rises in (only when the question changed since the last one shown).
 - `src/app/q/sendBackOnLoad.ts` — sends a reload or reopen on the recording or thinking route back to its question.
 - `src/lib/announcer.tsx` — the one hidden screen-reader live region (in the root layout); call `announce()` for every state change, in a full sentence.

@@ -33,7 +33,7 @@ export function ThinkingScreen({ n }: { n: number }) {
   const { animateIn, markShown } = useQuestionEnter(n);
   const xp = useSession()?.xp ?? 0;
   const { name: topic, questions } = useTopic();
-  const [message, setMessage] = useState<string | undefined>(undefined);
+  const [message, setMessage] = useState<string>('Thinking…');
   const isLast = n === questions.length;
 
   // Set when the student cancels, so a judge that finishes during the move doesn't count the take.
@@ -90,6 +90,7 @@ export function ThinkingScreen({ n }: { n: number }) {
         record.verdict = verdict;
         const hintsUsed = record.hintsUsed ?? [];
         record.feedback = timedOut ? { kind: 'timedOut' } : feedbackFor(verdict, covered, hintsUsed, keyPointCount);
+        if (take.kind === 'notCaught' && take.silent) record.feedback = { kind: 'notCaught', silent: true };
         // Only a hint the student hasn't seen is counted; the last one repeated, once they're all used, is not.
         if (record.feedback.kind === 'hint' && record.feedback.fresh) record.hintsUsed = [...hintsUsed, record.feedback.keyPoint];
         if (verdict === 'correct' && !record.outcome) {
@@ -126,9 +127,9 @@ export function ThinkingScreen({ n }: { n: number }) {
     };
 
     const timers: ReturnType<typeof setTimeout>[] = [];
-    // A live spoken take whose recording never started has nothing to judge: "didn't catch that".
+    // A live spoken take whose recording never started has nothing to judge: "didn't catch that", nothing heard.
     if (live && !typed && !audio) {
-      timers.push(setTimeout(() => resolve({ kind: 'notCaught' }), durationMs('--motion-duration-thinkingMin')));
+      timers.push(setTimeout(() => resolve({ kind: 'notCaught', silent: true }), durationMs('--motion-duration-thinkingMin')));
       return () => timers.forEach(clearTimeout);
     }
     if (live) {
@@ -224,9 +225,9 @@ export function ThinkingScreen({ n }: { n: number }) {
       }
       bottomContent={
         <div className="thinking__answer">
-          {/* The line where the other states put their hint: empty until a slow take shows "Taking a moment…". */}
-          <div className="thinking__hint" data-visible={message ? '' : undefined}>
-            <TapToAnswer text={message ?? '\u00A0'} />
+          {/* The line where the other states put their hint: "Thinking…", then "Taking a moment…" for a slow take. */}
+          <div className="thinking__hint" data-visible="">
+            <TapToAnswer text={message} />
           </div>
           {/* Not tappable while Knowie judges the take; the dots on the button show it's working. */}
           <div className="thinking__mic">

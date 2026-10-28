@@ -15,6 +15,7 @@ import { timedOut } from '../../../../content/questions';
 import { bold } from '../../../../content/bold';
 import { fillHint, type Feedback, type Verdict } from '../../../../lib/recallEngine';
 import { announce } from '../../../../lib/announcer';
+import { unlockAudio } from '../../../../lib/microphone';
 import { endQuestion, getSession, questionRecord, questionRoute, rememberRoute, updateSession, useSession, useTopic } from '../../../../lib/session';
 import { useQuestionEnter } from '../../../../lib/questionEnter';
 import { ExitConfirm } from '../../ExitConfirm';
@@ -34,8 +35,11 @@ const verdictWord: Record<Verdict, string> = {
   correct: 'Correct.',
   partial: 'Almost there.',
   wrong: 'Try again.',
-  notCaught: 'Didn’t catch that. Tap the mic to try again.',
+  notCaught: 'Didn’t catch that.',
 };
+
+// Why a take wasn't caught: nothing heard at all, or something the judge couldn't make out.
+const notCaughtReason = { silent: 'I didn’t hear anything.', unclear: 'I couldn’t understand that take.' };
 
 /**
  * Result: the verdict on the latest take. Correct ends the question; partial, wrong and "didn't catch that"
@@ -56,8 +60,8 @@ export function ResultScreen({ n }: { n: number }) {
   const [sheet, setSheet] = useState<'none' | 'exit' | 'answer'>('none');
   const closeSheet = useCallback(() => setSheet('none'), []);
 
-  // What the result card says for a feedback: the hint, the correct line or the slow-take line. Nothing for
-  // "didn't catch that", which keeps the card's own default line.
+  // What the result card says for a feedback: the hint, the correct line, the slow-take line or why a take
+  // wasn't caught.
   const feedbackText = useCallback(
     (feedback: Feedback, covered: number[]): string | undefined =>
       feedback.kind === 'correct'
@@ -66,7 +70,9 @@ export function ResultScreen({ n }: { n: number }) {
           ? fillHint(question.hints[feedback.keyPoint - 1][feedback.level - 1], covered, question.keyPointNames, feedback.level)
           : feedback.kind === 'timedOut'
             ? timedOut
-            : undefined,
+            : feedback.kind === 'notCaught'
+              ? notCaughtReason[feedback.silent ? 'silent' : 'unclear']
+              : undefined,
     [question],
   );
 
@@ -77,13 +83,14 @@ export function ResultScreen({ n }: { n: number }) {
     rememberRoute(`/q/${n}/result`);
     markShown();
     // The card's own words are the part the student acts on, so they are said too (not only the verdict). They
-    // name what was covered, so the verdict isn't followed by a count as well.
+    // name what was covered, so the verdict isn't followed by a count as well. "Didn't catch that" is followed
+    // by its reason.
     const card = saved.feedback ? feedbackText(saved.feedback, saved.covered ?? []) : undefined;
     announce(
       saved.feedback?.kind === 'timedOut'
         ? `${timedOut} Tap the mic to try again.`
         : saved.verdict === 'notCaught'
-          ? verdictWord.notCaught
+          ? `${verdictWord.notCaught} ${card ?? ''} Tap the mic to try again.`
           : `${verdictWord[saved.verdict]} ${card ?? ''}`.trim(),
     );
   }, [n, router, markShown, feedbackText]);
@@ -175,7 +182,10 @@ export function ResultScreen({ n }: { n: number }) {
                 <div className="result__toggle">
                   <InputModeToggle inputMode="voice" micBlocked={false} onInputModeChange={(mode) => mode === 'keyboard' && setMode('keyboard')} />
                 </div>
-                <MicButton listeningState="idle" interactionState="ready" onClick={() => router.push(`/q/${n}/recording`)} />
+                <MicButton listeningState="idle" interactionState="ready" onClick={() => {
+              unlockAudio();
+              router.push(`/q/${n}/recording`);
+            }} />
               </div>
             </>
           )}

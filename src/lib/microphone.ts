@@ -6,11 +6,29 @@
 // to send: a reload drops it, as a reload already drops a take.
 
 export type Recording = {
+  /** The live mic stream, for the voice waveform to listen to. It is the recorder's own: never stop or close it. */
+  stream: MediaStream;
   /** Ends the recording and returns it. */
   stop: () => Promise<Blob>;
   /** Ends the recording and throws it away. */
   cancel: () => void;
 };
+
+let audioContext: AudioContext | null = null;
+
+/**
+ * The one audio context the voice waveform listens through. Call `unlockAudio()` inside a tap (the mic buttons
+ * do) so Safari lets it run; the waveform resumes it again when it starts.
+ */
+export function unlockAudio(): AudioContext | null {
+  try {
+    audioContext ??= new AudioContext();
+    if (audioContext.state === 'suspended') void audioContext.resume();
+    return audioContext;
+  } catch {
+    return null;
+  }
+}
 
 /** Asks for the mic (the browser's prompt, the first time) and lets it go at once. False when it's blocked. */
 export async function requestMic(): Promise<boolean> {
@@ -38,6 +56,7 @@ export async function startRecording(): Promise<Recording> {
   const release = () => stream.getTracks().forEach((track) => track.stop());
   recorder.start();
   return {
+    stream,
     stop: () =>
       new Promise((resolve) => {
         recorder.onstop = () => {
