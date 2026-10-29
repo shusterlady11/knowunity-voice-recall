@@ -100,6 +100,16 @@ Web prototype styled as iOS: 390px, dark mode only.
 - recordingGlow's 4 static resting-state rings are retired, replaced outright by the ripple/breathing motion, because static lines carry no information — the motion should move in unison with the speaker's actual voice pattern as real-time feedback, and anything extraneous shouldn't appear.
 - recordingGlow in the usability-test build (2026-09-29): the two filled circles breathe per docs/recordingglow-listening-spec.md §3, and the two outline rings are removed. There are no ripples and no real mic level. The blur values (20px, 2px) sit in tokens/motion.json as part of the animation. The rest of that spec (ripples, mic level, ripple color) waits for the full rebuild. Figma doesn't have to match the code's animation exactly, because Figma can't hold motion.
 
+## User test findings
+
+Things a real student said or did that are not decisions yet. Each is research for the designer and team to weigh; none of them is being built. Move one to Decisions when it is decided.
+
+- First remote test (2026-10-28, one student, a teenager, on an iPhone):
+  - Prefers typing. He said he would never speak out loud. Typing is a full path (same judge, hints and reply card), but a new session still opens in voice mode with the mic primer first, so a student who won't speak reaches typing only by refusing the mic or finding the toggle. Open questions: ask "speak or type?" before question 1, or remember the last mode between sessions. One student is not yet a pattern.
+  - Wanted a way to make questions harder: a difficulty slider, or an option to ask for a harder question, with the questions getting harder as a session went on. He found them too easy. Today each topic has five fixed questions in a fixed order, so nothing adapts; a control needs a design, a component and more questions.
+  - Wanted more applied, real-world questions, such as word problems, not only definitions. This is content, not app work: the judge grades against a question's key ideas, so any question written in the existing shape works.
+  - Wanted questions that combine ideas or take several steps; he called the ones he saw "very baseline". Also content: each step needs its own key idea, and the hints and the "You got X" wording work unchanged.
+
 ## Not building
 - Streaming transcription or a real-time voice API (push-to-talk sends the whole take on stop; see Real recall engine)
 - Native iOS behavior
