@@ -47,5 +47,8 @@ export type Topic = {
 /** The transcript for an "I don't know" take. */
 export const idkTranscript = 'I don’t know.';
 
-/** What the result card says when a slow take gave up waiting (2026-10-12): the delay was ours, not the student's audio. */
-export const timedOut = 'That took longer than it should. Let’s try again.';
+/**
+ * What the result card says when the judge took too long or failed (2026-10-12; reworded 2026-10-28 after a
+ * missing server key read as "Didn't catch that"): the fault was ours, not the student's answer or audio.
+ */
+export const timedOut = 'Something went wrong on our side, not with your answer. Try again, or type your answer.';

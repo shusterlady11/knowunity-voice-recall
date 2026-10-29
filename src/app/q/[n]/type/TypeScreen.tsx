@@ -12,7 +12,7 @@ import { bold } from '../../../../content/bold';
 import { endQuestion, questionRecord, questionRoute, rememberRoute, updateSession, useSession, useTopic, type Session } from '../../../../lib/session';
 import { announce } from '../../../../lib/announcer';
 import { useQuestionEnter } from '../../../../lib/questionEnter';
-import { cardState, replyMessage } from '../../replyCard';
+import { cardStateFor, replyMessage } from '../../replyCard';
 import { ExitConfirm } from '../../ExitConfirm';
 import '../../exitConfirm.css';
 import './type.css';
@@ -37,7 +37,7 @@ export function TypeScreen({ n, startTyping }: { n: number; startTyping: boolean
   // A retry after a partial, wrong or not-caught take keeps Knowie's last reply under the question, so the
   // student can build on it while they type. Nothing on a question not yet answered, or a correct one.
   const last = session?.questions[n];
-  const reply = last?.verdict && last.verdict !== 'correct' && last.feedback ? { verdict: last.verdict, message: replyMessage(questions[n - 1], last.feedback, last.covered ?? []) } : null;
+  const reply = last?.verdict && last.verdict !== 'correct' && last.feedback ? { state: cardStateFor(last.verdict, last.feedback), message: replyMessage(questions[n - 1], last.feedback, last.covered ?? []) } : null;
 
   const replyText = reply?.message;
 
@@ -139,7 +139,7 @@ export function TypeScreen({ n, startTyping }: { n: number; startTyping: boolean
       middleContent={
         <div className="type__content" inert={leaving}>
           <MiddleSection topic={topic} intro={intro} question={bold(questions[n - 1].prompt)} showIntro={showIntro} animateIn={animateIn} />
-          {reply && <AnswerCard state={cardState[reply.verdict]} message={reply.message} />}
+          {reply && <AnswerCard state={reply.state} message={reply.message} />}
         </div>
       }
       bottomContent={

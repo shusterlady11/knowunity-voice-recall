@@ -3,6 +3,7 @@
 
 import { timedOut, type Question } from '../../content/questions';
 import { fillHint, type Feedback, type Verdict } from '../../lib/recallEngine';
+import type { AnswerCardState } from '../../components/answerCard/AnswerCard';
 
 export const cardState: Record<Verdict, 'answer-correct' | 'answer-partial' | 'answer-error' | 'answer-notcaught'> = {
   correct: 'answer-correct',
@@ -10,6 +11,14 @@ export const cardState: Record<Verdict, 'answer-correct' | 'answer-partial' | 'a
   wrong: 'answer-error',
   notCaught: 'answer-notcaught',
 };
+
+/**
+ * The card's look for a judged take. A take that timed out or failed on our side gets the plain card, with no
+ * "Didn't catch that" pill, since that pill says the student wasn't clear.
+ */
+export function cardStateFor(verdict: Verdict, feedback: Feedback): AnswerCardState {
+  return feedback.kind === 'timedOut' ? 'Default' : cardState[verdict];
+}
 
 // Why a take wasn't caught: nothing heard at all, or something the judge couldn't make out.
 export const notCaughtReason = { silent: 'I didn’t hear anything.', unclear: 'I couldn’t understand that take.' };

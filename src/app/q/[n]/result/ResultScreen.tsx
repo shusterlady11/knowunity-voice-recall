@@ -12,7 +12,7 @@ import { InputModeToggle } from '../../../../components/inputModeToggle/InputMod
 import { BottomCTA } from '../../../../components/bottomCTA/BottomCTA';
 import { ChatInput } from '../../../../components/chatInput/ChatInput';
 import { timedOut } from '../../../../content/questions';
-import { cardState, replyMessage } from '../../replyCard';
+import { cardStateFor, replyMessage } from '../../replyCard';
 import { bold } from '../../../../content/bold';
 import { type Feedback, type Verdict } from '../../../../lib/recallEngine';
 import { announce } from '../../../../lib/announcer';
@@ -66,7 +66,7 @@ export function ResultScreen({ n }: { n: number }) {
     const card = saved.feedback ? feedbackText(saved.feedback, saved.covered ?? []) : undefined;
     announce(
       saved.feedback?.kind === 'timedOut'
-        ? `${timedOut} Tap the mic to try again.`
+        ? timedOut
         : saved.verdict === 'notCaught'
           ? `${verdictWord.notCaught} ${card ?? ''} Tap the mic to try again.`
           : `${verdictWord[saved.verdict]} ${card ?? ''}`.trim(),
@@ -148,7 +148,7 @@ export function ResultScreen({ n }: { n: number }) {
       middleContent={
         <div className="result__content" inert={blocked}>
           <MiddleSection topic={topic} question={bold(question.prompt)} showIntro={false} animateIn={animateIn} />
-          <AnswerCard state={cardState[verdict]} message={message} />
+          <AnswerCard state={cardStateFor(verdict, feedback)} message={message} />
         </div>
       }
       bottomContent={

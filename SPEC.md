@@ -151,7 +151,7 @@ A different code starts a new session for it. An unknown code shows "This link d
 - **States** (changed 2026-10-12, Figma frame 15917:17457):
   - Thinking, for at least 1.2s: the mic is replaced by three violet dots on a dark disc. There is no "Thinking..." card and no skeleton; the wait is the button itself, with "Thinking…" in the `TapToAnswer` line above it (added back 2026-10-27, designer).
   - "Taking a moment…", from ~4s, only for a `slow` take, replacing "Thinking…" in the `TapToAnswer` line above the mic (where "Tap to submit…" sits on the dictating screen).
-  - Fallback at ~10s: goes to the result as "didn't catch that", with the card saying "That took longer than it should. Let's try again." (the caption below already says what to tap) instead of "I couldn't understand that take", because the wait was ours, not the student's audio.
+  - Fallback at ~10s: goes to the result as a plain card, with no "Didn't catch that" pill, saying "Something went wrong on our side, not with your answer. Try again, or type your answer." (reworded 2026-10-28; a failed judge shows the same) instead of "I couldn't understand that take", because the wait was ours, not the student's audio.
 - **Components:**
   - `AppBar`, hidden but keeping its height, as on the dictating screen: it fades back in with the result. `TopicPill`, `MascotSlot` 2XL, `AnswerCard` `question`.
   - `MicButton` `idle` / `thinking` (it holds the loading dots; `LoadingDots` is used inside it)
